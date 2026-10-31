@@ -90,3 +90,25 @@ def test_backstop_runs_when_decider_fails():
     hb = Heartbeat(Down(), WorkingMemory(), caps, rules, context)
     tick = asyncio.run(hb.on_event(Event("speech", 0, "s1", 1, "Surgeon", "Start closing the fascia.")))
     assert tick["decider_error"] and hb.memory.get("phase") == "closing"
+
+
+def test_failed_capability_is_flagged_and_retried():
+    class Flaky(RuleAgent):
+        calls = 0
+
+        async def run(self, system, user, tools, max_steps=4, stop_after_tools=False):
+            if "record_count_event" in {x.name for x in tools}:
+                Flaky.calls += 1
+                if Flaky.calls == 1:
+                    raise RuntimeError("429 free usage limit")
+            return await super().run(system, user, tools, max_steps, stop_after_tools)
+
+    caps, rules = pack(Flaky(), FixtureVision())
+    hb = Heartbeat(ScriptedDecider(intuition), WorkingMemory(), caps, rules, context)
+
+    async def go():
+        await hb.on_event(Event("speech", 0, "s1", 1, "Scrub nurse", "Initial count, ten lap sponges on the field."))
+        assert "unrecorded_count_lines" in hb.alerts
+        await hb.on_event(Event("speech", 1, "s2", 1, "Surgeon", "Suction, please."))
+    asyncio.run(go())
+    assert ledger(hb.memory)["added"] == 10 and "unrecorded_count_lines" not in hb.alerts

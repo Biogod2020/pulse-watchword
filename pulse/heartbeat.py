@@ -75,6 +75,8 @@ class Heartbeat:
         self.context = context
         self.alerts: dict[str, Alert] = {}
         self.trace: list[dict] = []
+        self.pending: list[tuple[Capability, Event, int]] = []   # failed runs waiting for a retry
+        self.max_attempts = 3
 
     @staticmethod
     def fires(cap: Capability, q: Question, d: Decision | None) -> tuple[bool, float | None]:
@@ -117,10 +119,14 @@ class Heartbeat:
                 woke = woke or go
             if woke:
                 fired.append(c)
-        ctx = TickContext(self.memory, ev)
-        outs = await asyncio.gather(*[c.run(ctx) for c in fired], return_exceptions=True)
-        results = {c.name: (o if not isinstance(o, BaseException) else {"error": f"{type(o).__name__}: {o}"})
-                   for c, o in zip(fired, outs)}
+        jobs = [(c, ev, 1) for c in fired] + self._due_retries()
+        outs = await asyncio.gather(*[c.run(TickContext(self.memory, e)) for c, e, _ in jobs], return_exceptions=True)
+        results = {}
+        for (c, e, attempt), o in zip(jobs, outs):
+            name = c.name if e is ev else f"{c.name} (retry {attempt - 1} for {e.seg_id or e.kind})"
+            failed = isinstance(o, BaseException) or (isinstance(o, dict) and "error" in o)
+            results[name] = {"error": f"{type(o).__name__}: {o}"} if isinstance(o, BaseException) else o
+            self._track(c, e, attempt, failed)
         raised, cleared = self._run_rules(ev)
         tick = {"t": ev.t, "event": {"kind": ev.kind, "seg_id": ev.seg_id, "rev": ev.rev, "speaker": ev.speaker,
                                      "text": ev.text, "data": ev.data},
@@ -131,6 +137,23 @@ class Heartbeat:
                 "tick_ms": (time.perf_counter() - t0) * 1e3, "memory_version": self.memory.version}
         self.trace.append(tick)
         return tick
+
+    def _due_retries(self) -> list[tuple[Capability, Event, int]]:
+        """Re-run failed capabilities whose input is still current; a revised segment drops its old retry."""
+        due, self.pending = self.pending, []
+        return [(c, e, n + 1) for c, e, n in due
+                if e.kind != "speech" or self.memory.is_current(Evidence("speech", e.seg_id, e.rev))]
+
+    def _track(self, cap: Capability, ev: Event, attempt: int, failed: bool) -> None:
+        key = f"pending.{cap.name}.{ev.seg_id or ev.kind}"
+        if not failed:
+            self.memory.facts.pop(key, None)
+            return
+        evidence = [Evidence("speech", ev.seg_id, ev.rev, ev.text)] if ev.kind == "speech" else []
+        self.memory.put(key, {"capability": cap.name, "attempts": attempt, "text": ev.text,
+                              "gave_up": attempt >= self.max_attempts}, evidence, "derived", ev.t)
+        if attempt < self.max_attempts:
+            self.pending.append((cap, ev, attempt))
 
     def _run_rules(self, ev: Event) -> tuple[list[dict], list[str]]:
         current: dict[str, Alert] = {}

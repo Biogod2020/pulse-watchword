@@ -60,7 +60,8 @@ def ledger(m: WorkingMemory) -> dict:
     events = m.facts_with_prefix("count.event.")
     added = sum(f.value["quantity"] for f in events if f.value["direction"] == "added")
     removed = sum(f.value["quantity"] for f in events if f.value["direction"] == "removed")
-    return {"added": added, "called_out": removed, "on_field_by_callout": added - removed,
+    pending = [f.value["text"] for f in m.facts_with_prefix("pending.extract_count.")]
+    return {"added": added, "called_out": removed, "on_field_by_callout": added - removed, "unrecorded": pending,
             "counter_bag_camera": m.get("count.vision.bag"), "phase": m.get("phase", "operating"),
             "events": [{"key": f.key, **f.value, "from": f.evidence[0].ref, "rev": f.evidence[0].rev}
                        for f in events]}
@@ -184,6 +185,10 @@ def pack(agent: AgentProvider, vision: VisionCounter) -> tuple[list[Capability],
             alerts.append(Alert("callout_vs_camera", "warning",
                                 f"Call-outs say {led['called_out']} sponges in the counter bag; camera counts {bag}.",
                                 [e["from"] for e in led["events"] if e["direction"] == "removed"]))
+        if led["unrecorded"]:
+            alerts.append(Alert("unrecorded_count_lines", "warning",
+                                f"{len(led['unrecorded'])} count line(s) not yet recorded: "
+                                + "; ".join(led["unrecorded"]), []))
         if led["phase"] == "closing" and (led["on_field_by_callout"] != 0 or alerts):
             alerts.append(Alert("unreconciled_at_closure", "high",
                                 f"Closing with count not reconciled: {led['added']} added, {led['called_out']} called "
