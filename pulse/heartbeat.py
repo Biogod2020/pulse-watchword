@@ -82,7 +82,7 @@ class Heartbeat:
             return False, None
         if d.probs:
             p = d.probs.get(q.options[0], 0.0)
-            return p >= cap.threshold, p
+            return p >= (q.threshold if q.threshold is not None else cap.threshold), p
         return d.choice == q.options[0], None
 
     def _apply(self, ev: Event) -> list[str]:

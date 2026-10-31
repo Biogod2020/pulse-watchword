@@ -22,6 +22,11 @@ class Question:
     id: str
     ask: str
     options: list[str] = field(default_factory=lambda: ["yes", "no"])
+    kind: str = "choice"            # choice | noul (djev's native yes/no read; options must be yes/no)
+    requires: str | None = None     # hierarchical: asked only after this question fired
+    scope: str = "context"          # which state the provider reads: context | event
+    criteria: dict[str, str] | None = None   # optional definition per option (djev choice criteria)
+    threshold: float | None = None           # overrides the capability threshold for this question
 
 
 @dataclass
@@ -117,8 +122,10 @@ class DjevDecider:
         for i in range(0, len(questions), self.CHUNK):
             part = questions[i:i + self.CHUNK]
             body = {"model": self.model, "state": context, "samples": 1,
-                    "questions": {q.id: {"type": "choice", "instructions": q.ask,
-                                         "criteria": {o: None for o in q.options}} for q in part}}
+                    "questions": {q.id: ({"type": "noul", "instructions": q.ask} if q.kind == "noul" else
+                                         {"type": "choice", "instructions": q.ask,
+                                          "criteria": {o: (q.criteria or {}).get(o) for o in q.options}})
+                                  for q in part}}
             try:
                 r = await self.client.post(self.url + "/v1/systemone", json=body)
             except httpx.HTTPError as e:
@@ -127,7 +134,11 @@ class DjevDecider:
                 raise ProviderError(f"{r.status_code}: {r.text[:300]}")
             for q in part:
                 a = r.json()["answers"][q.id]
-                decisions[q.id] = Decision(q.id, a["choice"], {k: float(v) for k, v in a["probabilities"].items()})
+                if q.kind == "noul":
+                    p = float(a["noul"])
+                    decisions[q.id] = Decision(q.id, "yes" if p >= 0.5 else "no", {"yes": p, "no": 1 - p})
+                else:
+                    decisions[q.id] = Decision(q.id, a["choice"], {k: float(v) for k, v in a["probabilities"].items()})
         return DecisionBatch(decisions, (time.perf_counter() - t) * 1e3, self.name, calibrated=True)
 
 

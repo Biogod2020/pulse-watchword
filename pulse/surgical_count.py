@@ -28,17 +28,31 @@ class FixtureVision:
         return {"count": int(frame["sponges_in_bag"]), "frame": frame.get("frame", ""), "detail": "fixture label"}
 
 
+# Question design follows what worked on djev (see eval_triggers.py and runs/trigger_eval*.json):
+# native yes/no reads, one fixed prefix that pins the subject to the utterance being judged, narrow
+# questions with explicit exclusions, and per-question thresholds. A broad "is this about sponges?"
+# gate was the weakest question in every design, so the pack asks its specific questions directly.
+PREFIX = "Does this utterance itself "
+
+
+def _q(qid: str, text: str, threshold: float | None = None) -> Question:
+    return Question(qid, PREFIX + text, kind="noul", threshold=threshold)
+
+
 TRIGGERS = {
-    "sponges_added": Question("sponges_added", "Does the NEWEST line report sponges being opened or added to the "
-                                               "field, including an initial count?"),
-    "sponges_out": Question("sponges_out", "Does the NEWEST line report sponges being taken out and put into the "
-                                           "counter bag?"),
-    "recount": Question("recount", "Do the LINES SINCE THE LAST CAMERA COUNT report sponges going into the "
-                                   "counter bag?"),
-    "verify": Question("verify", "Does the NEWEST line ask to check or verify the sponge count?"),
-    "closing": Question("closing", "Does the NEWEST line say the team is starting to close (fascia, wound or "
-                                   "skin closure)?"),
-    "query": Question("query", "Is the NEWEST line addressed to the assistant, asking it for information?"),
+    "added": _q("added", "report new sponges being opened, handed onto the field or added to the count, including "
+                         "an initial count? Not using or asking for a sponge already on the field, and not a "
+                         "restated total."),
+    "out": _q("out", "report used sponges being taken off the field into the counter bag? Not sponges packed or "
+                     "left inside the patient, and not a restated total."),
+    "verify": _q("verify", "ask, as a question or request, for the sponge count to be checked or reported? Not a "
+                           "statement that the count is correct."),
+    "closing": _q("closing", "say the surgical team is starting to close the incision (fascia, wound or skin "
+                             "closure)? Not closing a door, and not 'close' meaning near."),
+    "assistant": _q("assistant", "directly address the assistant, asking it for information or to record "
+                                 "something? Not a question or request to another team member.", threshold=0.8),
+    "recount": Question("recount", "Do the LINES SINCE THE LAST CAMERA COUNT report used sponges going into the "
+                                   "counter bag?", kind="noul", threshold=0.3),  # a missed recount costs more than a spare one
 }
 
 
@@ -54,20 +68,22 @@ def ledger(m: WorkingMemory) -> dict:
 
 def context(m: WorkingMemory, ev: Event, alerts: dict[str, Alert]) -> str:
     led = ledger(m)
+    bag = led["counter_bag_camera"]
     lines = [f"PHASE: {led['phase']}",
-             f"SPONGE LEDGER: added {led['added']}, called out {led['called_out']}, "
-             f"counter bag seen by camera: {led['counter_bag_camera'] if led['counter_bag_camera'] is not None else 'not yet counted'}",
-             "OPEN ALERTS: " + ("; ".join(a.text for a in alerts.values()) or "none"),
-             "TRANSCRIPT (oldest to newest):"]
-    lines += [f"[{s.seg_id}] {s.speaker}: {s.text}" for s in m.recent(6)]
-    seen = m.facts.get("count.vision.bag")
-    since = [m.segments[x] for x in m.order if seen is None or m.segments[x].t > seen.t]
-    lines.append("LINES SINCE THE LAST CAMERA COUNT:")
-    lines += [f"[{s.seg_id}] {s.speaker}: {s.text}" for s in since[-6:]] or ["(none)"]
+             f"SPONGE LEDGER: added {led['added']}, called out {led['called_out']}, counter bag seen by camera: "
+             f"{bag if bag is not None else 'not yet counted'}",
+             "OPEN ALERTS: " + ("; ".join(a.text for a in alerts.values()) or "none")]
     if ev.kind == "speech":
-        lines.append(f"NEWEST LINE: [{ev.seg_id}] {ev.speaker}: {ev.text}")
+        earlier = [s for s in m.recent(7) if s.seg_id != ev.seg_id][-6:]
+        lines += ["", "EARLIER TRANSCRIPT (context only):"]
+        lines += [f"{s.speaker}: {s.text}" for s in earlier] or ["(none)"]
+        lines += ["", f"THIS UTTERANCE: {ev.speaker}: {ev.text}"]
     else:
-        lines.append(f"NEWEST EVENT: new {ev.kind} frame {ev.data.get('frame', '')} (no speech)")
+        seen = m.facts.get("count.vision.bag")
+        since = [m.segments[x] for x in m.order if seen is None or m.segments[x].t > seen.t]
+        lines += ["", "LINES SINCE THE LAST CAMERA COUNT:"]
+        lines += [f"{s.speaker}: {s.text}" for s in since[-6:]] or ["(none)"]
+        lines += ["", f"THIS EVENT: new camera frame {ev.data.get('frame', '')} of the counter bag (no speech)"]
     return "\n".join(lines)
 
 
@@ -141,11 +157,11 @@ def pack(agent: AgentProvider, vision: VisionCounter) -> tuple[list[Capability],
         return {"agent": agent.name, "answer": run.text, "agent_ms": run.latency_ms, "calls": run.tool_calls}
 
     caps = [
-        Capability("extract_count", [TRIGGERS["sponges_added"], TRIGGERS["sponges_out"]], extract_count, kind="agent"),
+        Capability("extract_count", [TRIGGERS["added"], TRIGGERS["out"]], extract_count, kind="agent"),
         Capability("vision_recount", [TRIGGERS["recount"]], vision_recount, on=("vision",), kind="vision"),
         Capability("verify_recount", [TRIGGERS["verify"]], vision_recount, kind="vision"),
         Capability("set_closing", [TRIGGERS["closing"]], set_closing, kind="state"),
-        Capability("answer_query", [TRIGGERS["query"]], answer_query, kind="agent"),
+        Capability("answer_query", [TRIGGERS["assistant"]], answer_query, kind="agent"),
     ]
 
     closing_words = re.compile(r"\b(clos(e|ing)|fascia|skin staples?)\b", re.I)

@@ -13,15 +13,15 @@ WORDS = {"two": 2, "three": 3, "four": 4, "ten": 10}
 
 
 def newest(ctx: str) -> str:
-    m = re.search(r"NEWEST (LINE|EVENT): (.*)", ctx)
+    m = re.search(r"THIS (UTTERANCE|EVENT): (.*)", ctx)
     return m.group(2).lower() if m else ""
 
 
 def intuition(ctx: str, q) -> dict:
     line = newest(ctx)
-    yes = {"sponges_added": any(w in line for w in ("count, ten", "opening")),
-           "sponges_out": " out" in line, "recount": "frame" in line, "verify": "verify" in line,
-           "closing": "closing" in line, "query": "assistant" in line}[q.id]
+    yes = {"added": any(w in line for w in ("count, ten", "opening")),
+           "out": " out" in line, "recount": "frame" in line, "verify": "verify" in line,
+           "closing": "closing" in line, "assistant": "assistant" in line}[q.id]
     return {"yes": 0.9, "no": 0.1} if yes else {"yes": 0.05, "no": 0.95}
 
 
