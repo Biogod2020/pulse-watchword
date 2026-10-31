@@ -1,0 +1,17 @@
+{
+  "id": "or_sponge_count",
+  "note": "Synthetic, scripted operating-room count. No patient data. Frame counts are labels for the fixture vision provider until SAM 3.1 is connected.",
+  "events": [
+    {"t": 0,   "kind": "speech", "seg_id": "s1", "speaker": "Scrub nurse", "text": "Initial count, ten lap sponges on the field."},
+    {"t": 40,  "kind": "speech", "seg_id": "s2", "speaker": "Surgeon", "text": "Suction, please. A little more retraction."},
+    {"t": 95,  "kind": "speech", "seg_id": "s3", "speaker": "Circulator", "text": "Two sponges out, they're in the counter bag."},
+    {"t": 100, "kind": "vision", "data": {"frame": "f1", "sponges_in_bag": 2}},
+    {"t": 150, "kind": "speech", "seg_id": "s4", "speaker": "Scrub nurse", "text": "Opening three more sponges."},
+    {"t": 152, "kind": "speech", "seg_id": "s4", "rev": 2, "speaker": "Scrub nurse", "text": "Opening two more sponges."},
+    {"t": 210, "kind": "speech", "seg_id": "s5", "speaker": "Surgeon", "text": "I'm packing two sponges here for now, leave them in."},
+    {"t": 300, "kind": "speech", "seg_id": "s6", "speaker": "Circulator", "text": "Four more out into the bag."},
+    {"t": 305, "kind": "vision", "data": {"frame": "f2", "sponges_in_bag": 5}},
+    {"t": 380, "kind": "speech", "seg_id": "s7", "speaker": "Surgeon", "text": "Okay, let's start closing the fascia."},
+    {"t": 390, "kind": "speech", "seg_id": "s8", "speaker": "Surgeon", "text": "Assistant, where are we on the sponge count?"}
+  ]
+}
