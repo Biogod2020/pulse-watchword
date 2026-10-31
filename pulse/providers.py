@@ -12,6 +12,7 @@ import json
 import re
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Awaitable, Callable, Protocol
 
 import httpx
@@ -22,7 +23,7 @@ class Question:
     id: str
     ask: str
     options: list[str] = field(default_factory=lambda: ["yes", "no"])
-    kind: str = "choice"            # choice | noul (djev's native yes/no read; options must be yes/no)
+    kind: str = "choice"            # choice | noul (native yes/no read) | span (short free text, e.g. a caption)
     requires: str | None = None     # hierarchical: asked only after this question fired
     scope: str = "context"          # which state the provider reads: context | event
     criteria: dict[str, str] | None = None   # optional definition per option (djev choice criteria)
@@ -47,7 +48,8 @@ class DecisionBatch:
 class DecisionProvider(Protocol):
     name: str
 
-    async def decide(self, context: str, questions: list[Question]) -> DecisionBatch: ...
+    async def decide(self, context: str, questions: list[Question],
+                     images: list[str] | None = None) -> DecisionBatch: ...
 
 
 class ProviderError(RuntimeError):
@@ -82,7 +84,10 @@ class OpenAICompatDecider:
         self.client = httpx.AsyncClient(timeout=timeout, trust_env=False,
                                         headers={"Authorization": f"Bearer {api_key}"})
 
-    async def decide(self, context: str, questions: list[Question]) -> DecisionBatch:
+    async def decide(self, context: str, questions: list[Question],
+                     images: list[str] | None = None) -> DecisionBatch:
+        if images:
+            raise ProviderError(f"{self.name} is text-only here; route image questions to a vision decider")
         listing = "\n".join(f"- {q.id}: {q.ask} Options: {', '.join(q.options)}" for q in questions)
         body = {"model": self.model, "temperature": 0, "max_tokens": 40 * len(questions) + 40,
                 "messages": [{"role": "system", "content": DECIDE_SYSTEM},
@@ -110,22 +115,31 @@ class DjevDecider:
 
     CHUNK = 10  # djev changes its answer format above ten questions per read
 
+    @staticmethod
+    def _wire(q: Question) -> dict:
+        if q.kind == "noul":
+            return {"type": "noul", "instructions": q.ask}
+        if q.kind == "span":
+            return {"type": "span", "instructions": q.ask, "criteria": {"max_tokens": 32}}
+        return {"type": "choice", "instructions": q.ask,
+                "criteria": {o: (q.criteria or {}).get(o) for o in q.options}}
+
     def __init__(self, url: str, model: str = "dgemma", timeout: float = 30.0):
         self.url = url.rstrip("/")
         self.model = model
         self.name = "djev"
         self.client = httpx.AsyncClient(timeout=timeout, trust_env=False)
 
-    async def decide(self, context: str, questions: list[Question]) -> DecisionBatch:
+    async def decide(self, context: str, questions: list[Question],
+                     images: list[str] | None = None) -> DecisionBatch:
         t = time.perf_counter()
         decisions: dict[str, Decision] = {}
         for i in range(0, len(questions), self.CHUNK):
             part = questions[i:i + self.CHUNK]
             body = {"model": self.model, "state": context, "samples": 1,
-                    "questions": {q.id: ({"type": "noul", "instructions": q.ask} if q.kind == "noul" else
-                                         {"type": "choice", "instructions": q.ask,
-                                          "criteria": {o: (q.criteria or {}).get(o) for o in q.options}})
-                                  for q in part}}
+                    "questions": {q.id: self._wire(q) for q in part}}
+            if images:
+                body["images"] = images[:1]   # the current deployment accepts one image per read
             try:
                 r = await self.client.post(self.url + "/v1/systemone", json=body)
             except httpx.HTTPError as e:
@@ -134,12 +148,24 @@ class DjevDecider:
                 raise ProviderError(f"{r.status_code}: {r.text[:300]}")
             for q in part:
                 a = r.json()["answers"][q.id]
-                if q.kind == "noul":
+                if q.kind == "span":
+                    decisions[q.id] = Decision(q.id, (a.get("text") or "").strip() if a.get("found", True) else "")
+                elif q.kind == "noul":
                     p = float(a["noul"])
                     decisions[q.id] = Decision(q.id, "yes" if p >= 0.5 else "no", {"yes": p, "no": 1 - p})
                 else:
                     decisions[q.id] = Decision(q.id, a["choice"], {k: float(v) for k, v in a["probabilities"].items()})
         return DecisionBatch(decisions, (time.perf_counter() - t) * 1e3, self.name, calibrated=True)
+
+
+def _image_url(path: str) -> str:
+    import base64
+    import mimetypes
+    mime = mimetypes.guess_type(path)[0] or "image/png"
+    return f"data:{mime};base64," + base64.b64encode(Path(path).read_bytes()).decode()
+
+
+image_url = _image_url
 
 
 class ScriptedDecider:
@@ -149,7 +175,8 @@ class ScriptedDecider:
         self.fn = fn
         self.name = name
 
-    async def decide(self, context: str, questions: list[Question]) -> DecisionBatch:
+    async def decide(self, context: str, questions: list[Question],
+                     images: list[str] | None = None) -> DecisionBatch:
         decisions = {}
         calibrated = True
         for q in questions:

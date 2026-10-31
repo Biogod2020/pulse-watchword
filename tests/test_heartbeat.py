@@ -6,7 +6,7 @@ from pathlib import Path
 from pulse.heartbeat import Event, Heartbeat
 from pulse.memory import Evidence, WorkingMemory
 from pulse.providers import AgentRun, ScriptedDecider
-from pulse.surgical_count import FixtureVision, context, ledger, pack
+from pulse.packs.surgical_count import FixtureVision, context, ledger, pack
 
 SCENARIO = json.loads((Path(__file__).parent.parent / "scenarios/or_sponge_count.json").read_text())
 WORDS = {"two": 2, "three": 3, "four": 4, "ten": 10}

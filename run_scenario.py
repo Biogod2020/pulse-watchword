@@ -14,7 +14,7 @@ from pathlib import Path
 from pulse.heartbeat import Event, Heartbeat
 from pulse.memory import WorkingMemory
 from pulse.providers import DjevDecider, OpenAICompatAgent, OpenAICompatDecider
-from pulse.surgical_count import FixtureVision, context, ledger, pack
+from pulse.packs.surgical_count import FixtureVision, context, ledger, pack
 
 PROXY = "http://127.0.0.1:4002/v1"
 NO_THINKING = {"thinking": {"type": "disabled"}}

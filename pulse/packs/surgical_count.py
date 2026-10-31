@@ -9,9 +9,9 @@ from __future__ import annotations
 import re
 from typing import Protocol
 
-from .heartbeat import Alert, Capability, Event, Rule, TickContext
-from .memory import Evidence, WorkingMemory
-from .providers import AgentProvider, Question, Tool
+from ..heartbeat import Alert, Capability, Event, Rule, TickContext
+from ..memory import Evidence, WorkingMemory
+from ..providers import AgentProvider, Question, Tool
 
 
 class VisionCounter(Protocol):

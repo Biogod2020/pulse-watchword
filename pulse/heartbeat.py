@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from typing import Awaitable, Callable
 
 from .memory import Evidence, WorkingMemory
-from .providers import Decision, DecisionProvider, Question
+from .providers import Decision, DecisionProvider, Question, image_url
 
 
 @dataclass
@@ -49,6 +49,7 @@ class Capability:
     threshold: float = 0.5      # minimum P(yes) when the provider is calibrated
     on: tuple[str, ...] = ("speech",)
     kind: str = "agent"         # agent | vision | state — shown in the UI
+    dynamic: Callable[[WorkingMemory], list[Question]] | None = None   # extra triggers built from memory
 
 
 @dataclass
@@ -67,12 +68,18 @@ class Rule:
 
 class Heartbeat:
     def __init__(self, decider: DecisionProvider, memory: WorkingMemory, capabilities: list[Capability],
-                 rules: list[Rule], context: Callable[[WorkingMemory, Event, dict[str, Alert]], str]):
+                 rules: list[Rule], context: Callable[[WorkingMemory, Event, dict[str, Alert]], str],
+                 perceive: Callable[[Event], Awaitable[None]] | None = None,
+                 remember: Callable[[Event], Awaitable[None]] | None = None):
+        """perceive: enrich a raw event before the read (e.g. caption a frame).
+        remember: write the event to long-term memory after the tick."""
         self.decider = decider
         self.memory = memory
         self.capabilities = capabilities
         self.rules = rules
         self.context = context
+        self.perceive = perceive
+        self.remember = remember
         self.alerts: dict[str, Alert] = {}
         self.trace: list[dict] = []
         self.pending: list[tuple[Capability, Event, int]] = []   # failed runs waiting for a retry
@@ -97,21 +104,28 @@ class Heartbeat:
 
     async def on_event(self, ev: Event) -> dict:
         t0 = time.perf_counter()
+        perceive_ms = 0.0
+        if self.perceive:
+            tp = time.perf_counter()
+            await self.perceive(ev)
+            perceive_ms = (time.perf_counter() - tp) * 1e3
         invalidated = self._apply(ev)
         eligible = [c for c in self.capabilities if ev.kind in c.on]
+        triggers = {c.name: c.triggers + (c.dynamic(self.memory) if c.dynamic else []) for c in eligible}
         decisions: dict[str, Decision] = {}
         read_ms, provider, calibrated, error = 0.0, self.decider.name, None, None
         if eligible:
             try:
+                images = [image_url(ev.data["image"])] if ev.kind == "vision" and ev.data.get("image") else None
                 batch = await self.decider.decide(self.context(self.memory, ev, self.alerts),
-                                                  [q for c in eligible for q in c.triggers])
+                                                  [q for c in eligible for q in triggers[c.name]], images)
                 decisions, read_ms, calibrated = batch.decisions, batch.latency_ms, batch.calibrated
             except Exception as e:  # the backstop rules still run when the intuition layer is down
                 error = f"{type(e).__name__}: {e}"
         asked, fired = [], []
         for c in eligible:
             woke = False
-            for q in c.triggers:
+            for q in triggers[c.name]:
                 go, p = self.fires(c, q, decisions.get(q.id))
                 d = decisions.get(q.id)
                 asked.append({"capability": c.name, "question": q.id, "choice": d.choice if d else None,
@@ -128,8 +142,17 @@ class Heartbeat:
             results[name] = {"error": f"{type(o).__name__}: {o}"} if isinstance(o, BaseException) else o
             self._track(c, e, attempt, failed)
         raised, cleared = self._run_rules(ev)
+        remember_ms, remember_error = 0.0, None
+        if self.remember:
+            tr = time.perf_counter()
+            try:
+                await self.remember(ev)
+            except Exception as e:  # long-term memory is best effort; the tick's decisions still stand
+                remember_error = f"{type(e).__name__}: {e}"
+            remember_ms = (time.perf_counter() - tr) * 1e3
         tick = {"t": ev.t, "event": {"kind": ev.kind, "seg_id": ev.seg_id, "rev": ev.rev, "speaker": ev.speaker,
                                      "text": ev.text, "data": ev.data},
+                "perceive_ms": perceive_ms, "remember_ms": remember_ms, "remember_error": remember_error,
                 "invalidated": invalidated, "provider": provider, "calibrated": calibrated, "read_ms": read_ms,
                 "decider_error": error, "asked": asked, "results": results,
                 "alerts_raised": raised, "alerts_cleared": cleared,

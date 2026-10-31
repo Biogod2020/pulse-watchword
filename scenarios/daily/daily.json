@@ -1,0 +1,18 @@
+{
+  "id": "daily_evening",
+  "note": "Synthetic evening at home. Frames are GPT Image renders of a first-person view (frames/p*.txt hold the prompts).",
+  "events": [
+    {"t": 0,   "kind": "speech", "seg_id": "s1", "speaker": "User", "text": "I'll send Maya the slides by Friday."},
+    {"t": 8,   "kind": "speech", "seg_id": "s2", "speaker": "Roommate", "text": "Can you water the basil tonight? It looks dry."},
+    {"t": 15,  "kind": "speech", "seg_id": "s3", "speaker": "User", "text": "Sure, I'll do it after dinner."},
+    {"t": 30,  "kind": "vision", "data": {"frame": "f1", "image": "scenarios/daily/frames/f1.png"}},
+    {"t": 60,  "kind": "vision", "data": {"frame": "f2", "image": "scenarios/daily/frames/f2.png"}},
+    {"t": 75,  "kind": "speech", "seg_id": "s4", "speaker": "Roommate", "text": "This pasta is really good."},
+    {"t": 90,  "kind": "speech", "seg_id": "s5", "speaker": "User", "text": "Actually, I'll send Maya the slides on Thursday instead."},
+    {"t": 120, "kind": "vision", "data": {"frame": "f4", "image": "scenarios/daily/frames/f4.png"}},
+    {"t": 150, "kind": "vision", "data": {"frame": "f3", "image": "scenarios/daily/frames/f3.png"}},
+    {"t": 200, "kind": "speech", "seg_id": "s6", "speaker": "User", "text": "Hey assistant, where did I put my glasses?"},
+    {"t": 210, "kind": "speech", "seg_id": "s7", "speaker": "User", "text": "Assistant, did I water the basil today?"},
+    {"t": 220, "kind": "speech", "seg_id": "s8", "speaker": "User", "text": "Assistant, what's still on my list?"}
+  ]
+}
