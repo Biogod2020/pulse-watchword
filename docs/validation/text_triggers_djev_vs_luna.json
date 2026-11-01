@@ -1,0 +1,26 @@
+{
+ "djev": {
+  "errors": {
+   "added": 0,
+   "out": 0,
+   "verify": 1,
+   "closing": 0,
+   "assistant": 2
+  },
+  "total": 3,
+  "p50_ms": 53,
+  "p95_ms": 58
+ },
+ "luna": {
+  "errors": {
+   "added": 0,
+   "out": 0,
+   "verify": 0,
+   "closing": 0,
+   "assistant": 1
+  },
+  "total": 1,
+  "p50_ms": 360,
+  "p95_ms": 569
+ }
+}

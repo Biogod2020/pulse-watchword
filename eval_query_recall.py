@@ -14,7 +14,7 @@ from pathlib import Path
 
 import httpx
 
-from pulse.providers import DjevDecider, Question, image_url
+from pulse.providers import DjevDecider, LunaDecider, Question, image_url
 from run_video import grade_places, load_puts
 
 
@@ -23,6 +23,7 @@ async def main(a):
     by_t = {int(f.stem.split("_")[1]) - 1: f for f in frames}
     puts = [p for p in load_puts(a.annotations, a.video_id, 0, len(frames)) if p["place"]]
     djev = DjevDecider(a.djev_url)
+    judge = LunaDecider() if a.provider == "luna" else djev
     client = httpx.AsyncClient(timeout=60, trust_env=False)
     sem = asyncio.Semaphore(6)
 
@@ -30,7 +31,7 @@ async def main(a):
         async with sem:
             q = Question("v", f"Does this image itself clearly show a {noun} (the object itself, not just a similar "
                               f"object)?", kind="noul")
-            b = await djev.decide("A first-person kitchen camera image.", [q], [image_url(str(f))])
+            b = await judge.decide("A first-person kitchen camera image.", [q], [image_url(str(f))])
             return b.decisions["v"].probs["yes"]
 
     async def where(noun: str, f: Path) -> str:
@@ -74,6 +75,8 @@ async def main(a):
                "settings": {"window_s": a.window, "delay_s": a.delay, "threshold": a.threshold, "max_checks": a.max_checks}}
     Path(a.out).write_text(json.dumps({"summary": summary, "results": results}, ensure_ascii=False, indent=1))
     print(json.dumps(summary, indent=1))
+    if a.provider == "luna":
+        print("luna spend total $%.4f" % judge.spent)
     for r in results:
         print(f"{r['narration']:36} -> {r['answer_place']!s:18} p={r['visible_p']} match={r.get('place_match')}")
 
@@ -92,4 +95,5 @@ if __name__ == "__main__":
     p.add_argument("--grader-url", default="http://127.0.0.1:8317/v1")
     p.add_argument("--grader-key-file", default="/home1/jijh/tools/cliproxyapi/local_api_key")
     p.add_argument("--out", default="runs/video_query_recall_5min.json")
+    p.add_argument("--provider", choices=["djev", "luna"], default="djev")
     asyncio.run(main(p.parse_args()))

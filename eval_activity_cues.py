@@ -13,7 +13,7 @@ import json
 import time
 from pathlib import Path
 
-from pulse.providers import DjevDecider, Question, image_url
+from pulse.providers import DjevDecider, LunaDecider, Question, image_url
 from run_video import ts
 
 S = "Does this image itself show "
@@ -50,7 +50,8 @@ async def main(a):
     frames = sorted(Path(a.frames).glob("f_*.jpg"))
     n = len(frames)
     rows = [r for r in csv.DictReader(open(a.annotations)) if r["video_id"] == a.video_id]
-    djev, sem = DjevDecider(a.djev_url), asyncio.Semaphore(6)
+    djev = LunaDecider() if a.provider == "luna" else DjevDecider(a.djev_url)
+    sem = asyncio.Semaphore(a.concurrency)
     qs = [Question(k, v[0], kind="noul") for k, v in CUES.items()]
 
     async def read(f):
@@ -84,6 +85,8 @@ async def main(a):
         print(f"{k:13} events={len(wins):3d} base={base:.2f} auc={report['cues'][k]['auc']} best={best}", flush=True)
     Path(a.out).write_text(json.dumps(report, indent=1))
     print("wall", round(wall), "s; read p50", report["read_ms_p50"], "ms (6 cues per read)")
+    if a.provider == "luna":
+        print("luna spend total $%.4f" % djev.spent)
 
 
 if __name__ == "__main__":
@@ -93,4 +96,6 @@ if __name__ == "__main__":
     p.add_argument("--annotations", default="/cwStorage/home/jijh/pulse_data/epic/EPIC_100_train.csv")
     p.add_argument("--djev-url", default="http://127.0.0.1:18811")
     p.add_argument("--out", default="runs/activity_cues_full.json")
+    p.add_argument("--provider", choices=["djev", "luna"], default="djev")
+    p.add_argument("--concurrency", type=int, default=6)
     asyncio.run(main(p.parse_args()))

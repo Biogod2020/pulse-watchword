@@ -23,7 +23,7 @@ from pydantic import BaseModel
 
 from pulse.heartbeat import Capability, Heartbeat
 from pulse.memory import WorkingMemory
-from pulse.providers import DjevDecider, OpenAICompatAgent, Question, Tool
+from pulse.providers import DjevDecider, LunaDecider, OpenAICompatAgent, Question, Tool
 from pulse.recall import where_is
 from pulse.triggers import EdgeTrigger, StateTracker
 from pulse.video import ChangeFilter, video_events
@@ -64,7 +64,8 @@ def build_runtime() -> None:
     cues = [Question(q.id, q.ask, kind="noul", threshold=0.0) for _, q, _ in ACTIVITIES.values()]
     hb = Heartbeat(djev, WorkingMemory(), [Capability("activities", cues, nothing, on=("vision",), kind="vision")],
                    [], lambda m, ev, a: "A first-person kitchen camera image.")
-    STATE.update(djev=djev, hb=hb, seen=[], now=0.0, answers=[], activity_log=[],
+    recall_judge = LunaDecider() if CFG.get("recall_judge") == "luna" else djev
+    STATE.update(djev=djev, recall_judge=recall_judge, hb=hb, seen=[], now=0.0, answers=[], activity_log=[],
                  trackers={k: make() for k, (_, _, make) in ACTIVITIES.items()},
                  counters={"sampled": 0, "judged": 0, "noticed": 0, "brain_calls": 0, "judge_reads": 0})
 
@@ -137,7 +138,7 @@ async def ask(req: AskIn):
 
     async def find_object(args: dict) -> dict:
         noun = str(args.get("object", "")).strip().lower()
-        s = await where_is(noun, STATE["seen"], STATE["now"], STATE["djev"], CFG["djev_url"], window_s=req.window_s)
+        s = await where_is(noun, STATE["seen"], STATE["now"], STATE["recall_judge"], CFG["djev_url"], window_s=req.window_s)
         STATE["counters"]["judge_reads"] += s.frames_scanned
         out = {"object": noun, "found": s.found, "place": s.place, "seen_at_s": s.t, "frame": s.frame,
                "confidence": s.visible_p, "frames_scanned": s.frames_scanned, "now_s": STATE["now"]}
@@ -200,7 +201,9 @@ if __name__ == "__main__":
     p.add_argument("--frames", required=True)
     p.add_argument("--djev-url", default="http://127.0.0.1:18811")
     p.add_argument("--port", type=int, default=18900)
+    p.add_argument("--recall-judge", choices=["djev", "luna"], default="djev",
+                   help="judge used to scan frames for find_object (luna = OpenAI Decisions API, ~$0.002 per question)")
     a = p.parse_args()
-    CFG.update(frames=a.frames, djev_url=a.djev_url)
+    CFG.update(frames=a.frames, djev_url=a.djev_url, recall_judge=a.recall_judge)
     build_runtime()
     uvicorn.run(app, host="127.0.0.1", port=a.port, log_level="warning")

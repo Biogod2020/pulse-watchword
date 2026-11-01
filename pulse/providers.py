@@ -264,3 +264,56 @@ class OpenAICompatAgent:
             if stop_after_tools:
                 return AgentRun("", trace, (time.perf_counter() - t) * 1e3, step)
         return AgentRun("", trace, (time.perf_counter() - t) * 1e3, max_steps)
+
+class BudgetExceeded(ProviderError):
+    pass
+
+
+class LunaDecider:
+    """OpenAI Decisions API (POST /v1/decisions) with gpt-6-luna: typed choices with probabilities.
+
+    Cost is tracked from returned usage at the published rate ($0.10 / M input tokens, $0.01 cached, output free,
+    retrieved 2026-10-29); calls stop with BudgetExceeded once `budget_usd` would be crossed.
+    """
+    RATE_IN, RATE_CACHED = 0.10 / 1e6, 0.01 / 1e6
+
+    def __init__(self, key_file: str = "~/.config/pulse/openai_key", model: str = "gpt-6-luna",
+                 budget_usd: float = 8.0, timeout: float = 60.0, ledger: str | None = None):
+        key = Path(key_file).expanduser().read_text().strip()
+        self.model, self.name, self.budget = model, f"openai:{model}", budget_usd
+        self.client = httpx.AsyncClient(base_url="https://api.openai.com/v1", timeout=timeout,
+                                        headers={"Authorization": f"Bearer {key}"})
+        self.ledger = Path(ledger).expanduser() if ledger else Path("~/.config/pulse/luna_spend.json").expanduser()
+        self.spent = json.loads(self.ledger.read_text())["usd"] if self.ledger.exists() else 0.0
+        self.calls = 0
+
+    @staticmethod
+    def _wire(q: Question) -> dict:
+        options = q.options if q.kind != "noul" else ["yes", "no"]
+        return {"type": "choice", "name": q.id, "instructions": q.ask,
+                "choices": [{"value": o, "description": (q.criteria or {}).get(o) or o.capitalize()} for o in options]}
+
+    async def decide(self, context: str, questions: list[Question],
+                     images: list[str] | None = None) -> DecisionBatch:
+        if self.spent >= self.budget:
+            raise BudgetExceeded(f"Luna budget reached: ${self.spent:.4f} of ${self.budget}")
+        inp: object = context
+        if images:
+            inp = [{"role": "user", "content": [{"type": "input_text", "text": context}] +
+                    [{"type": "input_image", "image_url": u} for u in images]}]
+        t = time.perf_counter()
+        r = await self.client.post("/decisions", json={"model": self.model, "input": inp,
+                                                        "questions": [self._wire(q) for q in questions]})
+        if r.status_code != 200:
+            raise ProviderError(f"{r.status_code}: {r.text[:300]}")
+        d = r.json()
+        u = d.get("usage", {})
+        cached = u.get("input_tokens_details", {}).get("cached_tokens", 0)
+        self.spent += (u.get("input_tokens", 0) - cached) * self.RATE_IN + cached * self.RATE_CACHED
+        self.calls += 1
+        self.ledger.write_text(json.dumps({"usd": self.spent, "calls_this_process": self.calls}))
+        decisions = {}
+        for a in d.get("answers", []):
+            probs = {p["value"]: float(p["probability"]) for p in a.get("probabilities", [])}
+            decisions[a["name"]] = Decision(a["name"], a.get("choice") or max(probs, key=probs.get), probs)
+        return DecisionBatch(decisions, (time.perf_counter() - t) * 1e3, self.name, calibrated=True)
