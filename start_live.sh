@@ -7,7 +7,7 @@ PY=${PY:-../medcopilot/.venv/bin/python}
 GPU=${GPU:-jijh@192.168.17.113}
 up() { (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null; }
 
-for port in 18811 18831; do
+for port in 18831; do
   if ! up "$port"; then
     echo "port $port is down; opening a tunnel to $GPU"
     ssh -F /dev/null -f -N -o BatchMode=yes -o ConnectTimeout=8 -o ExitOnForwardFailure=yes \

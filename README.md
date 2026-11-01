@@ -21,7 +21,7 @@ Tell your camera, in plain words, what to watch for. When it happens, Pulse save
 shareable card (1080x1350) and a 9:16 reel, and you can ask "where did I leave my keys?" afterwards.
 
     # on headcw
-    ./start_live.sh                      # checks judge tunnels :18811/:18831, brain :8317, verifier key
+    ./start_live.sh                      # checks the judge tunnel :18831, brain :8317, verifier key
     # on your own computer
     ssh -L 18900:127.0.0.1:18900 headcw
     # then open http://localhost:18900 (browsers allow the camera on localhost)

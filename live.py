@@ -466,7 +466,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--port", type=int, default=18900)
     p.add_argument("--host", default="127.0.0.1")
-    p.add_argument("--djev-url", default="http://127.0.0.1:18811", help="frame judge for where-is scans")
+    p.add_argument("--djev-url", default="http://127.0.0.1:18831", help="frame judge for where-is scans (same server as clips)")
     p.add_argument("--video-djev-url", default="http://127.0.0.1:18831", help="video-capable judge for clips")
     p.add_argument("--data", default="/cwStorage/home/jijh/pulse_data/live")
     p.add_argument("--verifier", choices=["luna", "none"], default="luna",
