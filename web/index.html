@@ -35,52 +35,54 @@ main{display:grid;grid-template-columns:1.3fr .9fr 1fr;gap:12px;padding:12px;hei
 .ans img{width:100%;border-radius:8px;margin-top:6px}
 .note{font-size:11.5px;color:#94a3b8;margin-top:8px}
 </style></head><body>
-<header><h1>Pulse</h1><span class="sub">第一人称视频 · EPIC-KITCHENS-100 P12_101（CC BY-NC 4.0）</span>
+<header><h1>Pulse</h1><span class="sub">第一人称视频流 · EPIC-KITCHENS-100 P12_101（CC BY-NC 4.0）</span>
 <div class="ctl">从第 <input id="start" value="180"> 秒 · <input id="speed" value="6"> 倍速 <button id="go">开始回放</button></div></header>
 <main>
 <section class="panel"><h2>第一人称画面</h2>
   <div id="view"><img id="img" alt=""><span id="badge">等待开始</span><span id="clock">00:00</span></div>
-  <div class="counters"><div><b id="c-s">0</b><span>看过的画面</span></div><div><b id="c-r">0</b><span>判断员判断次数</span></div>
-  <div><b id="c-n">0</b><span>注意到的事</span></div><div><b id="c-b">0</b><span>叫醒大脑</span></div></div>
+  <div class="counters" style="grid-template-columns:repeat(5,1fr)"><div><b id="c-s">0</b><span>采集画面（4 帧/秒）</span></div><div><b id="c-r">0</b><span>2 秒视频片段判断</span></div>
+  <div><b id="c-n">0</b><span>注意到的事</span></div><div><b id="c-st">0</b><span id="c-mb">存下的画面</span></div><div><b id="c-b">0</b><span>叫醒大脑</span></div></div>
   <div id="strip"></div>
-  <div class="legend">每格一秒：<i style="background:#1e3a8a"></i>判断员看过<i style="background:#f59e0b"></i>在搅拌<i style="background:#06b6d4"></i>洗东西<i style="background:#f97316"></i>拧旋钮</div>
-  <div class="note">判断员每秒看一帧，一次同时判断三件事，约 0.5 秒；大脑只在你提问时才工作。</div>
+  <div class="legend">每格一秒：<i style="background:#1e3a8a"></i>只在内存里<i style="background:#f59e0b"></i>在搅拌<i style="background:#06b6d4"></i>洗东西<i style="background:#f97316"></i>拧旋钮</div>
+  <div class="note">摄像头每秒 4 帧，全部只放在内存里（最近 3 分钟）。每秒把最近 2 秒打包成一段视频，判断员一次看完、同时判断三件事。只有注意到事情的画面、回答用到的画面和每 30 秒一张关键帧会存到硬盘。大脑只在你提问时才工作。</div>
 </section>
 <section class="panel"><h2>心跳：判断员每秒同时盯三件事</h2>
   <div class="lanes"><div class="lane"><span style="color:#22d3ee">在水槽洗东西</span><div id="l-washing" class="spark"></div></div>
   <div class="lane"><span style="color:#fbbf24">在锅里搅拌</span><div id="l-stirring" class="spark"></div></div>
   <div class="lane"><span style="color:#fb923c">拧水龙头/灶台旋钮</span><div id="l-tap_or_knob" class="spark"></div></div></div>
   <h2 style="margin-top:12px">注意到的事</h2><div id="stream"></div>
-  <div class="note">只盯真实视频上验证过、判断得准的活动：洗东西（判断准确率 86%）、搅拌、拧旋钮（58%）。“放下东西的瞬间”验证下来判断不准，所以不在这里显示。</div></section>
+  <div class="note">只盯真实视频上验证过的活动（2 秒片段、前 10 分钟）：洗东西 7 次提示全对、搅拌、拧旋钮 40% 准。“放下东西的瞬间”无论帧率高低都判断不准，所以不显示。</div></section>
 <section class="panel"><h2>问它：东西放哪了？</h2>
   <div id="ask"><input id="q" placeholder="例如：Where did I put the knife?"><button id="askb">问</button></div>
   <div class="chips"><span>Where did I put the knife?</span><span>Where is the meat?</span><span>When did I last stir the pot?</span><span>Did I wash anything recently?</span></div>
   <div id="answers"></div>
-  <div class="note">提问时，大脑调用 find_object：判断员往回扫描最近 90 秒的画面，找到最后一次清楚看到它的地方。真实视频验证中全片答对 28/53。</div>
+  <div class="note">提问时，大脑调用 find_object：判断员先扫描内存里最近 90 秒的画面，找不到再查存下的关键帧。真实视频验证中全片答对 28/53。</div>
 </section>
 </main>
 <script>
 const $=id=>document.getElementById(id);const mmss=t=>String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0');
 let ws,last=null;function connect(){ws=new WebSocket((location.protocol==='https:'?'wss':'ws')+'://'+location.host+'/ws');ws.onmessage=e=>on(JSON.parse(e.data));ws.onclose=()=>setTimeout(connect,1000)}connect();
-function setC(c){$('c-s').textContent=c.sampled;$('c-r').textContent=c.judge_reads;$('c-n').textContent=c.noticed;$('c-b').textContent=c.brain_calls}
+function setC(c,u){$('c-s').textContent=c.captured;$('c-r').textContent=c.clips;$('c-n').textContent=c.noticed;$('c-st').textContent=c.stored;$('c-b').textContent=c.brain_calls;
+ if(u)$('c-mb').textContent=`存下的画面 · ${(u.blob_bytes/1e6).toFixed(2)} MB`}
 function on(m){
- if(m.type==='frame'){$('img').src='/frames/'+m.frame;$('clock').textContent=mmss(m.t);$('badge').textContent='判断员在看';$('badge').style.background='#1e3a8a';
-   last=document.createElement('i');last.style.background='#1e3a8a';$('strip').appendChild(last);while($('strip').children.length>200)$('strip').firstChild.remove()}
+ if(m.type==='frame'){$('img').src='/frames/'+m.frame;$('clock').textContent=mmss(m.t)}
  if(m.type==='tick'){const col={washing:'#06b6d4',stirring:'#f59e0b',tap_or_knob:'#f97316'};
+   last=document.createElement('i');last.style.background='#1e3a8a';if(m.stored)last.style.outline='1px solid #e5e7eb';$('strip').appendChild(last);while($('strip').children.length>200)$('strip').firstChild.remove();
+   if(!m.events.length){$('badge').textContent='判断员在看 2 秒片段';$('badge').style.background='#1e3a8a'}
    for(const k in m.probs){const sp=$('l-'+k);if(!sp)continue;const i=document.createElement('i');i.style.height=Math.max(2,m.probs[k]*30)+'px';i.style.background=(m.active[k]||m.events.some(e=>e.activity===k))?col[k]:'#334155';sp.appendChild(i);while(sp.children.length>110)sp.firstChild.remove()}
    if(m.active.stirring&&last)last.style.background='#f59e0b';
    for(const e of m.events){if(last&&e.kind!=='stop')last.style.background=col[e.activity];const r=document.createElement('div');r.className='ev';
      const verb=e.kind==='start'?'开始':e.kind==='stop'?'停止':'';r.innerHTML=`<span>${mmss(e.t)}</span><span style="color:${col[e.activity]}">${verb}${e.label}</span>`;$('stream').prepend(r);
      if(e.kind!=='stop'){$('badge').textContent='注意到：'+e.label;$('badge').style.background=col[e.activity]}}
-   setC(m.counters)}
- if(m.type==='done'){$('badge').textContent='回放结束';setC(m.counters)}
+   setC(m.counters,m.usage)}
+ if(m.type==='done'){$('badge').textContent='回放结束';setC(m.counters,m.usage)}
 }
 $('go').onclick=async()=>{$('stream').innerHTML='';$('strip').innerHTML='';for(const k of['washing','stirring','tap_or_knob'])$('l-'+k).innerHTML='';
  await fetch('/api/replay',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({start:+$('start').value,minutes:0,speed:+$('speed').value})})};
 async function askQ(q){const box=document.createElement('div');box.className='ans';box.innerHTML=`<div class="q">问：${q}</div><div class="a">大脑思考中，判断员在回看画面…</div>`;$('answers').prepend(box);
  const r=await (await fetch('/api/ask',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({question:q})})).json();
- const e=r.evidence||{};setC(r.counters);
- box.innerHTML=`<div class="q">问：${q}</div><div class="a">${r.answer}</div><div class="m">大脑 ${r.model} · ${(r.ms/1000).toFixed(1)} 秒 · 判断员回看 ${e.frames_scanned||0} 帧`+(e.found?` · 在 ${mmss(e.seen_at_s)} 看到（把握 ${(e.confidence*100).toFixed(0)}%）`:'')+`</div>`+(e.frame?`<img src="/frames/${e.frame}.jpg">`:'')}
+ const e=r.evidence||{};setC(r.counters,r.usage);
+ box.innerHTML=`<div class="q">问：${q}</div><div class="a">${r.answer}</div><div class="m">大脑 ${r.model} · ${(r.ms/1000).toFixed(1)} 秒 · 判断员回看 ${e.frames_scanned||0} 帧`+(e.found?` · 在 ${mmss(e.seen_at_s)} 看到（把握 ${(e.confidence*100).toFixed(0)}%，来自${e.source}）`:'')+`</div>`+(e.frame?`<img src="/frames/${e.frame}">`:'')}
 $('askb').onclick=()=>{const q=$('q').value.trim();if(q)askQ(q)};$('q').addEventListener('keydown',e=>{if(e.key==='Enter')$('askb').click()});
 document.querySelectorAll('.chips span').forEach(s=>s.onclick=()=>askQ(s.textContent));
 </script></body></html>

@@ -49,3 +49,17 @@ def test_edge_and_state_triggers():
     s = StateTracker(on=0.95, off=0.7, min_on=3)
     out = [s.update(t, p) for t, p in enumerate([0.96, 0.97, 0.99, 0.8, 0.75, 0.6, 0.99])]
     assert out == [None, None, "start", None, None, "stop", None] and s.started_at == 0
+
+
+def test_ring_clip_and_keep_policy(tmp_path):
+    from pulse.stream import FrameRing, KeepPolicy, make_clip
+    ring = FrameRing(seconds=3)
+    paths = [img(tmp_path / f"f{i}.jpg", 12 * i) for i in range(20)]
+    for i, p in enumerate(paths):
+        ring.add(i * 0.25, str(p))
+    assert ring.frames[0][0] >= 4.75 - 3 and len(ring.last(2)) == 8
+    assert len(ring.sampled(1.0)) == 4
+    url = make_clip(ring.last(2), 4, tmp_path / "c.mp4")
+    assert url.startswith("data:video/mp4;base64,") and (tmp_path / "c.mp4").stat().st_size > 0
+    k = KeepPolicy(keyframe_s=30)
+    assert [k.decide(t, n) for t, n in [(0, False), (1, False), (2, True), (31, False)]] == ["keyframe", None, "evidence", "keyframe"]

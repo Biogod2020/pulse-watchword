@@ -1,12 +1,14 @@
-"""Pulse MVP web app: replay a first-person video through the heartbeat and ask where things are.
+"""Pulse MVP web app: a first-person video stream judged as short clips; only meaningful frames are stored.
 
-    python app.py --frames /path/to/frames [--port 18900]
-Open http://127.0.0.1:18900 . The brain is any OpenAI-compatible endpoint, set by environment:
-PULSE_MODEL_BASE_URL / PULSE_MODEL / PULSE_MODEL_KEY_FILE (default: gpt-6-luna via CLIProxyAPI;
-final build: muse-spark-1.3-contributor via the Meta Model API).
+    python app.py --frames /path/to/4fps_frames [--fps 4] [--port 18900]
+Open http://127.0.0.1:18900 .
 
-Every frame gets one fast judge read (the visual cue that scored best on real video). Questions go to the
-brain, which calls find_object: a look-back scan of recent frames by the same judge (pulse/recall.py).
+Every captured frame goes into an in-memory ring (the last 3 minutes). Each second, the newest 2 seconds are
+encoded as a clip and read once by the video-capable judge (djev) with three activity questions; online
+triggers turn the scores into events. Only evidence frames (something noticed, or used in an answer) and one
+keyframe every 30 s are written to disk. "Where is X?" scans the ring first, then stored keyframes.
+The brain is any OpenAI-compatible endpoint: PULSE_MODEL_BASE_URL / PULSE_MODEL / PULSE_MODEL_KEY_FILE
+(default gpt-6-luna via CLIProxyAPI; final build muse-spark-1.3-contributor via the Meta Model API).
 """
 from __future__ import annotations
 
@@ -14,6 +16,7 @@ import argparse
 import asyncio
 import json
 import os
+from collections import deque
 from pathlib import Path
 
 import uvicorn
@@ -21,30 +24,30 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
-from pulse.heartbeat import Capability, Heartbeat
-from pulse.memory import WorkingMemory
+from pulse.longterm import Episode
 from pulse.providers import DjevDecider, LunaDecider, OpenAICompatAgent, Question, Tool
 from pulse.recall import where_is
+from pulse.store import Store
+from pulse.stream import FrameRing, KeepPolicy, make_clip
 from pulse.triggers import EdgeTrigger, StateTracker
-from pulse.video import ChangeFilter, video_events
 
 ROOT = Path(__file__).parent
 app = FastAPI()
 CFG: dict = {}
 STATE: dict = {"clients": set(), "task": None}
 
-# Activities the judge tracks reliably on real first-person video (eval_activity_cues.py, EPIC P12_101):
-# washing AUC 0.82 (edge 86% precise), stirring AUC 0.89 (state), tap/knob AUC 0.80 (edge 58% precise).
-# "Putting down" (AUC 0.62, below random as a trigger over the full video) is deliberately not tracked.
-S = "Does this image itself show "
+# Validated on EPIC P12_101 with 2 s clips every 1 s (eval_video_windows.py; thresholds tuned on minutes 0-10):
+# washing event AUC 0.98 (edge 0.2: 7/7 correct), stirring 1.00 (state 0.95/0.7), tap/knob 0.84 (edge 0.4: 40%).
+V = "Does this video itself show "
 ACTIVITIES = {
-    "washing": ("在水槽洗东西", Question("washing", S + "hands washing or rinsing something under running water at a "
-                                                     "sink?", kind="noul"), lambda: EdgeTrigger(0.9, 5)),
-    "stirring": ("在锅里搅拌", Question("stirring", S + "someone stirring food in a pot or pan with a spoon or "
-                                                     "spatula?", kind="noul"), lambda: StateTracker(0.95, 0.7, 3)),
-    "tap_or_knob": ("拧水龙头/灶台旋钮", Question("tap_or_knob", S + "a hand turning a tap, a stove knob or a "
-                                                              "switch?", kind="noul"), lambda: EdgeTrigger(0.5, 5)),
+    "washing": ("在水槽洗东西", V + "hands washing or rinsing something under running water at a sink?",
+                lambda: EdgeTrigger(0.2, 4)),
+    "stirring": ("在锅里搅拌", V + "someone stirring food in a pot or pan with a spoon or spatula?",
+                 lambda: StateTracker(0.95, 0.7, 2)),
+    "tap_or_knob": ("拧水龙头/灶台旋钮", V + "a hand turning a tap, a stove knob or a switch?",
+                    lambda: EdgeTrigger(0.4, 4)),
 }
+QUESTIONS = [Question(k, q, kind="noul") for k, (_, q, _) in ACTIVITIES.items()]
 
 
 def model_agent() -> OpenAICompatAgent:
@@ -55,19 +58,19 @@ def model_agent() -> OpenAICompatAgent:
 
 
 def build_runtime() -> None:
-    djev = DjevDecider(CFG["djev_url"])
-
-    async def nothing(ctx) -> dict:
-        return {}
-
-    # threshold 0 so every score is reported; the temporal triggers below decide what counts as an event
-    cues = [Question(q.id, q.ask, kind="noul", threshold=0.0) for _, q, _ in ACTIVITIES.values()]
-    hb = Heartbeat(djev, WorkingMemory(), [Capability("activities", cues, nothing, on=("vision",), kind="vision")],
-                   [], lambda m, ev, a: "A first-person kitchen camera image.")
-    recall_judge = LunaDecider() if CFG.get("recall_judge") == "luna" else djev
-    STATE.update(djev=djev, recall_judge=recall_judge, hb=hb, seen=[], now=0.0, answers=[], activity_log=[],
+    # Each replay gets a fresh store directory; the previous run's connection is closed first (on NFS an open
+    # SQLite file blocks deleting its directory).
+    if STATE.get("store") is not None:
+        STATE["store"].db.close()
+    import time
+    store = Store(str(Path(CFG["store"]) / f"run_{int(time.time())}"))
+    video_judge = DjevDecider(CFG["video_djev_url"])
+    frame_judge = DjevDecider(CFG["djev_url"])
+    STATE.update(store=store, video_judge=video_judge,
+                 recall_judge=LunaDecider() if CFG.get("recall_judge") == "luna" else frame_judge,
+                 ring=FrameRing(180), keep=KeepPolicy(30), now=0.0, activity_log=[], stored=[],
                  trackers={k: make() for k, (_, _, make) in ACTIVITIES.items()},
-                 counters={"sampled": 0, "judged": 0, "noticed": 0, "brain_calls": 0, "judge_reads": 0})
+                 counters={"captured": 0, "clips": 0, "noticed": 0, "stored": 0, "brain_calls": 0, "judge_reads": 0})
 
 
 async def broadcast(msg: dict) -> None:
@@ -78,38 +81,71 @@ async def broadcast(msg: dict) -> None:
             STATE["clients"].discard(ws)
 
 
-async def replay(start: float, minutes: float, speed: float) -> None:
-    frames = sorted(Path(CFG["frames"]).glob("f_*.jpg"))
-    end = start + minutes * 60 if minutes else 1e9
-    frames = [f for f in frames if start <= int(f.stem.split("_")[1]) - 1 < end]
+def store_frame(t: float, path: str, label: str) -> None:
+    store = STATE["store"]
+    store.save_episode(Episode(Path(path).stem, "frame", t, label, path), None, store.put_blob(path))
+    STATE["stored"].append((t, str(store.blob_path(store.put_blob(path))), label))
+    STATE["counters"]["stored"] += 1
+
+
+async def judge_clip(t: float, frames: list[tuple[float, str]]) -> tuple[float, str, dict, float]:
+    clip = Path(CFG["clips"]) / f"live_{t:08.2f}.mp4"
+    url = await asyncio.to_thread(make_clip, frames, CFG["fps"], clip)
+    clip.unlink(missing_ok=True)                      # clips are transient: judged once, never stored
+    clip.with_suffix(".txt").unlink(missing_ok=True)
+    b = await STATE["video_judge"].decide("A 2-second first-person kitchen video.", QUESTIONS, None, [url])
+    return t, frames[len(frames) // 2][1], {k: d.probs["yes"] for k, d in b.decisions.items()}, b.latency_ms
+
+
+def apply_result(t: float, mid: str, probs: dict, read_ms: float) -> dict:
     c = STATE["counters"]
-    flt = ChangeFilter()
-    for ev, path, t, diff in video_events(frames, 1.0, 0.0, flt):
-        loop_start = asyncio.get_running_loop().time()
-        c["sampled"] += 1
-        STATE["seen"].append((t, str(path)))
+    c["clips"] += 1
+    c["judge_reads"] += 1
+    events = []
+    for k, tracker in STATE["trackers"].items():
+        kind = tracker.update(t, probs.get(k, 0.0))
+        if kind:
+            entry = {"activity": k, "label": ACTIVITIES[k][0], "kind": kind, "t": t, "frame": Path(mid).name}
+            STATE["activity_log"].append(entry)
+            events.append(entry)
+            if kind != "stop":
+                c["noticed"] += 1
+    noticed = any(e["kind"] != "stop" for e in events)
+    why = STATE["keep"].decide(t, noticed)
+    if why:
+        store_frame(t, mid, ", ".join(e["label"] for e in events) or "关键帧")
+    return {"type": "tick", "t": t, "frame": Path(mid).name, "probs": probs, "events": events, "stored": why,
+            "active": {k: getattr(tr, "active", False) for k, tr in STATE["trackers"].items()},
+            "read_ms": round(read_ms), "counters": c, "usage": STATE["store"].usage()}
+
+
+async def replay(start: float, minutes: float, speed: float) -> None:
+    fps = CFG["fps"]
+    frames = sorted(Path(CFG["frames"]).glob("f_*.jpg"))
+    t_of = lambda f: (int(f.stem.split("_")[1]) - 1) / fps
+    end = start + minutes * 60 if minutes else 1e9
+    frames = [f for f in frames if start <= t_of(f) < end]
+    ring, c = STATE["ring"], STATE["counters"]
+    inflight: deque = deque()
+    loop = asyncio.get_running_loop()
+    t_start = loop.time()
+    for i, f in enumerate(frames):
+        t = t_of(f)
+        ring.add(t, str(f))
         STATE["now"] = t
-        await broadcast({"type": "frame", "t": t, "frame": path.name, "judged": ev is not None})
-        if ev:
-            tick = await STATE["hb"].on_event(ev)
-            c["judged"] += 1
-            c["judge_reads"] += 1
-            probs = {a["question"]: a["p_yes"] for a in tick["asked"]}
-            events = []
-            for k, tracker in STATE["trackers"].items():
-                kind = tracker.update(t, probs.get(k) or 0.0)
-                if kind:
-                    entry = {"activity": k, "label": ACTIVITIES[k][0], "kind": kind, "t": t, "frame": path.stem}
-                    STATE["activity_log"].append(entry)
-                    events.append(entry)
-                    if kind != "stop":
-                        c["noticed"] += 1
-            await broadcast({"type": "tick", "t": t, "frame": path.name, "probs": probs, "events": events,
-                             "active": {k: getattr(tr, "active", False) for k, tr in STATE["trackers"].items()},
-                             "read_ms": round(tick["read_ms"]), "counters": c})
-        elapsed = asyncio.get_running_loop().time() - loop_start
-        await asyncio.sleep(max(0.0, 1.0 / speed - elapsed))
-    await broadcast({"type": "done", "counters": c})
+        c["captured"] += 1
+        if i % 2 == 0:
+            await broadcast({"type": "frame", "t": t, "frame": f.name})
+        if i % int(fps) == int(fps) - 1 and len(ring.last(2.0)) >= 2 * fps - 1:
+            inflight.append(asyncio.create_task(judge_clip(t, ring.last(2.0))))
+        while inflight and (inflight[0].done() or len(inflight) > 6):
+            await broadcast(apply_result(*(await inflight.popleft())))
+        wait = t_start + (t - start) / speed - loop.time()
+        if wait > 0:
+            await asyncio.sleep(wait)
+    while inflight:
+        await broadcast(apply_result(*(await inflight.popleft())))
+    await broadcast({"type": "done", "counters": c, "usage": STATE["store"].usage()})
 
 
 class ReplayIn(BaseModel):
@@ -138,10 +174,28 @@ async def ask(req: AskIn):
 
     async def find_object(args: dict) -> dict:
         noun = str(args.get("object", "")).strip().lower()
-        s = await where_is(noun, STATE["seen"], STATE["now"], STATE["recall_judge"], CFG["djev_url"], window_s=req.window_s)
-        STATE["counters"]["judge_reads"] += s.frames_scanned
-        out = {"object": noun, "found": s.found, "place": s.place, "seen_at_s": s.t, "frame": s.frame,
-               "confidence": s.visible_p, "frames_scanned": s.frames_scanned, "now_s": STATE["now"]}
+        recent = STATE["ring"].sampled(1.0)
+        s = await where_is(noun, recent, STATE["now"], STATE["recall_judge"], CFG["djev_url"], window_s=req.window_s)
+        scanned, source = s.frames_scanned, "最近画面"
+        if not s.found and STATE["stored"]:
+            older = [(t, p) for t, p, _ in STATE["stored"] if t < STATE["now"] - req.window_s]
+            if older:
+                s2 = await where_is(noun, older, STATE["now"], STATE["recall_judge"], CFG["djev_url"], window_s=1e9)
+                scanned += s2.frames_scanned
+                if s2.found:
+                    s, source = s2, "存下的关键帧"
+        STATE["counters"]["judge_reads"] += scanned
+        frame = None
+        if s.found:
+            hit = next((p for t, p in recent if Path(p).stem == s.frame), None) or \
+                next((p for t, p, _ in STATE["stored"] if Path(p).stem == s.frame), None)
+            if hit:
+                if not any(Path(p).stem == s.frame for _, p, _ in STATE["stored"]):
+                    store_frame(s.t, hit, f"回答依据：{noun}")       # evidence for an answer is kept
+                frame = Path(hit).name if Path(hit).parent == Path(CFG["frames"]) else "blob/" + Path(hit).name
+        out = {"object": noun, "found": s.found, "place": s.place, "seen_at_s": s.t, "frame": frame,
+               "confidence": s.visible_p, "frames_scanned": scanned, "source": source if s.found else None,
+               "now_s": STATE["now"]}
         found.append(out)
         return out
 
@@ -150,34 +204,33 @@ async def ask(req: AskIn):
         log = [e for e in STATE["activity_log"] if not kind or e["activity"] == kind]
         return {"now_s": STATE["now"], "events": [{**e, "ago_s": round(STATE["now"] - e["t"])} for e in log[-12:]]}
 
-    activity_tool = Tool("recent_activities", "What the camera noticed the user doing: washing at the sink, stirring "
-                         "a pot (start/stop), turning a tap or stove knob. Optional filter: washing, stirring or "
-                         "tap_or_knob.", {"type": "object", "properties": {"activity": {"type": "string"}}},
-                         recent_activities)
-    tool = Tool("find_object", "Look back through the last minutes of camera frames for an object; returns where it "
-                "was last seen resting and when (seconds into the recording).",
-                {"type": "object", "properties": {"object": {"type": "string",
-                                                             "description": "short common noun, e.g. knife"}},
-                 "required": ["object"]}, find_object)
+    tools = [Tool("find_object", "Look back through what the camera saw for an object; returns where it was last "
+                  "seen resting and when (seconds into the recording).",
+                  {"type": "object", "properties": {"object": {"type": "string", "description": "short noun"}},
+                   "required": ["object"]}, find_object),
+             Tool("recent_activities", "What the camera noticed the user doing: washing at the sink, stirring a pot "
+                  "(start/stop), turning a tap or stove knob. Optional filter: washing, stirring or tap_or_knob.",
+                  {"type": "object", "properties": {"activity": {"type": "string"}}}, recent_activities)]
     STATE["counters"]["brain_calls"] += 1
     agent = model_agent()
     run = await agent.run("You are an always-on assistant that sees through the user's first-person camera. For "
-                          "questions about where something is, call find_object with a short noun. Answer in one short "
-                          "sentence: the place and how long ago (now_s minus seen_at_s, in seconds). If not found, say "
-                          "you did not see it in the last minutes. For questions about what the user did (washing, "
-                          "stirring, turning the stove or tap), call recent_activities and say how long ago.",
-                          req.question, [tool, activity_tool])
+                          "where-is questions call find_object with a short noun; for questions about what the user "
+                          "did call recent_activities. Answer in one short sentence with the place or activity and "
+                          "how long ago (now_s minus the time, in seconds).", req.question, tools)
     hit = next((f for f in reversed(found) if f["found"]), found[-1] if found else None)
-    answer = {"answer": run.text.strip(), "evidence": hit, "model": agent.name, "ms": round(run.latency_ms),
-              "counters": STATE["counters"]}
-    STATE["answers"].append(answer)
-    return JSONResponse(answer)
+    return JSONResponse({"answer": run.text.strip(), "evidence": hit, "model": agent.name, "ms": round(run.latency_ms),
+                         "counters": STATE["counters"], "usage": STATE["store"].usage()})
 
 
 @app.get("/frames/{name}")
 async def frame(name: str):
-    path = Path(CFG["frames"]) / Path(name).name
-    return FileResponse(path if path.suffix else path.with_suffix(".jpg"))
+    return FileResponse(Path(CFG["frames"]) / Path(name).name)
+
+
+@app.get("/frames/blob/{name}")
+async def blob(name: str):
+    sha = Path(name).stem
+    return FileResponse(STATE["store"].blob_path(sha))
 
 
 @app.get("/")
@@ -199,11 +252,15 @@ async def ws(socket: WebSocket):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--frames", required=True)
-    p.add_argument("--djev-url", default="http://127.0.0.1:18811")
+    p.add_argument("--fps", type=float, default=4)
+    p.add_argument("--djev-url", default="http://127.0.0.1:18811", help="frame judge (recall, place)")
+    p.add_argument("--video-djev-url", default="http://127.0.0.1:18831", help="video-capable judge for clips")
+    p.add_argument("--store", default="/cwStorage/home/jijh/pulse_data/store_live")
+    p.add_argument("--clips", default="/tmp/jijh-pulse-clips")
     p.add_argument("--port", type=int, default=18900)
-    p.add_argument("--recall-judge", choices=["djev", "luna"], default="djev",
-                   help="judge used to scan frames for find_object (luna = OpenAI Decisions API, ~$0.002 per question)")
+    p.add_argument("--recall-judge", choices=["djev", "luna"], default="djev")
     a = p.parse_args()
-    CFG.update(frames=a.frames, djev_url=a.djev_url, recall_judge=a.recall_judge)
+    CFG.update(frames=a.frames, fps=a.fps, djev_url=a.djev_url, video_djev_url=a.video_djev_url, store=a.store,
+               clips=a.clips, recall_judge=a.recall_judge)
     build_runtime()
     uvicorn.run(app, host="127.0.0.1", port=a.port, log_level="warning")

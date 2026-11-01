@@ -49,7 +49,7 @@ class DecisionProvider(Protocol):
     name: str
 
     async def decide(self, context: str, questions: list[Question],
-                     images: list[str] | None = None) -> DecisionBatch: ...
+                     images: list[str] | None = None, videos: list[str] | None = None) -> DecisionBatch: ...
 
 
 class ProviderError(RuntimeError):
@@ -85,9 +85,9 @@ class OpenAICompatDecider:
                                         headers={"Authorization": f"Bearer {api_key}"})
 
     async def decide(self, context: str, questions: list[Question],
-                     images: list[str] | None = None) -> DecisionBatch:
-        if images:
-            raise ProviderError(f"{self.name} is text-only here; route image questions to a vision decider")
+                     images: list[str] | None = None, videos: list[str] | None = None) -> DecisionBatch:
+        if images or videos:
+            raise ProviderError(f"{self.name} is text-only here; route image/video questions to a vision decider")
         listing = "\n".join(f"- {q.id}: {q.ask} Options: {', '.join(q.options)}" for q in questions)
         body = {"model": self.model, "temperature": 0, "max_tokens": 40 * len(questions) + 40,
                 "messages": [{"role": "system", "content": DECIDE_SYSTEM},
@@ -131,7 +131,7 @@ class DjevDecider:
         self.client = httpx.AsyncClient(timeout=timeout, trust_env=False)
 
     async def decide(self, context: str, questions: list[Question],
-                     images: list[str] | None = None) -> DecisionBatch:
+                     images: list[str] | None = None, videos: list[str] | None = None) -> DecisionBatch:
         t = time.perf_counter()
         decisions: dict[str, Decision] = {}
         for i in range(0, len(questions), self.CHUNK):
@@ -139,7 +139,9 @@ class DjevDecider:
             body = {"model": self.model, "state": context, "samples": 1,
                     "questions": {q.id: self._wire(q) for q in part}}
             if images:
-                body["images"] = images[:1]   # the current deployment accepts one image per read
+                body["images"] = images
+            if videos:
+                body["videos"] = videos
             try:
                 r = await self.client.post(self.url + "/v1/systemone", json=body)
             except httpx.HTTPError as e:
@@ -176,7 +178,7 @@ class ScriptedDecider:
         self.name = name
 
     async def decide(self, context: str, questions: list[Question],
-                     images: list[str] | None = None) -> DecisionBatch:
+                     images: list[str] | None = None, videos: list[str] | None = None) -> DecisionBatch:
         decisions = {}
         calibrated = True
         for q in questions:
@@ -294,9 +296,11 @@ class LunaDecider:
                 "choices": [{"value": o, "description": (q.criteria or {}).get(o) or o.capitalize()} for o in options]}
 
     async def decide(self, context: str, questions: list[Question],
-                     images: list[str] | None = None) -> DecisionBatch:
+                     images: list[str] | None = None, videos: list[str] | None = None) -> DecisionBatch:
         if self.spent >= self.budget:
             raise BudgetExceeded(f"Luna budget reached: ${self.spent:.4f} of ${self.budget}")
+        if videos:
+            raise ProviderError("the Decisions API path here takes images, not video; send sampled frames instead")
         inp: object = context
         if images:
             inp = [{"role": "user", "content": [{"type": "input_text", "text": context}] +

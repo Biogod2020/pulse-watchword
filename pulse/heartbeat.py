@@ -20,7 +20,7 @@ from .providers import Decision, DecisionProvider, Question, image_url
 
 @dataclass
 class Event:
-    kind: str                   # speech | vision | timer
+    kind: str                   # speech | vision | clip | timer
     t: float
     seg_id: str = ""
     rev: int = 1
@@ -120,8 +120,9 @@ class Heartbeat:
         if eligible:
             try:
                 images = [image_url(ev.data["image"])] if ev.kind == "vision" and ev.data.get("image") else None
+                videos = [ev.data["video_url"]] if ev.kind == "clip" and ev.data.get("video_url") else None
                 batch = await self.decider.decide(self.context(self.memory, ev, self.alerts),
-                                                  [q for c in eligible for q in triggers[c.name]], images)
+                                                  [q for c in eligible for q in triggers[c.name]], images, videos)
                 decisions, read_ms, calibrated = batch.decisions, batch.latency_ms, batch.calibrated
             except Exception as e:  # the backstop rules still run when the intuition layer is down
                 error = f"{type(e).__name__}: {e}"

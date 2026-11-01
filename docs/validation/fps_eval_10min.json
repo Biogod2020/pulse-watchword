@@ -1,0 +1,122 @@
+{
+ "washing": {
+  "events": 18,
+  "negatives": 272,
+  "median_event_s": 0.94,
+  "1fps": {
+   "event_auc": 0.916,
+   "events_without_a_frame": 0,
+   "reads_per_min": 60
+  },
+  "2fps": {
+   "event_auc": 0.957,
+   "events_without_a_frame": 0,
+   "reads_per_min": 120
+  },
+  "4fps": {
+   "event_auc": 0.98,
+   "events_without_a_frame": 0,
+   "reads_per_min": 240
+  }
+ },
+ "stirring": {
+  "events": 8,
+  "negatives": 46,
+  "median_event_s": 8.92,
+  "1fps": {
+   "event_auc": 0.997,
+   "events_without_a_frame": 0,
+   "reads_per_min": 60
+  },
+  "2fps": {
+   "event_auc": 1.0,
+   "events_without_a_frame": 0,
+   "reads_per_min": 120
+  },
+  "4fps": {
+   "event_auc": 1.0,
+   "events_without_a_frame": 0,
+   "reads_per_min": 240
+  }
+ },
+ "pouring": {
+  "events": 7,
+  "negatives": 156,
+  "median_event_s": 2.52,
+  "1fps": {
+   "event_auc": 0.966,
+   "events_without_a_frame": 0,
+   "reads_per_min": 60
+  },
+  "2fps": {
+   "event_auc": 0.959,
+   "events_without_a_frame": 0,
+   "reads_per_min": 120
+  },
+  "4fps": {
+   "event_auc": 0.959,
+   "events_without_a_frame": 0,
+   "reads_per_min": 240
+  }
+ },
+ "opening": {
+  "events": 26,
+  "negatives": 217,
+  "median_event_s": 1.18,
+  "1fps": {
+   "event_auc": 0.658,
+   "events_without_a_frame": 0,
+   "reads_per_min": 60
+  },
+  "2fps": {
+   "event_auc": 0.625,
+   "events_without_a_frame": 0,
+   "reads_per_min": 120
+  },
+  "4fps": {
+   "event_auc": 0.719,
+   "events_without_a_frame": 0,
+   "reads_per_min": 240
+  }
+ },
+ "tap_or_knob": {
+  "events": 18,
+  "negatives": 264,
+  "median_event_s": 0.96,
+  "1fps": {
+   "event_auc": 0.794,
+   "events_without_a_frame": 0,
+   "reads_per_min": 60
+  },
+  "2fps": {
+   "event_auc": 0.823,
+   "events_without_a_frame": 0,
+   "reads_per_min": 120
+  },
+  "4fps": {
+   "event_auc": 0.862,
+   "events_without_a_frame": 0,
+   "reads_per_min": 240
+  }
+ },
+ "putting_down": {
+  "events": 48,
+  "negatives": 201,
+  "median_event_s": 1.0,
+  "1fps": {
+   "event_auc": 0.662,
+   "events_without_a_frame": 0,
+   "reads_per_min": 60
+  },
+  "2fps": {
+   "event_auc": 0.612,
+   "events_without_a_frame": 0,
+   "reads_per_min": 120
+  },
+  "4fps": {
+   "event_auc": 0.603,
+   "events_without_a_frame": 0,
+   "reads_per_min": 240
+  }
+ }
+}
