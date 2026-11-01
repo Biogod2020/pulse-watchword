@@ -48,3 +48,21 @@ class StateTracker:
             self.active, self._run = False, 0
             return "stop"
         return None
+
+
+@dataclass
+class ConfirmedEdge:
+    """Fire once when `confirm` consecutive reads are at or above `threshold`, then stay quiet for `refractory_s`.
+    Overlapping clips (2 s every 1 s) make two agreeing reads cheap evidence against one-clip flickers."""
+    threshold: float
+    confirm: int = 2
+    refractory_s: float = 8.0
+    _run: int = 0
+    _last: float = -1e9
+
+    def update(self, t: float, p: float) -> str | None:
+        self._run = self._run + 1 if p >= self.threshold else 0
+        if self._run == self.confirm and t - self._last >= self.refractory_s:
+            self._last = t
+            return "event"
+        return None

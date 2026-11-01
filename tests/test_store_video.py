@@ -63,3 +63,12 @@ def test_ring_clip_and_keep_policy(tmp_path):
     assert url.startswith("data:video/mp4;base64,") and (tmp_path / "c.mp4").stat().st_size > 0
     k = KeepPolicy(keyframe_s=30)
     assert [k.decide(t, n) for t, n in [(0, False), (1, False), (2, True), (31, False)]] == ["keyframe", None, "evidence", "keyframe"]
+
+
+def test_confirmed_edge_needs_agreeing_reads():
+    from pulse.triggers import ConfirmedEdge
+    c = ConfirmedEdge(0.8, confirm=2, refractory_s=8)
+    seq = [0.9, 0.1, 0.85, 0.9, 0.95, 0.2, 0.9, 0.9, 0.1, 0.9, 0.9, 0.9, 0.1, 0.9, 0.9]
+    out = [c.update(t, p) for t, p in enumerate(seq)]
+    # one-clip spikes never fire; agreeing pairs inside the 8 s refractory are ignored; t=14 fires again
+    assert [t for t, o in enumerate(out) if o] == [3, 14]
