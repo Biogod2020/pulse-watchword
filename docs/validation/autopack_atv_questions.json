@@ -1,0 +1,45 @@
+{
+ "scenario": "A technician wearing smart glasses repairs an ATV (all-terrain vehicle) in a workshop, removing and reinstalling parts with hand tools while a remote expert guides them.",
+ "questions": [
+  {
+   "id": "loosen_fastener_with_tool",
+   "ask": "Does this video itself show a hand tool turning a visible ATV fastener to loosen it, not merely being held against the fastener?",
+   "why": "Shows a common first step in removing ATV parts."
+  },
+  {
+   "id": "remove_atv_panel",
+   "ask": "Does this video itself show a body or access panel being lifted away from the ATV, not merely being touched or wiggled while still attached?",
+   "why": "Tracks visible access-panel removal."
+  },
+  {
+   "id": "store_removed_fasteners",
+   "ask": "Does this video itself show a removed ATV fastener being placed in a tray or container, not simply set down on the work surface?",
+   "why": "Helps spot whether removed hardware is being kept together."
+  },
+  {
+   "id": "disconnect_electrical_connector",
+   "ask": "Does this video itself show an electrical connector being separated at its plug, not merely a wire being moved or handled?",
+   "why": "Tracks disconnection before work on electrical parts."
+  },
+  {
+   "id": "pull_connector_by_wires",
+   "ask": "Does this video itself show a hand pulling directly on wires to disconnect a plug, not gripping the connector housing?",
+   "why": "Identifies a visible way wiring can be damaged."
+  },
+  {
+   "id": "remove_atv_wheel",
+   "ask": "Does this video itself show an ATV wheel being pulled off its hub, not merely being rotated while still mounted?",
+   "why": "Tracks a common repair access step."
+  },
+  {
+   "id": "install_atv_wheel",
+   "ask": "Does this video itself show an ATV wheel being placed onto its hub, not merely held near the hub?",
+   "why": "Tracks wheel reinstallation."
+  },
+  {
+   "id": "spill_visible_fluid",
+   "ask": "Does this video itself show liquid visibly dripping or pooling beneath an opened ATV component, not just a wet or oily surface already present?",
+   "why": "Flags a visible fluid leak or spill during repair."
+  }
+ ]
+}

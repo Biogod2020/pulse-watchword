@@ -1,0 +1,66 @@
+{
+ "scenario": "A technician wearing smart glasses packs a mobile laser scanner (Navvis M6) away into its transport boxes, following an expert's remote guidance.",
+ "sop_from": "R117-11Aug-Navvis-Part2",
+ "sop": [
+  "puts on their lens caps.",
+  "disassembles the M6 head.",
+  "places the m6 head into the head box.",
+  "puts on the last lens cap.",
+  "removes the M6 batteries.",
+  "places the m6 batteries into the battery box.",
+  "disassembles the M6 body.",
+  "inserts the m6 body into the neck box.",
+  "disassembles their m6 wheels.",
+  "places the m6 wheels and wheel unit into the wheel box.",
+  "closes the M6 head box.",
+  "closes the wheel box.",
+  "closes the M6 body box.",
+  "closes the M6 battery box.",
+  "stacks the head box atop the battery box.",
+  "locks the head box and battery box together.",
+  "stands up all the boxes.",
+  "aligns all of the boxes."
+ ],
+ "questions": [
+  {
+   "id": "fit_lens_caps",
+   "ask": "Does this video itself show the technician fitting a lens cap onto an M6 lens, not merely holding a cap near the lens?",
+   "why": "Caps protect the exposed lenses during transport."
+  },
+  {
+   "id": "disassemble_head",
+   "ask": "Does this video itself show the technician separating the M6 head from the rest of the scanner, not merely repositioning or handling the assembled scanner?",
+   "why": "The head must be detached before it can be packed."
+  },
+  {
+   "id": "pack_head",
+   "ask": "Does this video itself show the technician placing the detached M6 head inside the head box, not merely setting it beside or on top of the box?",
+   "why": "The head needs to be secured in its designated box."
+  },
+  {
+   "id": "remove_batteries",
+   "ask": "Does this video itself show the technician removing an M6 battery from the scanner, not merely touching or inspecting a battery that remains installed?",
+   "why": "The batteries must be removed before packing."
+  },
+  {
+   "id": "pack_body",
+   "ask": "Does this video itself show the technician inserting the disassembled M6 body into the neck box, not merely placing the body next to the box?",
+   "why": "The body has a designated transport box."
+  },
+  {
+   "id": "pack_wheels",
+   "ask": "Does this video itself show the technician placing the M6 wheels and wheel unit inside the wheel box, not merely handling or setting them beside the box?",
+   "why": "The wheel components need to be packed together in their box."
+  },
+  {
+   "id": "close_box",
+   "ask": "Does this video itself show the technician shutting a transport-box lid, not merely placing an open lid on the box without closing it?",
+   "why": "Closed boxes protect the packed equipment."
+  },
+  {
+   "id": "lock_stacked_boxes",
+   "ask": "Does this video itself show the technician locking the head box to the battery box while the head box is stacked on top, not merely stacking the boxes or handling a latch?",
+   "why": "The stacked boxes need to be secured together for transport."
+  }
+ ]
+}

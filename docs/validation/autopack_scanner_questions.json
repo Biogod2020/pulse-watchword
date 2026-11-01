@@ -1,0 +1,45 @@
+{
+ "scenario": "A technician wearing smart glasses assembles a mobile laser scanner (a survey device with a sensor head, lenses, caps, a body and mounting locks) following an expert's remote guidance.",
+ "questions": [
+  {
+   "id": "remove_lens_cap",
+   "ask": "Does this video itself show a hand removing a protective cap from a scanner lens, not merely touching or holding the cap?",
+   "why": "Detects lens preparation before assembly."
+  },
+  {
+   "id": "lens_cap_still_on",
+   "ask": "Does this video itself show a protective cap still covering a lens while the scanner head is being assembled, not a cap held beside an uncovered lens?",
+   "why": "Flags a cap that may have been left on during assembly."
+  },
+  {
+   "id": "insert_lens",
+   "ask": "Does this video itself show a lens being inserted or screwed into the scanner head, not merely held near the head?",
+   "why": "Covers installation of an optical component."
+  },
+  {
+   "id": "align_head_marks",
+   "ask": "Does this video itself show the sensor head being rotated until visible alignment marks on it and the body line up, not just the parts being brought together?",
+   "why": "Checks a visible alignment step."
+  },
+  {
+   "id": "attach_head_to_body",
+   "ask": "Does this video itself show the sensor head being seated onto the scanner body, not merely positioned above or beside it?",
+   "why": "Detects the main head-to-body assembly step."
+  },
+  {
+   "id": "tighten_head_lock",
+   "ask": "Does this video itself show a hand turning or closing a mounting lock to secure the sensor head to the body, not merely touching the lock?",
+   "why": "Checks that the head is visibly secured."
+  },
+  {
+   "id": "lock_left_open",
+   "ask": "Does this video itself show the mounting lock remaining visibly open or unlatched after the head is seated, not a lock that is being closed in the clip?",
+   "why": "Flags a likely unsecured connection."
+  },
+  {
+   "id": "attach_mount",
+   "ask": "Does this video itself show the scanner body being fastened to its mount or support, not merely resting on or being held above it?",
+   "why": "Covers securing the assembled scanner for use."
+  }
+ ]
+}

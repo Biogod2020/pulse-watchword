@@ -1,0 +1,107 @@
+{
+ "report": {
+  "recording": "R119-11Aug-Navvis-Part2",
+  "task": "assemble laser scanner",
+  "scenario": "A technician wearing smart glasses assembles a mobile laser scanner (a survey device with a sensor head, lenses, caps, a body and mounting locks) following an expert's remote guidance.",
+  "clips": 517,
+  "judge_wall_s": 84,
+  "calibration_clips": 180,
+  "test_clips": 337,
+  "teacher_spend_usd": 0.3516,
+  "questions": [
+   {
+    "id": "remove_lens_cap",
+    "ask": "Does this video itself show a hand removing a protective cap from a scanner lens, not merely touching or holding the cap?",
+    "mapped_labels": [
+     "withdraw lens_caps"
+    ],
+    "threshold": 0.05,
+    "teacher_agreement_f1": 0.19,
+    "test_events": 0
+   },
+   {
+    "id": "lens_cap_still_on",
+    "ask": "Does this video itself show a protective cap still covering a lens while the scanner head is being assembled, not a cap held beside an uncovered lens?",
+    "mapped_labels": [
+     "hold lens_cover"
+    ],
+    "threshold": 0.05,
+    "teacher_agreement_f1": 0.6,
+    "test_events": 0
+   },
+   {
+    "id": "insert_lens",
+    "ask": "Does this video itself show a lens being inserted or screwed into the scanner head, not merely held near the head?",
+    "mapped_labels": [],
+    "threshold": 0.5,
+    "teacher_agreement_f1": 0.0,
+    "test_events": 0
+   },
+   {
+    "id": "align_head_marks",
+    "ask": "Does this video itself show the sensor head being rotated until visible alignment marks on it and the body line up, not just the parts being brought together?",
+    "mapped_labels": [],
+    "threshold": 0.5,
+    "teacher_agreement_f1": 0.0,
+    "test_events": 0
+   },
+   {
+    "id": "attach_head_to_body",
+    "ask": "Does this video itself show the sensor head being seated onto the scanner body, not merely positioned above or beside it?",
+    "mapped_labels": [
+     "place m6_head"
+    ],
+    "threshold": 0.05,
+    "teacher_agreement_f1": 0.64,
+    "test_events": 0
+   },
+   {
+    "id": "tighten_head_lock",
+    "ask": "Does this video itself show a hand turning or closing a mounting lock to secure the sensor head to the body, not merely touching the lock?",
+    "mapped_labels": [],
+    "threshold": 0.05,
+    "teacher_agreement_f1": 0.44,
+    "test_events": 0
+   },
+   {
+    "id": "lock_left_open",
+    "ask": "Does this video itself show the mounting lock remaining visibly open or unlatched after the head is seated, not a lock that is being closed in the clip?",
+    "mapped_labels": [],
+    "threshold": 0.05,
+    "teacher_agreement_f1": 0.4,
+    "test_events": 0
+   },
+   {
+    "id": "attach_mount",
+    "ask": "Does this video itself show the scanner body being fastened to its mount or support, not merely resting on or being held above it?",
+    "mapped_labels": [],
+    "threshold": 0.05,
+    "teacher_agreement_f1": 0.13,
+    "test_events": 0
+   }
+  ],
+  "expert_corrections": {
+   "in_test_part": 0,
+   "with_an_alert_in_prior_10s": 0,
+   "alerts_total": 54,
+   "chance_rate": 1.0,
+   "wrong_actions_in_test_part": 8
+  }
+ },
+ "mapping": {
+  "remove_lens_cap": [
+   "withdraw lens_caps"
+  ],
+  "lens_cap_still_on": [
+   "hold lens_cover"
+  ],
+  "insert_lens": [],
+  "align_head_marks": [],
+  "attach_head_to_body": [
+   "place m6_head"
+  ],
+  "tighten_head_lock": [],
+  "lock_left_open": [],
+  "attach_mount": []
+ }
+}
