@@ -23,6 +23,9 @@ main{display:grid;grid-template-columns:1.3fr .9fr 1fr;gap:12px;padding:12px;hei
 .row{display:grid;grid-template-columns:48px 1fr 78px;gap:8px;align-items:center;padding:3px 2px;border-bottom:1px solid #1a2342;font-size:12px}
 .bar{height:8px;background:#1e293b;border-radius:6px;overflow:hidden}.bar i{display:block;height:100%}
 .row.f{background:rgba(5,150,105,.14)}
+.lanes{display:flex;flex-direction:column;gap:6px}.lane{display:grid;grid-template-columns:120px 1fr;align-items:center;font-size:12px}
+.spark{display:flex;align-items:flex-end;gap:1px;height:34px;background:#0b1020;border-radius:6px;padding:2px;overflow:hidden}.spark i{flex:0 0 3px;border-radius:1px}
+.ev{display:grid;grid-template-columns:48px 1fr;gap:8px;padding:5px 2px;border-bottom:1px solid #1a2342;font-size:12.5px}
 #ask{display:flex;gap:6px}#ask input{flex:1;background:#0b1020;border:1px solid #1f2a4d;color:#e5e7eb;border-radius:8px;padding:9px}
 #ask button{background:var(--p);color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.chips span{background:#1e1b4b;color:#c4b5fd;border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer}
@@ -38,15 +41,20 @@ main{display:grid;grid-template-columns:1.3fr .9fr 1fr;gap:12px;padding:12px;hei
 <section class="panel"><h2>第一人称画面</h2>
   <div id="view"><img id="img" alt=""><span id="badge">等待开始</span><span id="clock">00:00</span></div>
   <div class="counters"><div><b id="c-s">0</b><span>看过的画面</span></div><div><b id="c-r">0</b><span>判断员判断次数</span></div>
-  <div><b id="c-n">0</b><span>注意到“在放东西”</span></div><div><b id="c-b">0</b><span>叫醒大脑</span></div></div>
+  <div><b id="c-n">0</b><span>注意到的事</span></div><div><b id="c-b">0</b><span>叫醒大脑</span></div></div>
   <div id="strip"></div>
-  <div class="legend">每格一秒：<i style="background:#1e3a8a"></i>判断员看过<i style="background:#059669"></i>注意到手在台面放东西</div>
-  <div class="note">判断员每秒看一帧，每次约 0.2 秒；大脑只在你提问时才工作。</div>
+  <div class="legend">每格一秒：<i style="background:#1e3a8a"></i>判断员看过<i style="background:#f59e0b"></i>在搅拌<i style="background:#06b6d4"></i>洗东西<i style="background:#f97316"></i>拧旋钮</div>
+  <div class="note">判断员每秒看一帧，一次同时判断三件事，约 0.5 秒；大脑只在你提问时才工作。</div>
 </section>
-<section class="panel"><h2>心跳：每一帧“手在台面放东西”的把握</h2><div id="stream"></div></section>
+<section class="panel"><h2>心跳：判断员每秒同时盯三件事</h2>
+  <div class="lanes"><div class="lane"><span style="color:#22d3ee">在水槽洗东西</span><div id="l-washing" class="spark"></div></div>
+  <div class="lane"><span style="color:#fbbf24">在锅里搅拌</span><div id="l-stirring" class="spark"></div></div>
+  <div class="lane"><span style="color:#fb923c">拧水龙头/灶台旋钮</span><div id="l-tap_or_knob" class="spark"></div></div></div>
+  <h2 style="margin-top:12px">注意到的事</h2><div id="stream"></div>
+  <div class="note">只盯真实视频上验证过、判断得准的活动：洗东西（判断准确率 86%）、搅拌、拧旋钮（58%）。“放下东西的瞬间”验证下来判断不准，所以不在这里显示。</div></section>
 <section class="panel"><h2>问它：东西放哪了？</h2>
   <div id="ask"><input id="q" placeholder="例如：Where did I put the knife?"><button id="askb">问</button></div>
-  <div class="chips"><span>Where did I put the knife?</span><span>Where is the meat?</span><span>Where is the saucepan?</span><span>Where did I leave the oil?</span></div>
+  <div class="chips"><span>Where did I put the knife?</span><span>Where is the meat?</span><span>When did I last stir the pot?</span><span>Did I wash anything recently?</span></div>
   <div id="answers"></div>
   <div class="note">提问时，大脑调用 find_object：判断员往回扫描最近 90 秒的画面，找到最后一次清楚看到它的地方。真实视频验证中全片答对 28/53。</div>
 </section>
@@ -58,13 +66,16 @@ function setC(c){$('c-s').textContent=c.sampled;$('c-r').textContent=c.judge_rea
 function on(m){
  if(m.type==='frame'){$('img').src='/frames/'+m.frame;$('clock').textContent=mmss(m.t);$('badge').textContent='判断员在看';$('badge').style.background='#1e3a8a';
    last=document.createElement('i');last.style.background='#1e3a8a';$('strip').appendChild(last);while($('strip').children.length>200)$('strip').firstChild.remove()}
- if(m.type==='tick'){const p=m.p||0,r=document.createElement('div');r.className='row'+(m.fired?' f':'');
-   r.innerHTML=`<span>${mmss(m.t)}</span><div class="bar"><i style="width:${(p*100).toFixed(0)}%;background:${m.fired?'#10b981':'#3b82f6'}"></i></div><span>${(p*100).toFixed(0)}% · ${m.read_ms}ms</span>`;
-   $('stream').prepend(r);while($('stream').children.length>300)$('stream').lastChild.remove();
-   if(m.fired){$('badge').textContent='注意到：手在台面放东西';$('badge').style.background='#059669';if(last)last.style.background='#059669'}setC(m.counters)}
+ if(m.type==='tick'){const col={washing:'#06b6d4',stirring:'#f59e0b',tap_or_knob:'#f97316'};
+   for(const k in m.probs){const sp=$('l-'+k);if(!sp)continue;const i=document.createElement('i');i.style.height=Math.max(2,m.probs[k]*30)+'px';i.style.background=(m.active[k]||m.events.some(e=>e.activity===k))?col[k]:'#334155';sp.appendChild(i);while(sp.children.length>110)sp.firstChild.remove()}
+   if(m.active.stirring&&last)last.style.background='#f59e0b';
+   for(const e of m.events){if(last&&e.kind!=='stop')last.style.background=col[e.activity];const r=document.createElement('div');r.className='ev';
+     const verb=e.kind==='start'?'开始':e.kind==='stop'?'停止':'';r.innerHTML=`<span>${mmss(e.t)}</span><span style="color:${col[e.activity]}">${verb}${e.label}</span>`;$('stream').prepend(r);
+     if(e.kind!=='stop'){$('badge').textContent='注意到：'+e.label;$('badge').style.background=col[e.activity]}}
+   setC(m.counters)}
  if(m.type==='done'){$('badge').textContent='回放结束';setC(m.counters)}
 }
-$('go').onclick=async()=>{$('stream').innerHTML='';$('strip').innerHTML='';
+$('go').onclick=async()=>{$('stream').innerHTML='';$('strip').innerHTML='';for(const k of['washing','stirring','tap_or_knob'])$('l-'+k).innerHTML='';
  await fetch('/api/replay',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({start:+$('start').value,minutes:0,speed:+$('speed').value})})};
 async function askQ(q){const box=document.createElement('div');box.className='ans';box.innerHTML=`<div class="q">问：${q}</div><div class="a">大脑思考中，判断员在回看画面…</div>`;$('answers').prepend(box);
  const r=await (await fetch('/api/ask',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({question:q})})).json();

@@ -39,3 +39,13 @@ def test_change_filter_skips_static_frames_with_floor(tmp_path):
     assert flt.keep(changed, 2)[0]       # changed
     assert not flt.keep(changed, 3)[0]
     assert flt.keep(changed, 33)[0]      # floor interval forces a keep
+
+
+def test_edge_and_state_triggers():
+    from pulse.triggers import EdgeTrigger, StateTracker
+    e = EdgeTrigger(0.9, refractory_s=5)
+    out = [e.update(t, p) for t, p in enumerate([0.1, 0.95, 0.97, 0.2, 0.95, 0.1, 0.1, 0.1, 0.95])]
+    assert out == [None, "event", None, None, None, None, None, None, "event"]   # quiet during refractory
+    s = StateTracker(on=0.95, off=0.7, min_on=3)
+    out = [s.update(t, p) for t, p in enumerate([0.96, 0.97, 0.99, 0.8, 0.75, 0.6, 0.99])]
+    assert out == [None, None, "start", None, None, "stop", None] and s.started_at == 0

@@ -25,6 +25,7 @@ from pulse.heartbeat import Capability, Heartbeat
 from pulse.memory import WorkingMemory
 from pulse.providers import DjevDecider, OpenAICompatAgent, Question, Tool
 from pulse.recall import where_is
+from pulse.triggers import EdgeTrigger, StateTracker
 from pulse.video import ChangeFilter, video_events
 
 ROOT = Path(__file__).parent
@@ -32,10 +33,18 @@ app = FastAPI()
 CFG: dict = {}
 STATE: dict = {"clients": set(), "task": None}
 
-# Best of three cues on EPIC P12_101 (AUC 0.62); threshold gives ~10% fire rate (docs/validation_epic_P12_101.md).
-NOTICE = Question("hand_on_surface", "Does this image itself show a hand holding an object that is touching or just "
-                  "above a surface such as a countertop, cutting board, stove or shelf, as if setting it down?",
-                  kind="noul", threshold=0.31)
+# Activities the judge tracks reliably on real first-person video (eval_activity_cues.py, EPIC P12_101):
+# washing AUC 0.82 (edge 86% precise), stirring AUC 0.89 (state), tap/knob AUC 0.80 (edge 58% precise).
+# "Putting down" (AUC 0.62, below random as a trigger over the full video) is deliberately not tracked.
+S = "Does this image itself show "
+ACTIVITIES = {
+    "washing": ("在水槽洗东西", Question("washing", S + "hands washing or rinsing something under running water at a "
+                                                     "sink?", kind="noul"), lambda: EdgeTrigger(0.9, 5)),
+    "stirring": ("在锅里搅拌", Question("stirring", S + "someone stirring food in a pot or pan with a spoon or "
+                                                     "spatula?", kind="noul"), lambda: StateTracker(0.95, 0.7, 3)),
+    "tap_or_knob": ("拧水龙头/灶台旋钮", Question("tap_or_knob", S + "a hand turning a tap, a stove knob or a "
+                                                              "switch?", kind="noul"), lambda: EdgeTrigger(0.5, 5)),
+}
 
 
 def model_agent() -> OpenAICompatAgent:
@@ -48,12 +57,15 @@ def model_agent() -> OpenAICompatAgent:
 def build_runtime() -> None:
     djev = DjevDecider(CFG["djev_url"])
 
-    async def noticed(ctx) -> dict:
-        return {"noticed": True}
+    async def nothing(ctx) -> dict:
+        return {}
 
-    hb = Heartbeat(djev, WorkingMemory(), [Capability("notice", [NOTICE], noticed, on=("vision",), kind="vision")],
-                   [], lambda m, ev, a: "A first-person camera image.")
-    STATE.update(djev=djev, hb=hb, seen=[], now=0.0, answers=[],
+    # threshold 0 so every score is reported; the temporal triggers below decide what counts as an event
+    cues = [Question(q.id, q.ask, kind="noul", threshold=0.0) for _, q, _ in ACTIVITIES.values()]
+    hb = Heartbeat(djev, WorkingMemory(), [Capability("activities", cues, nothing, on=("vision",), kind="vision")],
+                   [], lambda m, ev, a: "A first-person kitchen camera image.")
+    STATE.update(djev=djev, hb=hb, seen=[], now=0.0, answers=[], activity_log=[],
+                 trackers={k: make() for k, (_, _, make) in ACTIVITIES.items()},
                  counters={"sampled": 0, "judged": 0, "noticed": 0, "brain_calls": 0, "judge_reads": 0})
 
 
@@ -81,10 +93,18 @@ async def replay(start: float, minutes: float, speed: float) -> None:
             tick = await STATE["hb"].on_event(ev)
             c["judged"] += 1
             c["judge_reads"] += 1
-            q = tick["asked"][0] if tick["asked"] else {}
-            if q.get("fired"):
-                c["noticed"] += 1
-            await broadcast({"type": "tick", "t": t, "frame": path.name, "p": q.get("p_yes"), "fired": q.get("fired"),
+            probs = {a["question"]: a["p_yes"] for a in tick["asked"]}
+            events = []
+            for k, tracker in STATE["trackers"].items():
+                kind = tracker.update(t, probs.get(k) or 0.0)
+                if kind:
+                    entry = {"activity": k, "label": ACTIVITIES[k][0], "kind": kind, "t": t, "frame": path.stem}
+                    STATE["activity_log"].append(entry)
+                    events.append(entry)
+                    if kind != "stop":
+                        c["noticed"] += 1
+            await broadcast({"type": "tick", "t": t, "frame": path.name, "probs": probs, "events": events,
+                             "active": {k: getattr(tr, "active", False) for k, tr in STATE["trackers"].items()},
                              "read_ms": round(tick["read_ms"]), "counters": c})
         elapsed = asyncio.get_running_loop().time() - loop_start
         await asyncio.sleep(max(0.0, 1.0 / speed - elapsed))
@@ -124,6 +144,15 @@ async def ask(req: AskIn):
         found.append(out)
         return out
 
+    async def recent_activities(args: dict) -> dict:
+        kind = str(args.get("activity", "")).strip()
+        log = [e for e in STATE["activity_log"] if not kind or e["activity"] == kind]
+        return {"now_s": STATE["now"], "events": [{**e, "ago_s": round(STATE["now"] - e["t"])} for e in log[-12:]]}
+
+    activity_tool = Tool("recent_activities", "What the camera noticed the user doing: washing at the sink, stirring "
+                         "a pot (start/stop), turning a tap or stove knob. Optional filter: washing, stirring or "
+                         "tap_or_knob.", {"type": "object", "properties": {"activity": {"type": "string"}}},
+                         recent_activities)
     tool = Tool("find_object", "Look back through the last minutes of camera frames for an object; returns where it "
                 "was last seen resting and when (seconds into the recording).",
                 {"type": "object", "properties": {"object": {"type": "string",
@@ -134,7 +163,9 @@ async def ask(req: AskIn):
     run = await agent.run("You are an always-on assistant that sees through the user's first-person camera. For "
                           "questions about where something is, call find_object with a short noun. Answer in one short "
                           "sentence: the place and how long ago (now_s minus seen_at_s, in seconds). If not found, say "
-                          "you did not see it in the last minutes.", req.question, [tool])
+                          "you did not see it in the last minutes. For questions about what the user did (washing, "
+                          "stirring, turning the stove or tap), call recent_activities and say how long ago.",
+                          req.question, [tool, activity_tool])
     hit = next((f for f in reversed(found) if f["found"]), found[-1] if found else None)
     answer = {"answer": run.text.strip(), "evidence": hit, "model": agent.name, "ms": round(run.latency_ms),
               "counters": STATE["counters"]}
