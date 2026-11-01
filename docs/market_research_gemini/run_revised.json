@@ -1,0 +1,6 @@
+{
+  "requested_model": "gemini-3.8-flash-high",
+  "returned_model": "gemini-3.8-flash-n",
+  "finish_reason": "STOP",
+  "elapsed_s": 13.6
+}

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse 系统技术实现总结</title>
+<style>
+  :root {
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --badge-green-bg: #dcfce7;
+    --badge-green-text: #166534;
+    --badge-yellow-bg: #fef9c3;
+    --badge-yellow-text: #854d0e;
+    --badge-gray-bg: #f1f5f9;
+    --badge-gray-text: #475569;
+    --primary-blue: #2563eb;
+    --primary-blue-soft: #eff6ff;
+    --code-bg: #f1f5f9;
+    --accent-red: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    line-height: 1.6;
+    padding: 32px 16px;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  /* Typography */
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); letter-spacing: -0.5px; }
+  h2 { font-size: 20px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; }
+  h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-secondary); }
+  p { margin-bottom: 12px; color: var(--text-secondary); }
+  .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+
+  /* Cards */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    vertical-align: middle;
+  }
+  .badge-green { background: var(--badge-green-bg); color: var(--badge-green-text); border: 1px solid #bbf7d0; }
+  .badge-yellow { background: var(--badge-yellow-bg); color: var(--badge-yellow-text); border: 1px solid #fef08a; }
+  .badge-gray { background: var(--badge-gray-bg); color: var(--badge-gray-text); border: 1px solid #cbd5e1; }
+
+  /* Code */
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 13px;
+    background-color: var(--code-bg);
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* TOC */
+  .toc {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .toc-title { font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--text-primary); }
+  .toc-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 6px 16px;
+    list-style: none;
+    font-size: 13px;
+  }
+  .toc-list a { color: var(--primary-blue); text-decoration: none; }
+  .toc-list a:hover { text-decoration: underline; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px 0;
+    font-size: 13.5px;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border: 1px solid var(--border-color);
+  }
+  th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  tr:nth-child(even) td { background-color: #fafafa; }
+
+  /* Dataflow Chart (Pure HTML/CSS) */
+  .flow-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin: 16px 0;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .flow-node {
+    background: #fff;
+    border: 1px solid #94a3b8;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    font-size: 12.5px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    flex: 1;
+  }
+  .flow-node.highlight {
+    border-color: var(--primary-blue);
+    background: var(--primary-blue-soft);
+  }
+  .flow-node-title { font-weight: 600; margin-bottom: 2px; color: var(--text-primary); }
+  .flow-node-desc { font-size: 11px; color: var(--text-muted); }
+  .flow-arrow-down {
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .flow-arrow-right {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 4px;
+  }
+  .sub-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  /* Module Section Fields */
+  .field { margin-bottom: 8px; font-size: 14px; }
+  .field-label { font-weight: 600; color: var(--text-primary); display: inline-block; width: 84px; }
+
+  /* Priority Callout */
+  .callout {
+    border-left: 4px solid var(--primary-blue);
+    background: var(--primary-blue-soft);
+    padding: 12px 16px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .callout-title { font-weight: 600; color: #1e40af; margin-bottom: 4px; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; margin-bottom: 16px; }
+    a { color: var(--text-primary); text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header style="margin-bottom: 20px;">
+    <h1>Pulse 系统技术实现总结</h1>
+    <div class="subtitle">面向项目创始人 · 架构、实测与生产落地状态 · 截至 2026-11-01</div>
+  </header>
+
+  <!-- 目录导航 -->
+  <nav class="toc">
+    <div class="toc-title">目录索引</div>
+    <ul class="toc-list">
+      <li><a href="#summary">1. 一页结论与工作规划</a></li>
+      <li><a href="#dataflow">2. 整体数据流示意图</a></li>
+      <li><a href="#decision-exp">3. 核心专项：判断题设计实验</a></li>
+      <li><a href="#storage-cap">4. 核心专项：存储容量评估</a></li>
+      <li><a href="#modules">5. 系统分层模块实现</a></li>
+      <li><a href="#risks">6. 风险与待验证事项</a></li>
+    </ul>
+  </nav>
+
+  <!-- 1. 一页结论 -->
+  <section class="card" id="summary">
+    <h2>1. 一页结论</h2>
+    <p><strong>系统定位：</strong>Pulse 是一个能够常态化被动运行（一直在看、一直在听）的多模态实时 Agent，核心原则是<strong>“判断用 djev、执行用大模型”</strong>。djev 基于 DiffusionGemma 26B-A4B（AWQ INT4 量化），快在<strong>单次读取直接输出答案概率、不逐字生成</strong>；绝大多数常规音画帧由其在 50–110 ms 内完成是否/选择过滤，仅在极少数产生状态迁移或用户交互时才唤醒高耗时大语言模型，并完全避免存储视频和原始音频。</p>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 16px 0;">
+      <div style="border: 1px solid #bbf7d0; background: #f0fdf4; padding: 12px; border-radius: 6px;">
+        <div style="font-weight: 600; color: #166534; margin-bottom: 6px;">✅ 已实现核心</div>
+        <ul style="font-size: 12.5px; color: #166534; padding-left: 16px;">
+          <li>Heartbeat 事件循环与重试调度</li>
+          <li>版本化工作记忆与版本失效机制</li>
+          <li>djev 单次读取判断（文本/图）</li>
+          <li>工具循环执行（支持直接返回）</li>
+          <li>双模态隔离向量检索</li>
+          <li>日常合成场景离线回放（12 事件）</li>
+        </ul>
+      </div>
+      <div style="border: 1px solid #fef08a; background: #fefce8; padding: 12px; border-radius: 6px;">
+        <div style="font-weight: 600; color: #854d0e; margin-bottom: 6px;">🟡 部分实现</div>
+        <ul style="font-size: 12.5px; color: #854d0e; padding-left: 16px;">
+          <li>记忆系统（四层逻辑全在内存）</li>
+          <li>调度优先级与队列事件合并</li>
+          <li>Model 提供方接入（已验 luna，配置待环境化）</li>
+          <li>评测体系（仅完成 30 句文本集）</li>
+        </ul>
+      </div>
+      <div style="border: 1px solid #cbd5e1; background: #f8fafc; padding: 12px; border-radius: 6px;">
+        <div style="font-weight: 600; color: #475569; margin-bottom: 6px;">⬜ 待做事项</div>
+        <ul style="font-size: 12.5px; color: #475569; padding-left: 16px;">
+          <li>输入层（浏览器摄像头/ASR）</li>
+          <li>画面前后端双重去重过滤</li>
+          <li>三栏 Web 界面与实时 WebSocket</li>
+          <li>SQLite + 向量持久化落盘</li>
+          <li>大模型输出证据框坐标</li>
+          <li>Muse 模型适配与实拍评测</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">接下来三天的核心突破重点：</div>
+      <ol style="padding-left: 18px; font-size: 13.5px; color: #1e3a8a;">
+        <li><strong>打通端到端输入与界面通路：</strong>实现浏览器端摄像头采集（640px/1fps）、灰度差分过滤及 WebSocket 双向通信，上线三栏监控页面，使离线回放逻辑变为可见、可交互的活系统。</li>
+        <li><strong>切换并校准生产模型（Muse）：</strong>实现环境变量配置并验证 <code>muse-spark-1.3-contributor</code> 的工具调用、视觉看图能力，攻克结构化目标边界框输出，替换开发期代理模型。</li>
+        <li><strong>落地基础存储并录制演示视频：</strong>将内存工作记忆与情景表结构迁移到基础 SQLite，准备固定走位与实拍素材，录屏留存兜底演示。</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 2. 数据流示意图 -->
+  <section class="card" id="dataflow">
+    <h2>2. 整体数据流示意图</h2>
+    <div class="flow-chart">
+      <!-- Row 1: Browser Input -->
+      <div class="flow-row">
+        <div class="flow-node highlight" style="flex: 1;">
+          <div class="flow-node-title">浏览器输入层 (Web Client)</div>
+          <div class="flow-node-desc">getUserMedia (1fps/640px) 像素去重 · Web Speech API 实时修订转写</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down">↓ WebSocket 上行事件 <code>{kind, t, seg_id, rev, text|image}</code></div>
+
+      <!-- Row 2: Heartbeat Cycle Container -->
+      <div style="border: 1px dashed var(--primary-blue); padding: 12px; border-radius: 6px; background: #fff;">
+        <div style="font-size: 12px; font-weight: 700; color: var(--primary-blue); margin-bottom: 8px;">Heartbeat 运行循环 (单 Tick 管道)</div>
+        <div class="sub-grid">
+          <div class="flow-node">
+            <div class="flow-node-title">① 感知</div>
+            <div class="flow-node-desc">djev 生成图描述</div>
+          </div>
+          <div class="flow-node">
+            <div class="flow-node-title">② 工作记忆</div>
+            <div class="flow-node-desc">修订/注销旧事实</div>
+          </div>
+          <div class="flow-node" style="border-color: #f59e0b; background: #fffbeb;">
+            <div class="flow-node-title">③ djev 判断</div>
+            <div class="flow-node-desc">≤10 题并发是/否</div>
+          </div>
+          <div class="flow-node">
+            <div class="flow-node-title">④ 功能唤醒</div>
+            <div class="flow-node-desc">并发派发被触发项</div>
+          </div>
+          <div class="flow-node">
+            <div class="flow-node-title">⑤ 规则兜底</div>
+            <div class="flow-node-desc">确定性 Alert 检查</div>
+          </div>
+          <div class="flow-node">
+            <div class="flow-node-title">⑥ 长期记忆</div>
+            <div class="flow-node-desc">写长期记忆（目前同步、仅内存）</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Branching: LLM vs Direct Output -->
+      <div class="flow-row" style="margin-top: 4px;">
+        <div class="flow-arrow-down" style="flex: 1; text-align: right; padding-right: 20px;">
+          (仅在功能唤醒且需大模型时) ↓
+        </div>
+        <div class="flow-arrow-down" style="flex: 1; text-align: left; padding-left: 20px;">
+          (每个 Tick 必定推送) ↓
+        </div>
+      </div>
+
+      <div class="flow-row">
+        <!-- Node LLM -->
+        <div class="flow-node" style="flex: 1; border-color: #8b5cf6; background: #f5f3ff;">
+          <div class="flow-node-title">模型提供方 (Model)</div>
+          <div class="flow-node-desc">单步工具循环 (add_task, answer) · 结构化坐标</div>
+        </div>
+        <div class="flow-arrow-right">→</div>
+        <!-- Node UI -->
+        <div class="flow-node highlight" style="flex: 1.2;">
+          <div class="flow-node-title">界面层 (Web UI)</div>
+          <div class="flow-node-desc">左: 画面+字幕 | 中: Tick轨迹+唤醒计数 | 右: 事实+证据卡片</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 判断题设计实验 -->
+  <section class="card" id="decision-exp">
+    <h2>3. 核心专项：判断题设计实验</h2>
+    <p>系统能否在被动感知下节约成本，全依赖 <code>djev</code> 的“直觉门禁”。在包含 30 句带陷阱文本的离线测试集上，团队对比了 5 种不同的判断题架构：</p>
+    <table>
+      <thead>
+        <tr>
+          <th>设计方案</th>
+          <th>读取次数</th>
+          <th>耗时 p50</th>
+          <th>误判数 (致错动作)</th>
+          <th>结论与成因剖析</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1. 最初合并式设计</td>
+          <td>30 次</td>
+          <td>47 ms</td>
+          <td>8 处</td>
+          <td>淘汰。多意图掺杂在一起，模型无法精准解耦边界。</td>
+        </tr>
+        <tr>
+          <td>2. 6 个原子问题一次读取</td>
+          <td>30 次</td>
+          <td>53 ms</td>
+          <td>12 处</td>
+          <td>淘汰。宽泛门控题（如“是否关于纱布”）漏检严重（10/16 漏判）。</td>
+        </tr>
+        <tr>
+          <td>3. 分层判断机制</td>
+          <td>44 次</td>
+          <td>109 ms</td>
+          <td>4 处</td>
+          <td>备用。虽解耦了分类，但多次往返调用导致延迟与请求量骤增。</td>
+        </tr>
+        <tr>
+          <td>4. 5 个具体入口问题一次读取</td>
+          <td>30 次</td>
+          <td>52 ms</td>
+          <td>3 处</td>
+          <td>过渡方案。避免了宽泛门控，误判中两处是助手问题概率达 0.66 和 0.63。</td>
+        </tr>
+        <tr style="background-color: #f0fdf4; font-weight: 600;">
+          <td>5. 5 个具体问题 + 助手阈值0.8 (最终采用)</td>
+          <td>30 次</td>
+          <td>52 ms</td>
+          <td>1 处（推算）</td>
+          <td><strong>正式采用。</strong>原生 <code>noul</code> 是/否题，固定前缀锁定意图，将助手阈值设为 0.8（据概率推算误判降至 1 处，待重测验证）。</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-size: 13px; color: var(--text-secondary); background: #f1f5f9; padding: 10px; border-radius: 4px;">
+      <strong>工程准则落地：</strong>原生是/否题（<code>noul</code>）必须配合严格锁定主语的固定前缀（如 <code>"Does this utterance itself..."</code> / <code>"Does this image itself show..."</code>），并在窄问题中明确写明排除项；弃用宽泛门控，全部使用各功能包的具体触发题。
+    </div>
+  </section>
+
+  <!-- 4. 存储会不会撑爆 -->
+  <section class="card" id="storage-cap">
+    <h2>4. 核心专项：存储容量评估（“存储会不会撑爆”）</h2>
+    <p>Pulse 坚持<strong>“不存视频、不存录音、只存文字转写与关键帧”</strong>的原则。系统设计了严格的四层记忆生命周期机制：</p>
+    <table>
+      <thead>
+        <tr>
+          <th>层级</th>
+          <th>存储内容</th>
+          <th>生命周期与策略</th>
+          <th>预估容量占用</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>L0 感官缓冲</strong></td>
+          <td>最近 60 秒原始高频画面与连续语音分段</td>
+          <td>内存循环覆盖，纯瞬时态，绝对不落盘</td>
+          <td>内存循环覆盖，不落盘</td>
+        </tr>
+        <tr>
+          <td><strong>L1 情景记忆</strong></td>
+          <td>通过去重过滤的关键帧缩略图、文字描述、向量索引</td>
+          <td>滚动保存 14 天，到达 14 天硬上限后仅留文字向量</td>
+          <td>约 20 MB/天，约 600 MB/月（硬上限约 1 GB）</td>
+        </tr>
+        <tr>
+          <td><strong>L2 证据帧</strong></td>
+          <td>被具体事实引用（如“钥匙最后位置”）的画面缩略图</td>
+          <td>640 px 缩略图，数量少，随事实失效替换</td>
+          <td>数量少，未单独估算</td>
+        </tr>
+        <tr>
+          <td><strong>L3 语义记忆</strong></td>
+          <td>结构化文字事实、任务、每日摘要、语义向量</td>
+          <td>长期保留，黑客松阶段通过手动整理命令将当天情景压成文本摘要</td>
+          <td>文字事实、描述和向量合计约 2–3 MB/天（估算）</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="border-left: 4px solid var(--accent-red); background: #fef2f2; padding: 10px 14px; border-radius: 0 4px 4px 0; font-size: 13.5px; color: #991b1b;">
+      <strong>现状警告：</strong>当前代码库中<strong>全部四层记忆均常驻 Python 内存（未持久化）</strong>。上述 SQLite 表定义、图片按内容哈希存文件、14 天滚动清理和手动压缩命令<strong>纯属既定设计，尚未编码实现</strong>。若当前进程崩溃，所有状态即刻丢失。
+    </div>
+  </section>
+
+  <!-- 5. 分层模块详解 -->
+  <section class="card" id="modules">
+    <h2>5. 系统分层模块实现</h2>
+
+    <!-- 5.1 输入层 -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.1 输入层（浏览器端）</h3>
+        <span class="badge badge-gray">⬜ 待做</span>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>在用户浏览器采集眼睛（画面）和耳朵（声音），经过初筛后发送给后端。</div>
+      <div class="field"><span class="field-label">技术实现：</span>调用 <code>navigator.mediaDevices.getUserMedia</code> 捕获视频流，Canvas 每秒抽取 1 帧缩放至 640px；语音调用浏览器 <code>Web Speech API</code> 输出分句文本（备用已有的赛前本地流式 ASR）；建立单条 WebSocket 连接，统一按契约格式 <code>{kind, t, seg_id, rev, text | image}</code> 向上推送事件并接收服务端回调；内置“暂停/删除最近 N 分钟”的隐私开关。</div>
+      <div class="field"><span class="field-label">实测数据：</span>尚无（尚未接入）。</div>
+      <div class="field"><span class="field-label">下一步：</span>实现浏览器前端页面，完成摄像头抽帧与 WebSocket 握手联调。</div>
+    </div>
+
+    <!-- 5.2 Heartbeat 运行循环 -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.2 事件与运行循环 (Heartbeat)</h3>
+        <div><span class="badge badge-green">✅ 核心已实现</span> <span class="badge badge-yellow">🟡 调度部分实现</span></div>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>系统的中枢神经节拍器，每一个输入事件触发一次完整的决策流程。</div>
+      <div class="field"><span class="field-label">技术实现：</span>在 <code>pulse/heartbeat.py</code> 中定义：
+        <br>1. <code>Heartbeat.on_event(ev: Event)</code> 执行严格 8 步编排：① <code>perceive</code> 钩子 ② 写入工作记忆（语音修订使旧事实失效）③ 聚合静态与动态 <code>Question</code>，单次并发批量调 <code>decide</code> ④ 阈值分流 ⑤ 并发触发 <code>Capability</code> 及重试任务 ⑥ 确定性 <code>Rule</code> 兜底产生 <code>Alert</code> ⑦ <code>remember</code> 钩子写入长期记忆（目前同步执行，写入失败不中断本次判断，错误记录进 tick 轨迹）⑧ 组装 Tick 追踪轨迹。
+        <br>2. 健壮性：重试以 <code>pending.*</code> 事实入工作记忆，上限 3 次，输入版本修订时立即丢弃；判断器异常时规则保障兜底。</div>
+      <div class="field"><span class="field-label">实测数据：</span>日常合成场景回放（包含任务/找物/销账/回答 12 个事件）验证完全正确。</div>
+      <div class="field"><span class="field-label">下一步：</span>实现高频图像关键帧合并队列；赋予语音提问高优先级；将长期记忆写入剥离出主 Tick 循环至后台任务。</div>
+    </div>
+
+    <!-- 5.3 感知（画面） -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.3 画面感知</h3>
+        <span class="badge badge-yellow">🟡 部分实现</span>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>提取画面的第一印象，看图回答“是什么”、“在干什么”。</div>
+      <div class="field"><span class="field-label">技术实现：</span>在 <code>pulse/packs/daily.py</code> 中通过 <code>perceive</code> 钩子调用 djev 原始生成接口 <code>/v1/raw/chat/completions</code> 输出一句话描述；使用 <code>DjevDecider</code> 对图像调用 <code>noul</code> 或带选项 <code>choice</code> 的是/否判断。注意：djev 的 span 接口仅能摘录文本，生成描述必须走生成接口。</div>
+      <div class="field"><span class="field-label">实测数据：</span>djev 带图是/否题耗时约 0.2 秒；画面写描述耗时 0.3~1.0 秒（首次预热约 15 秒）；4 帧合成画面（放下物品、物品种类、浇花动作）判定全对。</div>
+      <div class="field"><span class="field-label">下一步：</span>在前端实现灰度缩略图像素差、在后端补充向量相似度 &gt;0.95 判定，补全这两处尚未实现的去重过滤器。</div>
+    </div>
+
+    <!-- 5.4 判断题设计 -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.4 判断题设计（Heartbeat的“直觉”）</h3>
+        <span class="badge badge-green">✅ 已实现</span>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>给单次读取的大模型设计的提问结构，决定什么时候该打扰执行大模型。</div>
+      <div class="field"><span class="field-label">技术实现：</span>采用 <code>Question(kind='noul')</code>，以固定句式 <code>"Does this utterance itself..."</code> 锁定输入原文；各功能提供 <code>dynamic(wm)</code> 方法从待办事项抽取额外题目（如给每个任务动态下发“画面里是否有人在做这件事？”）；单次读取请求限制在 10 题以内，防止破坏 djev 输出格式。</div>
+      <div class="field"><span class="field-label">实测数据：</span>单张 H100 GPU 上 5~6 题并发单次读取耗时 50~110 ms；30 句标注集测试下，单层 5 个具体问题（助手阈值0.8后推算）误判降至 1 处，p50 为 52 ms。</div>
+      <div class="field"><span class="field-label">下一步：</span>为题库增加哈希版本锁定登记；在实拍画面上重测一轮再调阈值。</div>
+    </div>
+
+    <!-- 5.5 模型提供方 -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.5 模型提供方 (Model 角色)</h3>
+        <span class="badge badge-yellow">🟡 部分实现</span>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>充当系统的大脑思考者，负责复杂任务规划、写回答与调用工具。</div>
+      <div class="field"><span class="field-label">技术实现：</span>在 <code>pulse/providers.py</code> 中定义统一 <code>OpenAICompatAgent.run(system, user, tools, max_steps=4, stop_after_tools=False)</code>；支持 <code>stop_after_tools</code> 单步执行机制，针对记录类操作在工具执行后立刻断开，省去一次冗余推理往返；目前代码已实现 <code>OpenAICompatAgent</code> 接收地址和模型名参数，三项环境变量配置（<code>PULSE_MODEL_BASE_URL</code> / <code>PULSE_MODEL</code> / <code>PULSE_MODEL_KEY_FILE</code>）属计划待做。</div>
+      <div class="field"><span class="field-label">实测数据：</span>开发替身 DeepSeek v4.1 每次需 2~8 秒（免费配额易触碰 429）；<code>gpt-6-luna</code> 测得工具调用 2.3 秒、看图 8.9 秒（不支持 <code>/v1/decisions</code> 原生判断接口）。</div>
+      <div class="field"><span class="field-label">下一步：</span>实现返回目标检测框坐标的结构化输出；完善环境变量统一配置；在正式环境 <code>muse-spark-1.3-contributor</code> 上完成工具调用、看图与框选能力验证。</div>
+    </div>
+
+    <!-- 5.6 工具 -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.6 工具层</h3>
+        <span class="badge badge-yellow">🟡 部分实现</span>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>大脑使用的手和脚，修改任务列表、记录物品、查询记忆。</div>
+      <div class="field"><span class="field-label">技术实现：</span>封装 <code>Tool(name, description, parameters, handler)</code>；内置核心工具集：<code>add_task</code>、<code>update_task</code>、<code>list_open_tasks</code>、<code>item_locations</code>、<code>search_memory</code>；所有写入逻辑严格执行版本隔离，提交前验证版本依赖，过期事实自动作废。</div>
+      <div class="field"><span class="field-label">实测数据：</span>离线任务新增、改期、物品查询调用均顺利通过。</div>
+      <div class="field"><span class="field-label">下一步：</span>（可选）通过官方 Python MCP 客户端接入 Google Calendar MCP 服务。</div>
+    </div>
+
+    <!-- 5.7 记忆与存储 -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.7 记忆与存储</h3>
+        <span class="badge badge-yellow">🟡 部分实现 (全在内存)</span>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>存放此刻所见（工作记忆）以及历史发生过的事（长期记忆）。</div>
+      <div class="field"><span class="field-label">技术实现：</span><code>pulse/memory.py</code> 管理分段 <code>Segment</code>、证据 <code>Evidence</code> 和事实 <code>Fact</code>；<code>add_segment</code> 会在语音被修订时联动废除引用它的旧事实；<code>pulse/longterm.py</code> 通过 <code>RemoteEmbedder</code> 请求本地 EmbeddingGemma 2 服务（POST /embed，float32，768 维）；检索设计了<strong>双模态分开排名策略</strong>，语音与图像各自取 top-k 再归并，在测试查询上解决了模态偏差导致的画面被挤掉问题。</div>
+      <div class="field"><span class="field-label">实测数据：</span>nodecw1 CPU 上图嵌入需 2.0~2.6 秒；“glasses”与“my keys”跨模态检索均准确排在首位。</div>
+      <div class="field"><span class="field-label">下一步：</span>将内存对象映射至 SQLite 表结构（segments/frames/facts/evidence/episodes/tasks）；集成 256 维压缩向量。</div>
+    </div>
+
+    <!-- 5.8 功能包 -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.8 功能包 (Packs)</h3>
+        <span class="badge badge-green">✅ 已实现</span>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>装卸不同场景业务逻辑的插件盒，切换场景只需替换包配置。</div>
+      <div class="field"><span class="field-label">技术实现：</span>一个包定义包含：判断题定义、<code>dynamic</code> 题目生成、触发执行的 <code>Capability</code>、<code>Rule</code> 兜底规则以及 <code>perceive</code>/<code>remember</code> 钩子。日常包 <code>pulse/packs/daily.py</code> 涵盖任务语音增改、物品视觉定点、动态做完销账、提问检索；并留有 <code>pulse/packs/surgical_count.py</code>（纱条清点）作为规范参考。</div>
+      <div class="field"><span class="field-label">实测数据：</span>在包含 12 个事件的日常合成场景中，完整跑通语音建任务、改期、识别三件物品位置、看到浇花后动态销账全流程。</div>
+      <div class="field"><span class="field-label">下一步：</span>保持日常包稳定，实拍测试后调整 <code>task_seen</code> 等判断阈值。</div>
+    </div>
+
+    <!-- 5.9 界面 -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.9 网页界面</h3>
+        <span class="badge badge-gray">⬜ 待做</span>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>向评委和用户直观证明“AI一直在看、但极少打扰模型”的展示屏幕。</div>
+      <div class="field"><span class="field-label">技术实现：</span>采用 FastAPI + 纯静态三栏页面设计。左栏：视频实时画面与 ASR 滚动字幕；中栏：Heartbeat 实时节拍信息流，展示每一跳的题目、概率柱、模型唤醒状态与累计“总事件 N / 唤醒 M 次”节约计数器；右栏：任务清单、物品卡片（附带证据关键帧与红框）及记忆占用统计。</div>
+      <div class="field"><span class="field-label">实测数据：</span>尚无。</div>
+      <div class="field"><span class="field-label">下一步：</span>编写单文件静态页面，接入下行 WebSocket 协议（tick/memory/answer 事件）。</div>
+    </div>
+
+    <!-- 5.10 评测与可观测 -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.10 评测与可观测</h3>
+        <span class="badge badge-yellow">🟡 部分实现</span>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>黑匣子监控仪，每一次感知和判断都在后台留下可回溯记录。</div>
+      <div class="field"><span class="field-label">技术实现：</span><code>Heartbeat</code> 每个 tick 均结构化沉淀完整轨迹 JSON（包含单项耗时、提问列表、置信概率、触发模型标志、状态变动）；<code>eval_triggers.py</code> 支撑对 <code>trigger_labels.json</code> 离线标注批量评估；提供 <code>run_scenario.py</code> 回归测试套件。</div>
+      <div class="field"><span class="field-label">实测数据：</span>已纳入 30 句文字回归集及 5 项离线集成测试。</div>
+      <div class="field"><span class="field-label">下一步：</span>制作包含实拍动作的视觉评测标注集。</div>
+    </div>
+
+    <!-- 5.11 部署与合规 -->
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="margin-bottom:0;">5.11 部署与合规</h3>
+        <span class="badge badge-yellow">🟡 联调完成 / 迁移动作中</span>
+      </div>
+      <div class="field"><span class="field-label">作用通俗解：</span>模型运行的算力拓扑与黑客松比赛规则防线。</div>
+      <div class="field"><span class="field-label">技术实现：</span>
+        <br>1. 部署架构：<code>djev</code> 部署于 <code>gpucw1</code> GPU0（vLLM 0.32、AWQ INT4 精度、FP8 KV Cache，单请求限 1 张图）；嵌入服务 <code>embed_server.py</code> 部署在 <code>nodecw1</code> CPU；主应用驻留 <code>headcw</code>，通过 SSH 隧道端口与 <code>gpucw1</code> 联通并跑通场景回放。
+        <br>2. 比赛合规：严格划分边界，赛期新编写 Pulse 全部代码（~1,500 行）、界面及 Muse 配置接入；复用赛前已有资产 djev 服务及基础模型权重；计划中的 Contributor 版本模型数据训练只使用合成素材和本人画面。演示视频计划预先完整录屏兜底。</div>
+      <div class="field"><span class="field-label">实测数据：</span><code>headcw</code> 与 <code>gpucw1</code> 已成功联通并验证回放逻辑。</div>
+      <div class="field"><span class="field-label">下一步：</span>将嵌入服务迁移至 GPU 提速，开展实拍画面端到端测试，完成演示视频录屏。</div>
+    </div>
+  </section>
+
+  <!-- 6. 风险与待验证事项 -->
+  <section class="card" id="risks">
+    <h2>6. 风险与待验证事项</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      
+      <div style="border: 1px solid #fed7aa; background: #fff7ed; padding: 14px; border-radius: 6px;">
+        <div style="font-weight: 600; color: #c2410c; margin-bottom: 6px;">⚠️ 核心风险警示</div>
+        <ul style="font-size: 13px; color: #7c2d12; padding-left: 18px; line-height: 1.5;">
+          <li><strong>生产模型 Muse 能力未知：</strong>开发期使用 <code>gpt-6-luna</code> 验证，正式切换到 <code>muse-spark-1.3-contributor</code> 后，其工具调用稳定性、看图能力及结构化目标框输出均未经过实测。</li>
+          <li><strong>CPU 嵌入计算瓶颈：</strong>EmbeddingGemma 2 当前在 <code>nodecw1</code> 的 CPU 上运行，单图耗时高达 2~2.6 秒，若不尽快迁移到 GPU，无法承接实时处理。</li>
+          <li><strong>全内存崩溃即丢：</strong>存储系统未落盘，演示过程中一旦进程遭遇意外崩溃，状态与记忆将全部丢失。</li>
+        </ul>
+      </div>
+
+      <div style="border: 1px solid #cbd5e1; background: #f8fafc; padding: 14px; border-radius: 6px;">
+        <div style="font-weight: 600; color: #334155; margin-bottom: 6px;">🧪 实测关键待验证</div>
+        <ul style="font-size: 13px; color: #475569; padding-left: 18px; line-height: 1.5;">
+          <li><strong>真实物理走位评测：</strong>当前视觉评测数据全部基于 <strong>4 帧合成画面</strong>，未经历真实光照形变、复杂背景与移动抖动的真实考验。</li>
+          <li><strong>前后端链路吞吐：</strong>浏览器 Web Speech API 在真实环境下的连续修订延迟，以及灰度像素差过滤能否有效压降无用上行。</li>
+          <li><strong>djev 首次预热延迟：</strong>实测初次生成描述存在长达 15 秒的模型冷启动，演示前必须执行脚本热身。</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

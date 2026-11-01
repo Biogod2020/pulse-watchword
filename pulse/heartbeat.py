@@ -70,7 +70,7 @@ class Heartbeat:
     def __init__(self, decider: DecisionProvider, memory: WorkingMemory, capabilities: list[Capability],
                  rules: list[Rule], context: Callable[[WorkingMemory, Event, dict[str, Alert]], str],
                  perceive: Callable[[Event], Awaitable[None]] | None = None,
-                 remember: Callable[[Event], Awaitable[None]] | None = None):
+                 remember: Callable[[Event], Awaitable[None]] | None = None, background_remember: bool = False):
         """perceive: enrich a raw event before the read (e.g. caption a frame).
         remember: write the event to long-term memory after the tick."""
         self.decider = decider
@@ -80,6 +80,9 @@ class Heartbeat:
         self.context = context
         self.perceive = perceive
         self.remember = remember
+        self.background_remember = background_remember
+        self._bg: set[asyncio.Task] = set()
+        self.remember_errors: list[str] = []
         self.alerts: dict[str, Alert] = {}
         self.trace: list[dict] = []
         self.pending: list[tuple[Capability, Event, int]] = []   # failed runs waiting for a retry
@@ -143,7 +146,11 @@ class Heartbeat:
             self._track(c, e, attempt, failed)
         raised, cleared = self._run_rules(ev)
         remember_ms, remember_error = 0.0, None
-        if self.remember:
+        if self.remember and self.background_remember:
+            task = asyncio.create_task(self._remember_bg(ev))
+            self._bg.add(task)
+            task.add_done_callback(self._bg.discard)
+        elif self.remember:
             tr = time.perf_counter()
             try:
                 await self.remember(ev)
@@ -160,6 +167,17 @@ class Heartbeat:
                 "tick_ms": (time.perf_counter() - t0) * 1e3, "memory_version": self.memory.version}
         self.trace.append(tick)
         return tick
+
+    async def _remember_bg(self, ev: Event) -> None:
+        try:
+            await self.remember(ev)
+        except Exception as e:
+            self.remember_errors.append(f"{ev.seg_id or ev.data.get('frame')}: {type(e).__name__}: {e}")
+
+    async def drain(self) -> None:
+        """Wait for background long-term memory writes."""
+        while self._bg:
+            await asyncio.gather(*list(self._bg), return_exceptions=True)
 
     def _due_retries(self) -> list[tuple[Capability, Event, int]]:
         """Re-run failed capabilities whose input is still current; a revised segment drops its old retry."""

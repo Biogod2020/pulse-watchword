@@ -44,6 +44,7 @@ class WorkingMemory:
     facts: dict[str, Fact] = field(default_factory=dict)
     log: list[dict] = field(default_factory=list)
     version: int = 0
+    store: object | None = None     # optional pulse.store.Store for persistence
 
     def _bump(self) -> int:
         self.version += 1
@@ -61,11 +62,15 @@ class WorkingMemory:
         if not old:
             self.order.append(seg_id)
         self._bump()
+        if self.store:
+            self.store.save_segment(self.segments[seg_id])
         stale = [k for k, f in self.facts.items()
                  if any(e.kind == "speech" and e.ref == seg_id and e.rev < rev for e in f.evidence)]
         for k in stale:
             self.log.append({"op": "invalidate", "key": k, "because": f"{seg_id} revised to r{rev}", "t": t})
             del self.facts[k]
+            if self.store:
+                self.store.delete_fact(k)
         return stale
 
     def is_current(self, ev: Evidence) -> bool:
@@ -80,6 +85,8 @@ class WorkingMemory:
             self.log.append({"op": "reject_stale", "key": key, "t": t})
             return False
         self.facts[key] = Fact(key, value, evidence, source, t, self._bump())
+        if self.store:
+            self.store.save_fact(self.facts[key])
         self.log.append({"op": "put", "key": key, "value": value, "source": source, "t": t})
         return True
 

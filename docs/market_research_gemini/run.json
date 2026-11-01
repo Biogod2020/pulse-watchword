@@ -1,0 +1,11 @@
+{
+  "requested_model": "gemini-3.8-flash-high",
+  "returned_model": "gemini-3.8-flash-n",
+  "finish_reason": "STOP",
+  "usage": {
+    "promptTokenCount": 2495,
+    "candidatesTokenCount": 1542,
+    "totalTokenCount": 6192,
+    "thoughtsTokenCount": 2155
+  }
+}

@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Pulse 技术实现总结</title><style>
+:root{--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--bg:#f6f7fb;--acc:#4f46e5;--ok:#10b981}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 -apple-system,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:36px 22px 60px}
+.hero{background:linear-gradient(135deg,#1e1b4b,#4338ca 55%,#0ea5e9);color:#fff;border-radius:22px;padding:34px 34px 28px;box-shadow:0 18px 40px -20px #312e81}
+.hero h1{margin:0 0 10px;font-size:27px;letter-spacing:.3px}.hero p{margin:0;opacity:.92;font-size:15.5px;max-width:860px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:24px}
+.kpi{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px 14px}
+.kpi b{display:block;font-size:22px}.kpi span{font-size:12.5px;opacity:.85}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 6px}nav a{font-size:13px;color:var(--acc);background:#eef2ff;padding:5px 12px;border-radius:999px;text-decoration:none}
+h2{font-size:21px;margin:38px 0 6px;display:flex;align-items:center;gap:10px}h2 .n{background:var(--acc);color:#fff;width:28px;height:28px;border-radius:8px;display:inline-grid;place-items:center;font-size:14px}
+.lead{color:var(--mut);margin:0 0 14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.chart{width:100%;height:auto;display:block}
+.chart .lbl{font-size:13px;fill:#1e293b}.chart .badge{font-size:11px;fill:#fff;font-weight:700}.chart .axis{font-size:11.5px;fill:#64748b}.chart .val{font-size:12px;fill:#334155;font-weight:600}.chart .pick{font-size:12.5px;fill:#047857;font-weight:700}
+.arch .h{font-size:15px;font-weight:700;fill:#0f172a}.arch .s{font-size:13.5px;font-weight:700;fill:#0f172a}.arch .t{font-size:12.5px;fill:#334155}.arch .t2{font-size:11.5px;fill:#475569}.arch .tag{font-size:11px;fill:#64748b;letter-spacing:2px}
+.arch .frame{fill:#f8fafc;stroke:#cbd5e1;stroke-dasharray:6 5}
+.box{stroke-width:1.5}.box.done{fill:#ecfdf5;stroke:#34d399}.box.partial{fill:#fffbeb;stroke:#f59e0b}.box.todo{fill:#f8fafc;stroke:#94a3b8;stroke-dasharray:5 4}
+.box.judge{fill:#d1fae5;stroke:#059669;stroke-width:2.5}.box.model{fill:#ede9fe;stroke:#7c3aed}.box.mem{fill:#eff6ff;stroke:#60a5fa}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mods{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
+.mod-h{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:14px}
+.pill{font-size:11.5px;padding:2px 9px;border-radius:999px;font-weight:600}
+.bar{height:7px;background:#f1f5f9;border-radius:9px;margin:7px 0 4px;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px}
+.mod p{margin:0;font-size:12.5px;color:var(--mut)}
+.tiers{display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0 18px}
+.tier{border-radius:12px;padding:10px 16px;display:grid;grid-template-columns:120px 1fr;row-gap:2px;color:#1e1b4b}
+.tier b{grid-row:span 2;align-self:center}.tier span{font-size:13px}.tier em{font-style:normal;font-size:12px;color:#1d4ed8}
+.warn{background:#fffbeb;border:1px solid #fcd34d;color:#78350f;border-radius:12px;padding:12px 16px;font-size:14px;margin-top:12px}
+.det h3{margin:0;font-size:16px}.det .where{font:12px ui-monospace,Menlo,monospace;color:#6366f1;margin:2px 0 8px}
+.det ul{margin:0;padding-left:18px}.det li{font-size:13.5px;margin:4px 0}
+code{font:12.5px ui-monospace,Menlo,Consolas,monospace;background:#f1f5f9;padding:1px 5px;border-radius:5px;color:#3730a3}
+.flow3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.plan{border-radius:14px;padding:16px;border:1px solid var(--line);background:#fff}.plan b{display:block;font-size:13px;color:var(--acc);margin-bottom:4px}.plan p{margin:0;font-size:13.5px}
+.risk{border-left:4px solid;border-radius:12px;padding:14px 16px;background:#fff;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.risk h4{margin:0 0 4px;font-size:14.5px}.risk p{margin:0;font-size:13.5px;color:#334155}
+.note{font-size:13px;color:#475569;margin-top:10px}
+.hero-foot{margin-top:16px!important;font-size:12.5px!important;opacity:.75}
+.uses{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 0}
+.use{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}.use b{font-size:15px}.use p{margin:4px 0 0;font-size:13.5px;color:#334155}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.role{border-radius:14px;padding:14px 16px;border:1.5px solid}.role b{font-size:15px}.role p{margin:4px 0 0;font-size:13.5px;color:#1f2937}
+.role.judge{background:#ecfdf5;border-color:#34d399}.role.brain{background:#f5f3ff;border-color:#a78bfa}
+b.g{color:#047857}b.p{color:#6d28d9}b.b{color:#1d4ed8}
+.explain{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:14px;margin-top:12px;color:#1f2937}
+details.eng{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 20px}details.eng summary{cursor:pointer;font-weight:600;color:var(--acc)}
+@media print{body{background:#fff}.hero{box-shadow:none}.card,.risk{break-inside:avoid}}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.mods,.flow3,.uses,.roles{grid-template-columns:1fr}}
+</style></head>
+<body><div class="wrap">
+<section class="hero">
+  <h1>Pulse：一直在看、在听，只在需要时才动脑的 AI 助手</h1>
+  <p>用手机或电脑的摄像头和麦克风（将来可以是智能眼镜），帮你记住东西放在哪、答应过什么、哪些事已经做完。它时刻留意身边发生的事，但只有真正需要时才叫醒昂贵的大模型。</p>
+  <div class="kpis">
+    <div class="kpi"><b>0.05–0.13 秒</b><span>听到一句话后判断“要不要行动”</span></div>
+    <div class="kpi"><b>0.23–0.25 秒</b><span>看到一帧画面后判断</span></div>
+    <div class="kpi"><b>12 / 12</b><span>模拟场景里的事件都处理对了</span></div>
+    <div class="kpi"><b>≈ 20 MB/天</b><span>按设计估算的画面存储</span></div>
+    <div class="kpi"><b>约 1.5k 行</b><span>代码 · 5 项自动测试通过</span></div>
+  </div>
+  <p class="hero-foot">截至 2026-11-01 · 为 Meta 全球 AI 开发者黑客松制作（比赛要求使用 Meta 的模型）</p>
+</section>
+
+<div class="uses">
+  <div class="use"><b>“我钥匙放哪了？”</b><p>放下钥匙时它看到了，问的时候给你看当时那张画面。</p></div>
+  <div class="use"><b>“周五前把幻灯片发给 Maya”</b><p>随口一说就记成待办；改口说“周四”，它跟着改。</p></div>
+  <div class="use"><b>做完自动打勾</b><p>摄像头看到你在给花浇水，就把“浇花”这件事勾掉。</p></div>
+</div>
+
+<div class="roles">
+  <div class="role judge"><b>快速判断员 · djev</b><p>每句话、每帧画面都先过它这一关，只回答“是/否、选哪个”这类简单问题，不到 0.3 秒。它一次直接给出答案，不像聊天模型那样一个字一个字地写。</p></div>
+  <div class="role brain"><b>大脑 · Meta Muse</b><p>只有判断员说“需要”时才叫醒它，由它记待办、查记忆、回答问题。开发期间先用 gpt-6-luna 代替，正式版换成 Muse Spark 1.3。</p></div>
+</div>
+
+<nav><a href="#status">做到哪了</a><a href="#arch">怎么运作</a><a href="#timeline">一次实际运行</a><a href="#exp">怎么问才准</a><a href="#mem">会不会撑爆存储</a><a href="#next">接下来三天</a><a href="#risk">风险</a><a href="#detail">工程细节</a></nav>
+
+<h2 id="status"><span class="n">1</span>做到哪了</h2>
+<p class="lead">“动脑”的部分已经能跑：判断、记忆、日常功能。还缺“看得见”的部分：摄像头和麦克风输入、展示界面、存到硬盘，以及换成 Meta 的模型。</p>
+<div class="card mods"><div class="mod"><div class="mod-h"><span>心跳主循环</span><span class="pill" style="color:#059669;background:#d1fae5">已实现 · 约 85%</span></div><div class="bar"><i style="width:85%;background:#059669"></i></div><p>每来一句话、一帧画面就过一遍；出错会重试，判断员掉线也有保底规则</p></div><div class="mod"><div class="mod-h"><span>判断题怎么问</span><span class="pill" style="color:#059669;background:#d1fae5">已实现 · 约 90%</span></div><div class="bar"><i style="width:90%;background:#059669"></i></div><p>找到了让判断员答得准的问法：问题要窄、写清哪些情况不算</p></div><div class="mod"><div class="mod-h"><span>日常功能</span><span class="pill" style="color:#059669;background:#d1fae5">已实现 · 约 90%</span></div><div class="bar"><i style="width:90%;background:#059669"></i></div><p>记待办、记物品位置、看到做完自动打勾、回答提问（在模拟场景里全对）</p></div><div class="mod"><div class="mod-h"><span>看懂画面</span><span class="pill" style="color:#b45309;background:#fef3c7">部分实现 · 约 60%</span></div><div class="bar"><i style="width:60%;background:#b45309"></i></div><p>能描述画面、判断动作；过滤重复画面还没做</p></div><div class="mod"><div class="mod-h"><span>大脑模型接入</span><span class="pill" style="color:#b45309;background:#fef3c7">部分实现 · 约 55%</span></div><div class="bar"><i style="width:55%;background:#b45309"></i></div><p>能调用工具；换成 Meta 的 Muse、在画面里框出物品还没做</p></div><div class="mod"><div class="mod-h"><span>动手的工具</span><span class="pill" style="color:#b45309;background:#fef3c7">部分实现 · 约 60%</span></div><div class="bar"><i style="width:60%;background:#b45309"></i></div><p>待办、物品、记忆查询已有；连 Google 日历是可选项</p></div><div class="mod"><div class="mod-h"><span>记忆与存储</span><span class="pill" style="color:#b45309;background:#fef3c7">部分实现 · 约 35%</span></div><div class="bar"><i style="width:35%;background:#b45309"></i></div><p>能记、能查，但关掉程序就忘（还没存到硬盘）</p></div><div class="mod"><div class="mod-h"><span>测试与记录</span><span class="pill" style="color:#b45309;background:#fef3c7">部分实现 · 约 50%</span></div><div class="bar"><i style="width:50%;background:#b45309"></i></div><p>每一步都有记录，30 句测试题；真实拍摄的测试还没做</p></div><div class="mod"><div class="mod-h"><span>摄像头和麦克风输入</span><span class="pill" style="color:#475569;background:#e2e8f0">待做 · 约 0%</span></div><div class="bar"><i style="width:0%;background:#475569"></i></div><p>在浏览器里打开摄像头和麦克风，画面不变就不上传</p></div><div class="mod"><div class="mod-h"><span>展示界面</span><span class="pill" style="color:#475569;background:#e2e8f0">待做 · 约 0%</span></div><div class="bar"><i style="width:0%;background:#475569"></i></div><p>三栏：画面 / 判断过程 / 记忆和回答</p></div></div>
+<p class="note">百分比是团队的粗略估计，不是精确测量。</p>
+
+<h2 id="arch"><span class="n">2</span>怎么运作</h2>
+<p class="lead">每句话、每帧画面先交给<b class="g">快速判断员（绿色）</b>；只有需要时才叫醒<b class="p">大脑（紫色）</b>。<b class="b">蓝色</b>是记忆，虚线框表示还没做。</p>
+<div class="card">
+<svg viewBox="0 0 940 470" class="chart arch" role="img" aria-label="系统架构">
+  <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker></defs>
+  <!-- input -->
+  <rect x="20" y="30" width="190" height="150" rx="14" class="box todo"/>
+  <text x="115" y="58" class="h" text-anchor="middle">浏览器输入</text>
+  <text x="115" y="84" class="t" text-anchor="middle">摄像头 1 fps · 640 px</text>
+  <text x="115" y="106" class="t" text-anchor="middle">像素差过滤（不变不传）</text>
+  <text x="115" y="128" class="t" text-anchor="middle">浏览器语音识别</text>
+  <text x="115" y="160" class="tag" text-anchor="middle">待做</text>
+  <line x1="212" y1="105" x2="262" y2="105" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  
+  <!-- heartbeat -->
+  <rect x="266" y="14" width="420" height="300" rx="16" class="frame"/>
+  <text x="282" y="40" class="h">心跳：每句话、每帧画面都过一遍</text>
+  <g class="step"><rect x="284" y="56" width="124" height="54" rx="10" class="box done"/><text x="346" y="78" class="s" text-anchor="middle">① 感知</text><text x="346" y="97" class="t2" text-anchor="middle">看图写一句描述</text></g>
+  <g class="step"><rect x="418" y="56" width="124" height="54" rx="10" class="box done"/><text x="480" y="78" class="s" text-anchor="middle">② 工作记忆</text><text x="480" y="97" class="t2" text-anchor="middle">听错了能改正</text></g>
+  <g class="step"><rect x="552" y="56" width="124" height="54" rx="10" class="box judge"/><text x="614" y="78" class="s" text-anchor="middle">③ 要不要行动？</text><text x="614" y="97" class="t2" text-anchor="middle">快速判断员 djev</text></g>
+  <g class="step"><rect x="284" y="124" width="124" height="54" rx="10" class="box done"/><text x="346" y="146" class="s" text-anchor="middle">④ 唤醒功能</text><text x="346" y="165" class="t2" text-anchor="middle">只叫醒需要的</text></g>
+  <g class="step"><rect x="418" y="124" width="124" height="54" rx="10" class="box done"/><text x="480" y="146" class="s" text-anchor="middle">⑤ 规则兜底</text><text x="480" y="165" class="t2" text-anchor="middle">判断器挂了也运行</text></g>
+  <g class="step"><rect x="552" y="124" width="124" height="54" rx="10" class="box partial"/><text x="614" y="146" class="s" text-anchor="middle">⑥ 长期记忆</text><text x="614" y="165" class="t2" text-anchor="middle">还没存到硬盘</text></g>
+  <rect x="284" y="194" width="392" height="104" rx="10" class="box mem"/>
+  <text x="300" y="216" class="s">记忆</text>
+  <text x="300" y="240" class="t2">此刻记住的：待办、东西放在哪（每条都记得出处）</text>
+  <text x="300" y="262" class="t2">很久以前的：说过的话和看过的画面，可以用一句话搜回来</text>
+  <text x="300" y="284" class="t2" fill="#b45309">⚠ 目前还没存到硬盘，关掉程序会忘</text>
+  <!-- model & tools -->
+  <line x1="480" y1="316" x2="480" y2="352" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="490" y="340" class="t2">只在触发时</text>
+  <rect x="266" y="356" width="200" height="96" rx="14" class="box model"/>
+  <text x="366" y="382" class="h" text-anchor="middle">大脑（只在需要时）</text>
+  <text x="366" y="406" class="t2" text-anchor="middle">正式：Meta Muse Spark 1.3</text>
+  <text x="366" y="426" class="t2" text-anchor="middle">开发期替身：gpt-6-luna</text>
+  <rect x="486" y="356" width="200" height="96" rx="14" class="box done"/>
+  <text x="586" y="382" class="h" text-anchor="middle">工具</text>
+  <text x="586" y="406" class="t2" text-anchor="middle">任务 · 物品 · 记忆检索（已有）</text>
+  <text x="586" y="426" class="t2" text-anchor="middle">Google 日历 MCP（可选）</text>
+  <!-- UI -->
+  <line x1="688" y1="165" x2="736" y2="165" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="740" y="30" width="180" height="270" rx="14" class="box todo"/>
+  <text x="830" y="58" class="h" text-anchor="middle">网页界面</text>
+  <rect x="756" y="74" width="148" height="52" rx="8" fill="#f1f5f9"/><text x="830" y="104" class="t2" text-anchor="middle">左：画面 + 字幕</text>
+  <rect x="756" y="134" width="148" height="70" rx="8" fill="#ecfdf5"/><text x="830" y="164" class="t2" text-anchor="middle">中：heartbeat 流</text><text x="830" y="184" class="t2" text-anchor="middle">N 事件 / 唤醒 M 次</text>
+  <rect x="756" y="212" width="148" height="52" rx="8" fill="#eef2ff"/><text x="830" y="242" class="t2" text-anchor="middle">右：记忆 + 回答卡片</text>
+  <text x="830" y="286" class="tag" text-anchor="middle">待做</text>
+  <!-- legend -->
+  <g transform="translate(740,330)">
+    <rect width="14" height="14" rx="3" class="box done"/><text x="22" y="12" class="t2">已实现</text>
+    <rect y="24" width="14" height="14" rx="3" class="box partial"/><text x="22" y="36" class="t2">部分实现</text>
+    <rect y="48" width="14" height="14" rx="3" class="box todo"/><text x="22" y="60" class="t2">待做</text>
+    <rect y="72" width="14" height="14" rx="3" class="box judge"/><text x="22" y="84" class="t2">快速判断员 djev</text>
+    <rect y="96" width="14" height="14" rx="3" class="box model"/><text x="22" y="108" class="t2">大脑（Meta Muse）</text>
+  </g>
+</svg></div>
+
+<h2 id="timeline"><span class="n">3</span>一次实际运行：每件事花了多少时间</h2>
+<p class="lead">在一个模拟的“晚上在家”场景里，12 件事依次发生。快速判断员一共回答了 35 道小问题，大脑只被叫醒 8 次。绿色那一小段就是判断本身，几乎看不见；时间主要花在大脑思考（紫色）和存画面（蓝色）上。</p>
+<div class="card"><svg viewBox="0 0 920 440" class="chart" role="img" aria-label="每个事件的耗时分解"><line x1="250.0" y1="26" x2="250.0" y2="400" stroke="#e2e8f0"/><text x="250.0" y="20" class="axis" text-anchor="middle">0s</text><line x1="315.0" y1="26" x2="315.0" y2="400" stroke="#e2e8f0"/><text x="315.0" y="20" class="axis" text-anchor="middle">1s</text><line x1="380.0" y1="26" x2="380.0" y2="400" stroke="#e2e8f0"/><text x="380.0" y="20" class="axis" text-anchor="middle">2s</text><line x1="445.0" y1="26" x2="445.0" y2="400" stroke="#e2e8f0"/><text x="445.0" y="20" class="axis" text-anchor="middle">3s</text><line x1="510.0" y1="26" x2="510.0" y2="400" stroke="#e2e8f0"/><text x="510.0" y="20" class="axis" text-anchor="middle">4s</text><line x1="575.0" y1="26" x2="575.0" y2="400" stroke="#e2e8f0"/><text x="575.0" y="20" class="axis" text-anchor="middle">5s</text><line x1="640.0" y1="26" x2="640.0" y2="400" stroke="#e2e8f0"/><text x="640.0" y="20" class="axis" text-anchor="middle">6s</text><line x1="705.0" y1="26" x2="705.0" y2="400" stroke="#e2e8f0"/><text x="705.0" y="20" class="axis" text-anchor="middle">7s</text><line x1="770.0" y1="26" x2="770.0" y2="400" stroke="#e2e8f0"/><text x="770.0" y="20" class="axis" text-anchor="middle">8s</text><rect x="4" y="39" width="34" height="17" rx="4" fill="#0ea5e9"/><text x="21" y="51" class="badge" text-anchor="middle">语音</text><text x="44" y="51" class="lbl">“我会把幻灯片发给 Maya…”</text><rect x="250.0" y="39" width="2.5" height="17" rx="3" fill="#6ee7b7"><title>caption: 0 ms</title></rect><rect x="252.5" y="39" width="8.5" height="17" rx="3" fill="#059669"><title>judge: 131 ms</title></rect><rect x="261.0" y="39" width="188.0" height="17" rx="3" fill="#7c3aed"><title>agent: 2892 ms</title></rect><rect x="449.0" y="39" width="5.3" height="17" rx="3" fill="#60a5fa"><title>remember: 82 ms</title></rect><text x="460.3" y="52" class="val">3.10s · 记入待办</text><rect x="4" y="69" width="34" height="17" rx="4" fill="#0ea5e9"/><text x="21" y="81" class="badge" text-anchor="middle">语音</text><text x="44" y="81" class="lbl">“你能浇一下罗勒吗？”</text><rect x="250.0" y="69" width="2.5" height="17" rx="3" fill="#6ee7b7"><title>caption: 0 ms</title></rect><rect x="252.5" y="69" width="6.8" height="17" rx="3" fill="#059669"><title>judge: 104 ms</title></rect><rect x="259.3" y="69" width="177.8" height="17" rx="3" fill="#7c3aed"><title>agent: 2736 ms</title></rect><rect x="437.1" y="69" width="5.7" height="17" rx="3" fill="#60a5fa"><title>remember: 87 ms</title></rect><text x="448.8" y="82" class="val">2.93s · 记入待办</text><rect x="4" y="99" width="34" height="17" rx="4" fill="#0ea5e9"/><text x="21" y="111" class="badge" text-anchor="middle">语音</text><text x="44" y="111" class="lbl">“好，我晚饭后浇”</text><rect x="250.0" y="99" width="2.5" height="17" rx="3" fill="#6ee7b7"><title>caption: 0 ms</title></rect><rect x="252.5" y="99" width="3.8" height="17" rx="3" fill="#059669"><title>judge: 58 ms</title></rect><rect x="256.3" y="99" width="177.8" height="17" rx="3" fill="#7c3aed"><title>agent: 2736 ms</title></rect><rect x="434.1" y="99" width="5.4" height="17" rx="3" fill="#60a5fa"><title>remember: 83 ms</title></rect><text x="445.6" y="112" class="val">2.88s · 记入待办</text><rect x="4" y="129" width="34" height="17" rx="4" fill="#a855f7"/><text x="21" y="141" class="badge" text-anchor="middle">画面</text><text x="44" y="141" class="lbl">钥匙放进门口的碗</text><rect x="250.0" y="129" width="22.5" height="17" rx="3" fill="#6ee7b7"><title>caption: 347 ms</title></rect><rect x="272.5" y="129" width="15.9" height="17" rx="3" fill="#059669"><title>judge: 245 ms</title></rect><rect x="288.5" y="129" width="130.1" height="17" rx="3" fill="#60a5fa"><title>remember: 2001 ms</title></rect><text x="424.6" y="142" class="val">2.59s · 记住物品位置</text><rect x="4" y="159" width="34" height="17" rx="4" fill="#a855f7"/><text x="21" y="171" class="badge" text-anchor="middle">画面</text><text x="44" y="171" class="lbl">手机放在厨房台面</text><rect x="250.0" y="159" width="17.9" height="17" rx="3" fill="#6ee7b7"><title>caption: 275 ms</title></rect><rect x="267.9" y="159" width="14.9" height="17" rx="3" fill="#059669"><title>judge: 230 ms</title></rect><rect x="282.8" y="159" width="138.4" height="17" rx="3" fill="#60a5fa"><title>remember: 2129 ms</title></rect><text x="427.2" y="172" class="val">2.63s · 记住物品位置</text><rect x="4" y="189" width="34" height="17" rx="4" fill="#0ea5e9"/><text x="21" y="201" class="badge" text-anchor="middle">语音</text><text x="44" y="201" class="lbl">“这意面真好吃”</text><rect x="250.0" y="189" width="2.5" height="17" rx="3" fill="#6ee7b7"><title>caption: 0 ms</title></rect><rect x="252.5" y="189" width="6.8" height="17" rx="3" fill="#059669"><title>judge: 104 ms</title></rect><rect x="259.3" y="189" width="5.2" height="17" rx="3" fill="#60a5fa"><title>remember: 80 ms</title></rect><text x="270.5" y="202" class="val">0.18s · 闲聊 · 未唤醒</text><rect x="4" y="219" width="34" height="17" rx="4" fill="#0ea5e9"/><text x="21" y="231" class="badge" text-anchor="middle">语音</text><text x="44" y="231" class="lbl">“…还是周四发吧”</text><rect x="250.0" y="219" width="2.5" height="17" rx="3" fill="#6ee7b7"><title>caption: 0 ms</title></rect><rect x="252.5" y="219" width="7.2" height="17" rx="3" fill="#059669"><title>judge: 110 ms</title></rect><rect x="259.7" y="219" width="186.2" height="17" rx="3" fill="#7c3aed"><title>agent: 2865 ms</title></rect><rect x="445.9" y="219" width="5.8" height="17" rx="3" fill="#60a5fa"><title>remember: 89 ms</title></rect><text x="457.6" y="232" class="val">3.06s · 记入待办</text><rect x="4" y="249" width="34" height="17" rx="4" fill="#a855f7"/><text x="21" y="261" class="badge" text-anchor="middle">画面</text><text x="44" y="261" class="lbl">给罗勒浇水</text><rect x="250.0" y="249" width="48.0" height="17" rx="3" fill="#6ee7b7"><title>caption: 739 ms</title></rect><rect x="298.0" y="249" width="16.2" height="17" rx="3" fill="#059669"><title>judge: 250 ms</title></rect><rect x="314.3" y="249" width="174.8" height="17" rx="3" fill="#7c3aed"><title>agent: 2690 ms</title></rect><rect x="489.1" y="249" width="128.2" height="17" rx="3" fill="#60a5fa"><title>remember: 1973 ms</title></rect><text x="623.4" y="262" class="val">5.65s · 看到做完·打勾</text><rect x="4" y="279" width="34" height="17" rx="4" fill="#a855f7"/><text x="21" y="291" class="badge" text-anchor="middle">画面</text><text x="44" y="291" class="lbl">眼镜放在书桌</text><rect x="250.0" y="279" width="43.7" height="17" rx="3" fill="#6ee7b7"><title>caption: 672 ms</title></rect><rect x="293.7" y="279" width="14.9" height="17" rx="3" fill="#059669"><title>judge: 229 ms</title></rect><rect x="308.6" y="279" width="122.2" height="17" rx="3" fill="#60a5fa"><title>remember: 1880 ms</title></rect><text x="436.8" y="292" class="val">2.78s · 记住物品位置</text><rect x="4" y="309" width="34" height="17" rx="4" fill="#0ea5e9"/><text x="21" y="321" class="badge" text-anchor="middle">语音</text><text x="44" y="321" class="lbl">“我的眼镜放哪了？”</text><rect x="250.0" y="309" width="2.5" height="17" rx="3" fill="#6ee7b7"><title>caption: 0 ms</title></rect><rect x="252.5" y="309" width="3.1" height="17" rx="3" fill="#059669"><title>judge: 48 ms</title></rect><rect x="255.6" y="309" width="362.5" height="17" rx="3" fill="#7c3aed"><title>agent: 5577 ms</title></rect><rect x="618.1" y="309" width="5.3" height="17" rx="3" fill="#60a5fa"><title>remember: 82 ms</title></rect><text x="629.5" y="322" class="val">5.71s · 回答提问</text><rect x="4" y="339" width="34" height="17" rx="4" fill="#0ea5e9"/><text x="21" y="351" class="badge" text-anchor="middle">语音</text><text x="44" y="351" class="lbl">“我今天浇罗勒了吗？”</text><rect x="250.0" y="339" width="2.5" height="17" rx="3" fill="#6ee7b7"><title>caption: 0 ms</title></rect><rect x="252.5" y="339" width="6.4" height="17" rx="3" fill="#059669"><title>judge: 98 ms</title></rect><rect x="258.9" y="339" width="394.0" height="17" rx="3" fill="#7c3aed"><title>agent: 6061 ms</title></rect><rect x="652.8" y="339" width="5.3" height="17" rx="3" fill="#60a5fa"><title>remember: 82 ms</title></rect><text x="664.2" y="352" class="val">6.24s · 回答提问</text><rect x="4" y="369" width="34" height="17" rx="4" fill="#0ea5e9"/><text x="21" y="381" class="badge" text-anchor="middle">语音</text><text x="44" y="381" class="lbl">“我还有什么没做？”</text><rect x="250.0" y="369" width="2.5" height="17" rx="3" fill="#6ee7b7"><title>caption: 0 ms</title></rect><rect x="252.5" y="369" width="5.9" height="17" rx="3" fill="#059669"><title>judge: 91 ms</title></rect><rect x="258.4" y="369" width="335.2" height="17" rx="3" fill="#7c3aed"><title>agent: 5157 ms</title></rect><rect x="593.6" y="369" width="5.3" height="17" rx="3" fill="#60a5fa"><title>remember: 82 ms</title></rect><text x="605.0" y="382" class="val">5.33s · 回答提问</text><rect x="44" y="412" width="12" height="12" rx="2" fill="#6ee7b7"/><text x="62" y="422" class="axis">看图写一句描述（快速判断员）</text><rect x="264" y="412" width="12" height="12" rx="2" fill="#059669"/><text x="282" y="422" class="axis">判断要不要行动（快速判断员）</text><rect x="484" y="412" width="12" height="12" rx="2" fill="#7c3aed"/><text x="502" y="422" class="axis">大脑思考并动手（目前用替身模型）</text><rect x="704" y="412" width="12" height="12" rx="2" fill="#60a5fa"/><text x="722" y="422" class="axis">存进长期记忆</text></svg></div>
+<div class="explain"><b>怎么读这张图：</b>“这意面真好吃”只是闲聊，判断员花 0.1 秒就判定不用管，没有叫醒大脑，所以条很短。这个场景是特意安排的，几乎每件事都需要处理；真实生活里大部分时间什么都不会发生，能省多少还要用真实的长时间数据来测。这次的“大脑”用的是替身模型，之后换成 Meta Muse。场景里的对话原文是英文，图中显示的是中文翻译。</div>
+
+<h2 id="exp"><span class="n">4</span>怎么问，判断员才答得准</h2>
+<p class="lead">同一个判断员，同样 30 句话（里面埋了容易答错的“陷阱句”），换 5 种问法。结论：笼统的问题最容易错；具体、写清哪些情况不算的问题又快又准。</p>
+<div class="card"><svg viewBox="0 0 920 300" class="chart" role="img" aria-label="判断题设计对比"><text x="210" y="22" class="axis">判断错、会导致做错事的次数（越少越好）</text><text x="570" y="22" class="axis">一般要等多久（毫秒，中位数）</text><text x="8" y="60" class="lbl" font-weight="400">A 一个问题问好几件事</text><text x="8" y="78" class="axis">问了 30 次</text><rect x="210" y="46" width="200.0" height="22" rx="4" fill="#ef4444" opacity="0.55"/><text x="418.0" y="62" class="val">8</text><rect x="570" y="46" width="74.2" height="22" rx="4" fill="#cbd5e1"/><text x="652.2" y="62" class="val">47</text><text x="8" y="110" class="lbl" font-weight="400">B 6 个小问题，含一个笼统的</text><text x="8" y="128" class="axis">问了 30 次</text><rect x="210" y="96" width="300.0" height="22" rx="4" fill="#ef4444" opacity="0.55"/><text x="518.0" y="112" class="val">12</text><rect x="570" y="96" width="83.7" height="22" rx="4" fill="#cbd5e1"/><text x="661.7" y="112" class="val">53</text><text x="8" y="160" class="lbl" font-weight="400">C 先问大类，再问细节</text><text x="8" y="178" class="axis">问了 44 次</text><rect x="210" y="146" width="100.0" height="22" rx="4" fill="#ef4444" opacity="0.55"/><text x="318.0" y="162" class="val">4</text><rect x="570" y="146" width="172.1" height="22" rx="4" fill="#cbd5e1"/><text x="750.1" y="162" class="val">109</text><text x="8" y="210" class="lbl" font-weight="700">D 5 个具体问题一次问完</text><text x="8" y="228" class="pick">问了 30 次 · ✓ 采用</text><rect x="210" y="196" width="75.0" height="22" rx="4" fill="#10b981" opacity="1"/><text x="293.0" y="212" class="val">3</text><rect x="570" y="196" width="82.1" height="22" rx="4" fill="#10b981"/><text x="660.1" y="212" class="val">52</text><text x="315.0" y="212" class="axis">把“在跟助手说话”调严后，估计只剩 1 次</text><text x="8" y="260" class="lbl" font-weight="400">E 先选主题，再问细节</text><text x="8" y="278" class="axis">问了 49 次</text><rect x="210" y="246" width="125.0" height="22" rx="4" fill="#ef4444" opacity="0.55"/><text x="343.0" y="262" class="val">5</text><rect x="570" y="246" width="295.3" height="22" rx="4" fill="#cbd5e1"/><text x="873.3" y="262" class="val">187</text></svg></div>
+<div class="grid2" style="margin-top:14px">
+  <div class="card"><h3 style="margin:0 0 6px;font-size:15px">好问法长什么样（日常功能里用的，中文意译）</h3><code>这句话本身是否在说“以后要做某件事”或请求提醒？已经做完的不算，提问也不算。</code><p class="note">问题要窄，写清哪些情况不算，每个问题单独设一个“多有把握才行动”的门槛。这组实验用的是手术室清点的测试句，日常功能沿用了同样的问法。</p></div>
+  <div class="card"><h3 style="margin:0 0 6px;font-size:15px">关键发现</h3><p style="margin:0;font-size:14px">同一个笼统的问题（“这句话和某个话题有关吗？”这一类），和另外 5 个问题一起问时 16 次漏了 10 次，和另外 2 个问题一起问时只漏 2 次。笼统的问题不稳定，具体的问题很稳。</p></div>
+</div>
+
+<h2 id="mem"><span class="n">5</span>长期用下来，存储会不会撑爆？</h2>
+<p class="lead">按设计不会：不存视频，也不存录音；画面越旧留得越少，留下的主要是文字。</p>
+<div class="card"><div class="tiers"><div class="tier" style="width:360px;background:#eff6ff"><b>刚刚（L0）</b><span>最近 60 秒的画面和声音</span><em>只在内存里，不存盘</em></div><div class="tier" style="width:440px;background:#dbeafe"><b>最近两周（L1）</b><span>有变化的画面缩略图 + 一句描述</span><em>滚动保留 14 天 · 最多约 1 GB</em></div><div class="tier" style="width:520px;background:#bfdbfe"><b>证据（L2）</b><span>能证明某件事的那张画面，比如钥匙最后的位置</span><em>事情还成立就保留，钥匙换地方就换新图</em></div><div class="tier" style="width:600px;background:#93c5fd"><b>长期（L3）</b><span>文字记录：待办、发生过的事、每日摘要</span><em>长期保留 · 约 2–3 MB/天</em></div></div><svg viewBox="0 0 920 150" class="chart" role="img" aria-label="存储估算对比（对数刻度）"><text x="8" y="34" class="lbl">每秒 1 帧全存（不这样做）</text><rect x="200" y="18" width="520.0" height="24" rx="4" fill="#ef4444"/><text x="730.0" y="35" class="val">≈ 5.8 GB/天 · 170 GB/月</text><text x="8" y="76" class="lbl">只存变化的关键帧（近 14 天）</text><rect x="200" y="60" width="251.2" height="24" rx="4" fill="#60a5fa"/><text x="461.2" y="77" class="val">≈ 20 MB/天 · 滚动保留，最多约 1 GB</text><text x="8" y="118" class="lbl">长期只留文字与向量</text><rect x="200" y="102" width="152.6" height="24" rx="4" fill="#2563eb"/><text x="362.6" y="119" class="val">≈ 2–3 MB/天 · 约 1 GB/年</text><text x="200" y="144" class="axis">对数刻度 · 估算值，按醒着 16 小时、640 px JPEG 约 40 KB/帧、每天约 500 张关键帧</text></svg>
+<div class="explain"><b>对你意味着什么：</b>最近两周的画面最多占约 1 GB，更早的只留文字，一年约 1 GB，普通手机或电脑都放得下。</div>
+<div class="warn"><b>诚实说明：</b>上面是设计方案，还没完成。黑客松阶段我们先验证“判断得快不快、准不准”，所以记忆暂时还在内存里，关掉程序就会忘；存到硬盘、自动清理旧画面、过滤重复画面，是接下来要做的。</div></div>
+
+<h2 id="next"><span class="n">6</span>接下来三天</h2>
+<div class="flow3">
+  <div class="plan"><b>11/1 · 搭骨架</b><p>接上开发用的大脑模型（gpt-6-luna），做展示界面的框架；同时申请 Meta 模型的使用额度。</p></div>
+  <div class="plan"><b>11/2 · 接通</b><p>打开摄像头和麦克风、把记忆存到硬盘、在画面里框出物品；额度到账后换成 Meta Muse 并测试。</p></div>
+  <div class="plan"><b>11/3–4 · 交付</b><p>在家实拍、根据真实画面重新调准判断；录 3 分钟演示视频，11/4 下午提交。</p></div>
+</div>
+
+<h2 id="risk"><span class="n">7</span>风险</h2>
+<div class="grid2">
+  <div class="risk" style="border-left-color:#ef4444"><h4>Meta 模型还没试过</h4><p>Muse 能不能稳定地调用工具、看懂画面、框出物品，要等额度到账才能验证。这一步决定整个计划能否按时完成。</p></div>
+  <div class="risk" style="border-left-color:#f59e0b"><h4>真实画面可能没那么准</h4><p>看图判断只在 4 张模拟画面上测过；真实拍摄的光线、角度、杂乱背景都可能让它判断错。</p></div>
+  <div class="risk" style="border-left-color:#f59e0b"><h4>时间很紧</h4><p>输入和界面都还没做。演示视频会提前录好，不依赖现场一定不出错。</p></div>
+  <div class="risk" style="border-left-color:#94a3b8"><h4>使用体验细节</h4><p>存画面目前每张约 2 秒，要换到显卡上加速；判断员第一次启动要等约 15 秒，演示前要先预热。Muse 的折扣版会把数据用于训练，所以只拍自己、不拍别人。</p></div>
+</div>
+
+<h2 id="detail"><span class="n">8</span>工程细节（给技术读者）</h2>
+<details class="eng"><summary>展开：每个模块的类、接口和实测数据</summary>
+<div class="grid2" style="margin-top:14px"><div class="card det"><h3>Heartbeat 运行循环</h3><div class="where">pulse/heartbeat.py</div><ul><li><code>Heartbeat.on_event(ev)</code>：感知 → 写工作记忆 → 一次 <code>decide</code>（画面事件附图）→ 逐题阈值唤醒 → 功能与到期重试并发 → <code>Rule</code> 兜底 → 写长期记忆 → 生成 tick 轨迹</li><li><code>Capability(triggers, run, threshold, on, dynamic)</code>：任一题触发即唤醒；<code>dynamic</code> 从工作记忆生成问题</li><li>失败记 <code>pending.*</code> 事实，后续 tick 重试最多 3 次；语音被修订则丢弃</li><li>下一步：画面关键帧合并、语音优先、长期记忆写入后台化、调用与费用计数</li></ul></div><div class="card det"><h3>判断器 djev</h3><div class="where">pulse/providers.py · DjevDecider</div><ul><li><code>POST /v1/systemone</code>：noul（是/否概率）、choice（各选项概率）、span（只摘录原文）</li><li>每次最多 10 题，超过按 10 题分块并发；可带 1 张图</li><li>画面描述走生成接口 <code>/v1/raw/chat/completions</code></li><li>DiffusionGemma 26B-A4B（AWQ INT4）：快在一次读出答案，不逐字生成</li></ul></div><div class="card det"><h3>模型提供方</h3><div class="where">pulse/providers.py · OpenAICompatAgent</div><ul><li><code>run(system, user, tools, max_steps=4, stop_after_tools)</code>：标准工具循环；记录类功能执行完工具直接返回，省一次往返</li><li>gpt-6-luna 实测：工具调用 2.3 s、看图 8.9 s；不支持 /v1/decisions</li><li>待做：dev/prod 配置切换（环境变量计划中）、证据帧上返回物品框、Muse 三项能力验证</li></ul></div><div class="card det"><h3>工作记忆</h3><div class="where">pulse/memory.py</div><ul><li><code>Segment(seg_id, rev)</code> · <code>Evidence(kind, ref, rev)</code> · <code>Fact(key, value, evidence, source, version)</code></li><li><code>add_segment</code>：新版本覆盖旧版本，删除证据指向旧版本的事实</li><li><code>put</code>：证据不是最新版本就拒绝，慢请求的旧结果不能覆盖新状态</li></ul></div><div class="card det"><h3>长期记忆</h3><div class="where">pulse/longterm.py · tools/embed_server.py</div><ul><li>EmbeddingGemma 2（FastAPI <code>POST /embed</code>，float32，768 维），文字与图像同一空间</li><li>语音与画面分开排名各取 top-k：测试查询中解决了“画面被文字挤掉”的问题</li><li>实测（nodecw1 CPU）：每张图 2.0–2.6 s；“glasses”“my keys”都检索到正确画面</li></ul></div><div class="card det"><h3>日常功能包</h3><div class="where">pulse/packs/daily.py</div><ul><li>判断题：task_new · task_change · assistant（阈值 0.8）· put_down（图像）· 每个待办一个动态问题</li><li>功能：tasks（add/update_task）· note_item（djev 选择题判断物品）· task_seen（看到即销账）· answer（任务/物品/检索）</li><li>合成场景 12 个事件：任务、改期、三件物品、自动销账、三个提问全部正确</li></ul></div></div>
+<div class="warn" style="margin-top:14px">存储设计：SQLite 存事实、出处与版本；图片按内容哈希存文件；向量先用 numpy，之后换 sqlite-vec / FAISS；画面去重 = 浏览器像素差 + 后端向量相似度 &gt; 0.95。以上均尚未实现。</div>
+</details>
+<p class="note">数据来源：pulse/runs/daily_r4.json、runs/trigger_eval*.json、docs/tech_facts.md。赛前已有：djev 服务、DiffusionGemma、EmbeddingGemma 2；其余为赛期新做。</p>
+</div></body></html>

@@ -54,8 +54,9 @@ class Episode:
 
 
 class LongTermMemory:
-    def __init__(self, embedder: Embedder | None):
+    def __init__(self, embedder: Embedder | None, store=None):
         self.embedder = embedder
+        self.store = store
         self.items: list[Episode] = []
         self.vecs: list[np.ndarray] = []
         self.stats = {"embed_ms": 0.0, "embedded": 0}
@@ -70,6 +71,8 @@ class LongTermMemory:
                 vec = (await self.embedder.texts([ep.text], "document"))[0]
             self.stats["embed_ms"] += (time.perf_counter() - t) * 1e3
             self.stats["embedded"] += 1
+        if self.store:
+            self.store.save_episode(ep, vec, self.store.put_blob(ep.image) if ep.image else None)
         # replace an older version of the same episode (an ASR revision)
         for i, old in enumerate(self.items):
             if old.id == ep.id:

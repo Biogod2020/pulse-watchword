@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pulse · 一直在看，只在需要时动脑</title>
+<style>
+:root{--g:#059669;--p:#7c3aed;--b:#2563eb;--mut:#64748b;--line:#e2e8f0}
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#0b1020;color:#e5e7eb}
+header{display:flex;align-items:center;gap:14px;padding:12px 18px;background:#111833;border-bottom:1px solid #1f2a4d}
+header h1{font-size:17px;margin:0}header .sub{color:#94a3b8;font-size:12.5px}
+header button{margin-left:auto;background:var(--g);color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+main{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:12px;padding:12px;height:calc(100vh - 58px)}
+.panel{background:#111833;border:1px solid #1f2a4d;border-radius:14px;padding:12px;overflow:hidden;display:flex;flex-direction:column}
+.panel h2{font-size:13px;margin:0 0 8px;color:#cbd5e1;letter-spacing:.5px}
+#view{position:relative;border-radius:10px;overflow:hidden;background:#000}#view img{width:100%;display:block}
+#badge{position:absolute;left:10px;top:10px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700}
+#clock{position:absolute;right:10px;top:10px;background:rgba(0,0,0,.55);padding:3px 9px;border-radius:8px;font-variant-numeric:tabular-nums}
+.kept{background:#059669}.drop{background:#334155;color:#cbd5e1}.fire{background:#7c3aed}
+.counters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.counters div{background:#0b1020;border-radius:10px;padding:8px}.counters b{display:block;font-size:20px}.counters span{font-size:11.5px;color:#94a3b8}
+#strip{display:flex;gap:2px;height:34px;align-items:flex-end;margin-top:10px;overflow:hidden}
+#strip i{flex:0 0 4px;border-radius:2px}
+#stream{flex:1;overflow:auto;font-variant-numeric:tabular-nums}
+.row{display:grid;grid-template-columns:52px 1fr 64px;gap:8px;align-items:center;padding:4px 2px;border-bottom:1px solid #1a2342;font-size:12.5px}
+.bar{height:8px;background:#1e293b;border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--g)}
+.row.f{background:rgba(124,58,237,.12)}.row .r{color:#c4b5fd;font-size:12px;grid-column:2/4}
+#items{flex:1;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}
+.item{background:#0b1020;border-radius:10px;overflow:hidden;border:1px solid #1f2a4d}.item img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+.item div{padding:6px 8px;font-size:12.5px}.item b{color:#93c5fd}
+#ask{display:flex;gap:6px;margin-top:10px}#ask input{flex:1;background:#0b1020;border:1px solid #1f2a4d;color:#e5e7eb;border-radius:8px;padding:8px}
+#ask button{background:var(--p);color:#fff;border:0;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer}
+#answer{margin-top:8px;background:#1a1440;border:1px solid #4c1d95;border-radius:10px;padding:10px;display:none}
+#answer img{width:100%;border-radius:8px;margin-top:6px}
+.usage{font-size:12px;color:#94a3b8;margin-top:6px}
+.legend{font-size:11.5px;color:#94a3b8;margin-top:6px}.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin:0 4px 0 10px}
+</style></head><body>
+<header><h1>Pulse</h1><span class="sub">一直在看，只在需要时动脑 · 第一人称视频回放（EPIC-KITCHENS P12_101，CC BY-NC 4.0）</span>
+<button id="go">开始回放</button></header>
+<main>
+<section class="panel"><h2>第一人称画面</h2>
+  <div id="view"><img id="img" alt=""><span id="badge" class="drop">等待</span><span id="clock">00:00</span></div>
+  <div class="counters"><div><b id="c-s">0</b><span>采样画面</span></div><div><b id="c-k">0</b><span>有变化、送去判断</span></div>
+  <div><b id="c-f">0</b><span>判断“在放东西”</span></div><div><b id="c-b">0</b><span>叫醒大脑</span></div></div>
+  <div id="strip"></div>
+  <div class="legend">每一格是一秒：<i style="background:#334155"></i>画面没变，跳过<i style="background:#059669"></i>判断员看过<i style="background:#7c3aed"></i>记下了东西</div>
+</section>
+<section class="panel"><h2>心跳：判断员每一次的判断（是否“在放东西”的把握）</h2><div id="stream"></div></section>
+<section class="panel"><h2>记住的东西（最后放在哪）</h2><div id="items"></div>
+  <div class="usage" id="usage"></div>
+  <div id="ask"><input id="q" placeholder="问我：刀放哪了？ where did I put the plate?"><button id="askb">问</button></div>
+  <div id="answer"></div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);const mmss=t=>String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0');
+let ws;function connect(){ws=new WebSocket((location.protocol==='https:'?'wss':'ws')+'://'+location.host+'/ws');ws.onmessage=e=>on(JSON.parse(e.data));ws.onclose=()=>setTimeout(connect,1000)}connect();
+function cell(c){const i=document.createElement('i');i.style.background=c;i.style.height='100%';$('strip').appendChild(i);while($('strip').children.length>220)$('strip').firstChild.remove();return i}
+let lastCell=null;
+function on(m){
+ if(m.type==='frame'){$('img').src='/frames/'+m.frame;$('clock').textContent=mmss(m.t);$('badge').className=m.kept?'kept':'drop';$('badge').textContent=m.kept?'送去判断':'没变化 · 跳过';
+   $('c-s').textContent=+$('c-s').textContent+1;if(m.kept)$('c-k').textContent=+$('c-k').textContent+1;lastCell=cell(m.kept?'#059669':'#334155')}
+ if(m.type==='tick'){const r=document.createElement('div');r.className='row'+(m.fired?' f':'');const p=m.p==null?0:m.p;
+   r.innerHTML=`<span>${mmss(m.t)}</span><div class="bar"><i style="width:${(p*100).toFixed(0)}%;background:${m.fired?'#7c3aed':'#059669'}"></i></div><span>${(p*100).toFixed(0)}% · ${m.read_ms}ms</span>`+
+   (m.result&&m.result.object?`<span class="r">记下：${m.result.object} → ${m.result.place}</span>`:'');
+   $('stream').prepend(r);while($('stream').children.length>300)$('stream').lastChild.remove();
+   if(m.fired){$('c-f').textContent=+$('c-f').textContent+1;$('badge').className='fire';$('badge').textContent='在放东西 → 记下';if(lastCell)lastCell.style.background='#7c3aed'}}
+ if(m.type==='memory'){$('items').innerHTML=m.items.map(x=>`<div class="item"><img src="/frames/${x.frame}.jpg"><div><b>${x.object}</b> → ${x.place}<br><span style="color:#94a3b8">${mmss(x.t)}</span></div></div>`).join('');
+   const u=m.usage;$('usage').textContent=`记忆占用：${(u.blob_bytes/1e6).toFixed(1)} MB 图片（${u.blob_files} 张）+ ${(u.db_bytes/1e6).toFixed(2)} MB 数据库 · ${u.facts} 条事实`;$('c-b').textContent=m.counters.brain_calls}
+}
+$('go').onclick=async()=>{for(const k of['c-s','c-k','c-f','c-b'])$(k).textContent=0;$('stream').innerHTML='';$('strip').innerHTML='';$('items').innerHTML='';
+ await fetch('/api/replay',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({start:0,minutes:0,speed:4,fresh:true})})};
+$('askb').onclick=async()=>{const q=$('q').value.trim();if(!q)return;$('answer').style.display='block';$('answer').textContent='大脑思考中…';
+ const r=await (await fetch('/api/ask',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({question:q})})).json();
+ $('c-b').textContent=+$('c-b').textContent+1;
+ $('answer').innerHTML=`<b>${r.answer}</b><div style="color:#c4b5fd;font-size:12px">大脑：${r.model} · ${(r.ms/1000).toFixed(1)}s · 工具：${r.tools.join(', ')||'无'}</div>`+(r.frame?`<img src="/frames/${r.frame}.jpg">`:'')};
+$('q').addEventListener('keydown',e=>{if(e.key==='Enter')$('askb').click()});
+</script></body></html>
