@@ -1,0 +1,15 @@
+[
+ {
+  "name": "c_lens3",
+  "first": "pulse_kf_open_lens3.png",
+  "prompt_file": "/cwStorage/home/jijh/playground/jev-diagnosis/pulse/film/h3/c_lens3.txt",
+  "seed": 20261102,
+  "width": 1344,
+  "height": 768,
+  "length": 124,
+  "steps": 8,
+  "encode_mp4": true,
+  "lora": "minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors",
+  "lora_exact": true
+ }
+]

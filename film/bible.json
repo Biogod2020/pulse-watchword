@@ -1,0 +1,19 @@
+{
+  "film": "Pulse launch demo (English, ~85 s, 1920x1080, 24 fps)",
+  "logline": "Tell your camera, in plain words, what to watch for. Pulse keeps watching with a fast model, double-checks with a bigger one, saves only the moments you asked for, and lets you ask what it saw.",
+  "style_webcam": "Authentic laptop-webcam footage: fixed camera, slight wide-angle lens, natural warm indoor evening light mixed with a cool window, mild sensor noise, true-to-life colours, no cinematic grading, no depth-of-field tricks, 16:9.",
+  "style_cine": "Premium lifestyle product film: large-format cinema camera, 35-50 mm lens, shallow depth of field, warm golden-hour light from a window, soft contrast, natural skin texture, calm and intimate, restrained colour (warm oak, cream, sage green) with one cool cyan accent only from screen light.",
+  "negative": "No text, no letters, no captions, no logos, no watermarks, no user-interface overlays, no timestamps, no extra people, no extra animals, no extra limbs or fingers, no deformed hands, no plastic or waxy skin, no oversaturated colours.",
+  "characters": {
+    "maya": "Maya, a woman in her early 30s with light-brown skin, shoulder-length dark-brown wavy hair tucked behind her left ear, small gold hoop earrings, round tortoiseshell glasses, an oversized cream cable-knit sweater with the sleeves pushed up, dark sage-green wide-leg trousers, a thin silver watch on her left wrist.",
+    "miso": "Miso, a fluffy orange tabby cat with a white chest, white front paws, bright green eyes, a slightly chubby build and a long tail with darker orange rings.",
+    "leo": "Leo, Maya's roommate, a man in his early 30s with short curly black hair and a short trimmed beard, wearing a heather-grey hoodie and dark jeans, carrying a woven laundry basket with folded towels."
+  },
+  "room": "Maya's small warm apartment living room that doubles as her home office, early evening. A light-oak desk stands against the front wall facing into the room. Behind the desk (from the desk's point of view): on the LEFT a low warm-grey fabric sofa with a mustard-yellow cushion and a framed abstract print above it; in the CENTRE-BACK a white open shelf (waist height) holding a speckled cream ceramic bowl, a trailing green pothos plant and a few books; on the RIGHT an open doorway to a hallway lit by a warm pendant light; on the far LEFT wall a tall window with sheer white curtains letting in low golden sun; a paper floor lamp glowing beside the sofa. A light-grey mesh desk chair stands right behind the desk.",
+  "webcam_view": "Seen from the webcam of an open laptop on the desk: lens at the height of a seated person's chin, looking straight into the room, wide ~78 degree field of view. The bottom edge of the frame is the desk's front strip with a clear glass of water at the right and a closed notebook at the left. The light-grey mesh desk chair is centred about 0.8 m away; the sofa, the white shelf with the ceramic bowl and the hallway doorway are visible behind it, all in focus.",
+  "honesty": {
+    "webcam_feeds": "Camera feeds are generated for this demo; every detection, card and answer on screen is live Pulse output on that feed.",
+    "cine": "Illustrative footage (generated).",
+    "numbers": "Only measured values from the real runs recorded for this film."
+  }
+}

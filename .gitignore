@@ -2,3 +2,5 @@ runs/
 __pycache__/
 *.pyc
 .pytest_cache/
+film/out/
+__pycache__/

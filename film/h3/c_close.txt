@@ -1,0 +1,5 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Premium lifestyle film, one continuous shot, very slow push-in, shallow depth of field, golden-hour light. Miso, a fluffy orange tabby cat with a white chest, white front paws, bright green eyes, a slightly chubby build and a long tail with darker orange rings. He sits on the light-oak desk beside the open silver laptop, watching the softly glowing screen, then slowly turns his head toward the camera and gives a long, slow blink; his tail curls around his paws. The laptop does not move. No text, no captions, no logos, no watermark, no user-interface overlays, no flicker, no extra people or animals.
+overall_soundscape: soft room tone, a faint purr.
+non_diegetic_music: N/A

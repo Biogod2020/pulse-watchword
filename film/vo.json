@@ -1,0 +1,52 @@
+[
+ {
+  "id": "L1",
+  "shot": "lens",
+  "text": "Your camera sees everything. It just doesn't know what you care about."
+ },
+ {
+  "id": "L2",
+  "shot": "title",
+  "text": "Meet Pulse."
+ },
+ {
+  "id": "L3",
+  "shot": "type",
+  "text": "Tell it what to watch for, in plain words. Pulse turns that into one clear question, and keeps checking it."
+ },
+ {
+  "id": "L3b",
+  "shot": "keys",
+  "text": "Then get on with your day."
+ },
+ {
+  "id": "L4",
+  "shot": "how",
+  "text": "Every second, a fast model reads the last two seconds of video. Only when something looks likely does a bigger model take a second look."
+ },
+ {
+  "id": "L5",
+  "shot": "montage",
+  "text": "A sip of water. Someone walking in behind you. Anything you can put into words."
+ },
+ {
+  "id": "L6",
+  "shot": "ask",
+  "text": "And because it was paying attention, you can just ask."
+ },
+ {
+  "id": "L7",
+  "shot": "share",
+  "text": "Every moment becomes a card and a clip, ready to share."
+ },
+ {
+  "id": "L8",
+  "shot": "privacy",
+  "text": "Video stays in memory for three minutes, then it's gone. Only your moments, and a snapshot every thirty seconds, are kept."
+ },
+ {
+  "id": "L9",
+  "shot": "close",
+  "text": "Pulse. Tell your camera what matters."
+ }
+]

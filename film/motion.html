@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Pulse film · motion</title>
+<!--
+  Deterministic scenes for the Pulse demo film. window.SCENES = {id: duration}; await window.render(id, t) draws the
+  exact frame at t seconds (no CSS transitions/animations; images swapped by t). Data in DATA comes from the real
+  recorded takes (ui/main.json, ui/drink.json): cat candidate p=0.9998 -> second look yes 0.99; drink-take session
+  46 clips read, 2 second looks, 2 moments kept (spark = the cat watch's real readings around the candidate). Cards and reel frames are Pulse's own output.
+-->
+<style>
+@font-face{font-family:"Inter";src:url("InterVariable.ttf") format("truetype");font-weight:100 900}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#060a14;font-family:"Inter",sans-serif;color:#eef2ff;
+  font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased}
+.scene{position:absolute;inset:0;display:none;overflow:hidden}
+.bg{position:absolute;inset:0;background:radial-gradient(1300px 760px at 80% -10%,rgba(34,211,238,.13),transparent 60%),
+  radial-gradient(1000px 700px at -10% 110%,rgba(124,92,255,.12),transparent 60%),#060a14}
+.abs{position:absolute}
+.kick{font-size:22px;letter-spacing:.32em;text-transform:uppercase;color:#22d3ee;font-weight:650}
+.big{font-weight:750;letter-spacing:-.035em;line-height:1.02}
+.mut{color:rgba(238,242,255,.62)}
+.cardui{background:rgba(17,24,43,.86);border:1px solid rgba(255,255,255,.09);border-radius:28px;box-shadow:0 40px 90px rgba(0,0,0,.45)}
+.mono{font-variant-numeric:tabular-nums}
+.thumb{position:absolute;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);background:#000}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.bar{height:14px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:#22d3ee}
+.pill{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:10px 20px;font-weight:650}
+</style></head><body>
+
+<!-- 1. TITLE -->
+<div class="scene" id="title"><div class="bg"></div>
+  <div class="abs" id="ti_ring" style="border-radius:50%;border:3px solid #22d3ee"></div>
+  <div class="abs" id="ti_dot" style="width:34px;height:34px;border-radius:50%"></div>
+  <div class="abs big" id="ti_word" style="font-size:168px;left:0;top:0;white-space:nowrap">Pulse</div>
+  <div class="abs" id="ti_sub" style="font-size:46px;font-weight:500;width:1920px;text-align:center;top:640px;color:rgba(238,242,255,.78)">Tell your camera what matters.</div>
+</div>
+
+<!-- 2. HOW -->
+<div class="scene" id="how"><div class="bg"></div>
+  <div class="abs kick" id="hw_kick" style="left:120px;top:96px">How it keeps up</div>
+  <div class="abs" id="hw_strip" style="left:120px;top:250px;width:520px;height:420px"></div>
+  <div class="abs mut" id="hw_striplab" style="left:120px;top:690px;font-size:26px">the last 2 seconds · 4 frames/s · every second</div>
+  <div class="abs cardui" id="hw_fast" style="left:720px;top:222px;width:520px;height:490px;padding:40px">
+    <div class="kick" style="font-size:18px">Fast model</div>
+    <div style="font-size:40px;font-weight:700;margin-top:14px;letter-spacing:-.02em">Reads every clip</div>
+    <div class="mut" style="font-size:20px;margin-top:6px">DiffusionGemma · on our GPU server</div>
+    <div class="mut" style="font-size:24px;margin-top:22px;line-height:1.4">“Is a cat on top of the desk?”</div>
+    <div style="display:flex;align-items:center;gap:18px;margin-top:34px"><div class="bar" style="flex:1"><i id="hw_fbar"></i>
+      <div style="position:absolute;left:50%;top:-6px;bottom:-6px;width:2px;background:rgba(255,255,255,.35)"></div></div>
+      <div class="mono" id="hw_fval" style="font-size:40px;font-weight:700;width:96px;text-align:right">0.00</div></div>
+    <svg id="hw_spark" width="440" height="90" style="margin-top:28px;display:block"></svg>
+  </div>
+  <div class="abs" id="hw_arrow" style="left:1252px;top:446px;height:4px;border-radius:2px;background:#22d3ee"></div>
+  <div class="abs cardui" id="hw_slow" style="left:1340px;top:222px;width:460px;height:490px;padding:40px">
+    <div class="kick" style="font-size:18px;color:#a78bfa">Second look</div>
+    <div style="font-size:40px;font-weight:700;margin-top:14px;letter-spacing:-.02em">Bigger model</div>
+    <div class="mut" style="font-size:20px;margin-top:6px">a cloud model · sees 3 frames</div>
+    <div class="mut" style="font-size:24px;margin-top:18px">only when the fast one says “maybe”</div>
+    <div id="hw_three" style="position:relative;height:120px;margin-top:30px"></div>
+    <div id="hw_ok" class="pill" style="margin-top:26px;background:rgba(52,211,153,.14);color:#6ee7b7;font-size:26px;border:1px solid rgba(52,211,153,.4)">✓ Confirmed · saved</div>
+  </div>
+  <div class="abs mono" id="hw_stats" style="left:120px;top:800px;font-size:30px;color:rgba(238,242,255,.82)"></div>
+  <div class="abs mut" id="hw_note" style="left:120px;top:848px;font-size:21px">numbers from one recorded session of this demo</div>
+  <div class="abs big" id="hw_super" style="left:0;width:1920px;text-align:center;top:420px;font-size:112px"></div>
+</div>
+
+<!-- 3. SHARE -->
+<div class="scene" id="share">
+  <div class="abs" style="inset:0;background:url(card_cat.jpg) center/cover;filter:blur(60px) brightness(.32) saturate(1.2);transform:scale(1.2)"></div>
+  <div class="abs" style="inset:0;background:linear-gradient(90deg,rgba(6,10,20,.72),rgba(6,10,20,.35))"></div>
+  <div class="abs" id="sh_card" style="width:500px;height:625px;border-radius:26px;overflow:hidden;box-shadow:0 50px 110px rgba(0,0,0,.6)"><img src="card_cat.jpg" style="width:100%;height:100%;display:block"></div>
+  <div class="abs mut" id="sh_cardlab" style="font-size:26px">Moment card · 1080×1350</div>
+  <div class="abs" id="sh_phone" style="width:404px;height:860px;border-radius:64px;background:#0b0d12;padding:14px;box-shadow:0 60px 120px rgba(0,0,0,.65),inset 0 0 0 2px rgba(255,255,255,.12)">
+    <div style="position:relative;width:100%;height:100%;border-radius:52px;overflow:hidden;background:#000">
+      <img id="sh_reel" style="width:100%;height:100%;object-fit:contain;display:block;background:#000">
+      <div style="position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:34px;border-radius:20px;background:#000"></div>
+      <div id="sh_sheet" style="position:absolute;left:0;right:0;bottom:0;height:300px;background:rgba(28,30,38,.94);border-radius:30px 30px 0 0;padding:26px 26px">
+        <div style="width:60px;height:6px;border-radius:3px;background:rgba(255,255,255,.3);margin:0 auto 22px"></div>
+        <div style="font-size:22px;font-weight:650;color:#fff;margin-bottom:22px">Share clip</div>
+        <div id="sh_icons" style="display:flex;justify-content:space-between"></div>
+      </div>
+    </div>
+  </div>
+  <div class="abs mut" id="sh_phonelab" style="font-size:26px">9:16 clip, made automatically</div>
+</div>
+
+<!-- 4. MEMORY -->
+<div class="scene" id="memory"><div class="bg"></div>
+  <svg class="abs" id="mm_ring" width="760" height="760" style="left:580px;top:150px"></svg>
+  <div class="abs" id="mm_center" style="left:780px;top:350px;width:360px;height:360px;text-align:center;padding-top:118px">
+    <div class="big mono" style="font-size:96px">3 min</div><div class="mut" style="font-size:28px;margin-top:12px">in memory, then gone</div></div>
+  <div class="abs" id="mm_keep" style="left:1390px;top:360px;width:520px;white-space:nowrap"></div>
+</div>
+
+<!-- 5. END -->
+<div class="scene" id="end"><div class="bg"></div>
+  <div class="abs" id="en_lock" style="left:0;width:1920px;top:360px;text-align:center">
+    <div style="display:inline-flex;align-items:center;gap:30px"><div id="en_dot" style="width:40px;height:40px;border-radius:50%;background:#22d3ee"></div>
+      <div class="big" style="font-size:150px">Pulse</div></div>
+    <div style="font-size:46px;font-weight:500;margin-top:30px;color:rgba(238,242,255,.82)">Tell your camera what matters.</div>
+    <div class="pill" id="en_pill" style="margin-top:46px;font-size:26px;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.45);color:#a5f3fc">Open it in your browser · nothing to install</div>
+  </div>
+  <div class="abs mut" id="en_foot" style="left:0;width:1920px;text-align:center;top:960px;font-size:21px;line-height:1.5;color:rgba(238,242,255,.7)">
+    Demo notes: camera footage was generated (GPT Image + MiniMax H3). Every watch, detection, card and answer shown in the app was recorded live
+    from Pulse running on that footage; edited for length. Prototype; “second look” runs on a cloud model.</div>
+</div>
+
+<script>
+const DATA={catP:0.9998,catYes:0.99,clips:46,looks:2,dismissed:0,kept:2,
+  spark:[0.001,0.001,0.003,0.023,0.017,0.011,0.066,0.01,0.178,1.0,0.359,0.301,0.791,0.999,0.962,0.28,0.775,0.62,0.9,0.71]};
+window.SCENES={title:3.0,how:11.1,share:7.0,memory:4.6,end:5.0};
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,k)=>a+(b-a)*k;
+const ease=k=>{k=cl(k);return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2}, eout=k=>1-Math.pow(1-cl(k),3);
+const seg=(t,a,b)=>cl((t-a)/(b-a));
+function op(e,v){$(e).style.opacity=v}
+function tf(e,s){$(e).style.transform=s}
+const imgs={};
+function setImg(el,src){return new Promise(r=>{if(el.getAttribute('src')===src&&el.complete)return r();el.onload=()=>r();el.onerror=()=>r();el.src=src})}
+
+async function rTitle(t){
+  const cx=960, cy=470, word=$('ti_word'), ww=word.offsetWidth;
+  const k=ease(seg(t,0.55,1.0));                        // dot slides left first, then the word appears beside it
+  const green=[52,211,153], cyan=[34,211,238], c=green.map((g,i)=>Math.round(lerp(g,cyan[i],seg(t,0.2,0.7))));
+  const dx=lerp(0,-(ww/2+44),k), dot=$('ti_dot');
+  const s=1+0.18*Math.sin(t*5.5)*(1-k*0.6);
+  dot.style.left=(cx-17+dx)+'px';dot.style.top=(cy-17)+'px';dot.style.background=`rgb(${c})`;
+  dot.style.boxShadow=`0 0 ${30+40*seg(t,0,0.6)}px rgba(${c},.75)`;dot.style.transform=`scale(${s})`;
+  const rk=seg(t,0.35,1.25), ring=$('ti_ring'), r=20+150*eout(rk);
+  ring.style.width=ring.style.height=2*r+'px';ring.style.left=(cx+dx-r)+'px';ring.style.top=(cy-r)+'px';ring.style.opacity=(1-rk)*0.9*(rk>0?1:0);
+  const wk=eout(seg(t,0.95,1.6));
+  word.style.left=(cx-ww/2+34)+'px';word.style.top=(cy-112)+'px';word.style.opacity=wk;
+  word.style.filter=`blur(${(1-wk)*14}px)`;word.style.letterSpacing=`${-0.035+0.06*(1-wk)}em`;
+  const sk=eout(seg(t,1.35,2.0));op('ti_sub',sk);tf('ti_sub',`translateY(${(1-sk)*24}px)`);
+}
+
+async function rHow(t){
+  // filmstrip: 8 real frames of the clip light up one by one
+  const strip=$('hw_strip');
+  if(!strip.children.length){for(let i=0;i<8;i++){const d=document.createElement('div');d.className='thumb';const im=document.createElement('img');im.src=`strip/s_${String(i+3).padStart(2,'0')}.jpg`;d.appendChild(im);strip.appendChild(d)}}
+  [...strip.children].forEach((d,i)=>{const col=i%4,row=Math.floor(i/4),a=seg(t,0.15+i*0.11,0.45+i*0.11);
+    d.style.left=col*132+'px';d.style.top=row*140+'px';d.style.width='122px';d.style.height='122px';
+    d.style.opacity=a;d.style.transform=`translateY(${(1-eout(a))*18}px)`;
+    const hot=t>1.6&&t<4.2; d.style.borderColor=hot?'rgba(34,211,238,.85)':'rgba(255,255,255,.08)'});
+  const sl=seg(t,0.2,0.8);op('hw_striplab',sl);op('hw_kick',seg(t,0,0.5));
+  // fast model card
+  const fa=eout(seg(t,1.0,1.7));op('hw_fast',fa);tf('hw_fast',`translateY(${(1-fa)*30}px)`);
+  const p=DATA.catP*ease(seg(t,1.9,3.3));$('hw_fbar').style.width=(p*100)+'%';$('hw_fbar').style.background=p>=0.5?'#22d3ee':'#64748b';
+  $('hw_fval').textContent=p.toFixed(2);
+  const n=Math.round(cl((t-1.4)/2.0)*DATA.spark.length), pts=DATA.spark.slice(0,Math.max(n,1)).map((v,i)=>`${i*440/(DATA.spark.length-1)},${84-v*76}`).join(' ');
+  $('hw_spark').innerHTML=`<line x1="0" x2="440" y1="${84-0.5*76}" y2="${84-0.5*76}" stroke="rgba(255,255,255,.22)" stroke-dasharray="4 6"/>`+
+    `<polyline points="${pts}" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linejoin="round"/>`;
+  // hand-off arrow and the second look
+  const ar=eout(seg(t,3.6,4.3));$('hw_arrow').style.width=(78*ar)+'px';op('hw_arrow',ar>0?1:0);
+  const sa=eout(seg(t,4.1,4.8));op('hw_slow',sa);tf('hw_slow',`translateY(${(1-sa)*30}px)`);
+  const three=$('hw_three');
+  if(!three.children.length){[3,6,10].forEach((f,i)=>{const d=document.createElement('div');d.className='thumb';const im=document.createElement('img');im.src=`strip/s_${String(f).padStart(2,'0')}.jpg`;d.appendChild(im);three.appendChild(d)})}
+  [...three.children].forEach((d,i)=>{const a=eout(seg(t,4.7+i*0.18,5.1+i*0.18));d.style.left=i*128+'px';d.style.top='0px';d.style.width='118px';d.style.height='118px';d.style.opacity=a;d.style.borderColor='rgba(167,139,250,.6)'});
+  const ok=eout(seg(t,5.9,6.4));op('hw_ok',ok);tf('hw_ok',`scale(${0.9+0.1*ok})`);
+  const st=seg(t,6.4,7.0);op('hw_stats',st);op('hw_note',st*0.9);
+  $('hw_stats').innerHTML=`This session: <b style="color:#fff">${DATA.clips}</b> clips read by the fast model · <b style="color:#fff">${DATA.looks}</b> second looks · <b style="color:#6ee7b7">${DATA.kept}</b> moments kept`;
+  // closing super: everything dims, the line takes over
+  const sup=seg(t,9.1,9.7), dim=1-0.9*sup;
+  ['hw_strip','hw_striplab','hw_fast','hw_arrow','hw_slow','hw_stats','hw_note','hw_kick'].forEach(id=>{const e=$(id);e.style.filter=`blur(${sup*10}px)`;e.style.opacity=Math.min(parseFloat(e.style.opacity||1),dim)});
+  const s1=eout(seg(t,9.25,9.8)),s2=eout(seg(t,9.75,10.3));
+  $('hw_super').innerHTML=`<span style="opacity:${s1};display:inline-block;transform:translateY(${(1-s1)*20}px)">Always watching.</span> <span style="opacity:${s2};display:inline-block;transform:translateY(${(1-s2)*20}px);color:#22d3ee">Rarely thinking.</span>`;
+}
+
+async function rShare(t){
+  const ca=eout(seg(t,0.0,0.8)), card=$('sh_card');
+  card.style.left=(300-80*(1-ca))+'px';card.style.top='190px';card.style.opacity=ca;card.style.transform=`rotate(${-3*ca}deg)`;
+  $('sh_cardlab').style.left='300px';$('sh_cardlab').style.top='850px';op('sh_cardlab',seg(t,0.6,1.1));
+  const pa=eout(seg(t,0.5,1.4)), ph=$('sh_phone');ph.style.left=(1180+90*(1-pa))+'px';ph.style.top='110px';ph.style.opacity=pa;
+  $('sh_phonelab').style.left='1188px';$('sh_phonelab').style.top='992px';op('sh_phonelab',seg(t,1.1,1.6));
+  const fi=1+Math.floor(((t*24)%144)); await setImg($('sh_reel'),`reel/r_${String(fi).padStart(3,'0')}.jpg`);
+  const sh=eout(seg(t,4.2,4.9));$('sh_sheet').style.transform=`translateY(${(1-sh)*320}px)`;
+  const ic=$('sh_icons');
+  if(!ic.children.length){[['Message','#34d399'],['Copy link','#94a3b8'],['Save video','#60a5fa'],['More','#64748b']].forEach(([n,c])=>{
+    const d=document.createElement('div');d.style.cssText='width:80px;text-align:center;font-size:15px;color:#cbd5e1';
+    d.innerHTML=`<div style="width:64px;height:64px;border-radius:18px;margin:0 auto 10px;background:${c};opacity:.9"></div>${n}`;ic.appendChild(d)})}
+  [...ic.children].forEach((d,i)=>{d.style.opacity=eout(seg(t,4.6+i*0.08,4.9+i*0.08))});
+}
+
+async function rMemory(t){
+  const svg=$('mm_ring'), R=330, N=180, head=(t*45)%N;
+  let s='';
+  for(let i=0;i<N;i++){const a=(i/N)*Math.PI*2-Math.PI/2, age=((head-i)+N)%N, alpha=Math.max(0,1-age/N*1.15);
+    const x1=380+Math.cos(a)*(R-26),y1=380+Math.sin(a)*(R-26),x2=380+Math.cos(a)*R,y2=380+Math.sin(a)*R;
+    s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="rgba(34,211,238,${(0.08+0.92*alpha*alpha).toFixed(3)})" stroke-width="5" stroke-linecap="round"/>`}
+  svg.innerHTML=s;
+  const a=eout(seg(t,0,0.6));op('mm_ring',a);op('mm_center',eout(seg(t,0.3,0.9)));
+  const kp=$('mm_keep');
+  if(!kp.children.length){kp.innerHTML='<div class="mut" style="font-size:24px;margin-bottom:18px">kept: only your moments</div>'+['card_cat.jpg','card_drink.jpg','card_walk.jpg'].map((c,i)=>`<img src="${c}" style="width:140px;height:175px;object-fit:cover;border-radius:14px;margin-right:12px;box-shadow:0 20px 40px rgba(0,0,0,.5)">`).join('')+'<div id="mm_snap" class="mut" style="font-size:22px;margin-top:20px">+ one snapshot every 30 s</div>'}
+  op('mm_keep',0);
+}
+
+async function rEnd(t){
+  const a=eout(seg(t,0.1,0.9));op('en_lock',a);tf('en_lock',`translateY(${(1-a)*20}px)`);
+  $('en_dot').style.boxShadow=`0 0 ${30+20*Math.sin(t*4)}px rgba(34,211,238,.8)`;
+  op('en_pill',eout(seg(t,0.9,1.5)));op('en_foot',eout(seg(t,1.4,2.0)));
+}
+
+const R={title:rTitle,how:rHow,share:rShare,memory:rMemory,end:rEnd};
+window.render=async(id,t)=>{document.querySelectorAll('.scene').forEach(e=>e.style.display=e.id===id?'block':'none');await R[id](t);
+  await Promise.all([...document.querySelectorAll(`#${id} img`)].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));};
+</script></body></html>

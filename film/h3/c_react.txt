@@ -1,0 +1,5 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Premium lifestyle film, one continuous shot, very slow push-in, shallow depth of field, golden-hour window light. Maya, a woman in her early 30s with light-brown skin, shoulder-length dark-brown wavy hair tucked behind her left ear, small gold hoop earrings, round tortoiseshell glasses, an oversized cream cable-knit sweater with the sleeves pushed up, dark sage-green wide-leg trousers, a thin silver watch on her left wrist. Curled up on the warm-grey sofa, she watches her phone screen (held in both hands, screen facing her) and bursts into genuine, warm laughter, her shoulders shaking, then shakes her head smiling. The phone stays in her hands; its back faces the camera. Natural skin texture. No text, no captions, no logos, no watermark, no user-interface overlays, no flicker, no extra people or animals.
+overall_soundscape: soft room tone and her light natural laugh.
+non_diegetic_music: N/A

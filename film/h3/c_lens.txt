@@ -1,0 +1,5 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Premium macro product shot, one continuous shot. A very slow, smooth push-in toward the small round webcam lens on the thin silver laptop bezel; the tiny green indicator light beside it glows steadily; a soft cyan reflection glides slowly across the dark screen glass below; the warm golden bokeh behind the laptop breathes gently as a sheer curtain moves in a light breeze. Fixed focus on the lens, shallow depth of field, calm and intimate. No text, no captions, no logos, no watermark, no flicker.
+overall_soundscape: very quiet warm room tone, a faint electronic hum.
+non_diegetic_music: N/A

@@ -59,6 +59,8 @@ class Watch:
     fires: int = 0
     candidate: float = 0.5      # cheap-judge score that proposes a moment to the verifier
     said: str = ""              # the user's own words, shown on the card
+    verify_yes: float = 0.0     # last verifier P(yes)
+    rejected: list = field(default_factory=list)   # times of recent verifier rejections
     dismissed: int = 0
 
     def make_trigger(self):
@@ -67,7 +69,7 @@ class Watch:
         if self.mode == "state":
             self.trigger = StateTracker(self.threshold, max(0.3, self.threshold - 0.3), 2)
         elif CFG.get("verifier"):
-            self.trigger = ConfirmedEdge(self.candidate, 1, 8)
+            self.trigger = ConfirmedEdge(self.candidate, 1, 30)   # one moment per event, not one every few seconds
         else:
             self.trigger = ConfirmedEdge(self.threshold, 2, 8)
 
@@ -102,6 +104,7 @@ class Session:
     clients: set = field(default_factory=set)
     inflight: deque = field(default_factory=deque)
     history: deque = field(default_factory=lambda: deque(maxlen=600))   # (t, {watch: p}) for sparklines / tuning
+    events: list = field(default_factory=list)                            # candidates and verifier verdicts
     last_clip_t: float = -1.0
 
 
@@ -194,26 +197,50 @@ async def apply(result) -> None:
         if kind in ("event", "start"):
             w.fires += 1
             fired.append(w)
-    confirmed = []
-    for w in fired:
-        if w.mode != "state" and CFG.get("verifier"):
-            S.stats["candidates"] += 1
-            if await verify(w, frames):
-                S.stats["verified"] += 1
-                confirmed.append(w)
-            else:
-                w.dismissed += 1
-                w.fires -= 1
-                S.stats["dismissed"] += 1
-        else:
-            confirmed.append(w)
-    for w in confirmed:
-        await make_moment(w, t, clip, frames, probs[w.id])
-    if not confirmed:
-        clip.unlink(missing_ok=True)
-    clip.with_suffix(".txt").unlink(missing_ok=True)
+    # show the reading first, then take the second look without holding up the next clips
     await send_all({"type": "tick", "t": t, "probs": probs, "ms": round(ms), "stats": S.stats,
                     "active": {w.id: bool(getattr(w.trigger, "active", False)) for w in S.watches.values()}})
+    looks = []
+    for w in fired:
+        if w.mode != "state" and CFG.get("verifier"):
+            looks.append(asyncio.create_task(second_look(w, t, clip, frames, probs)))
+        else:
+            await make_moment(w, t, clip, frames, probs[w.id])
+    asyncio.create_task(drop_clip(clip, looks))
+
+
+async def second_look(w: Watch, t: float, clip: Path, frames, probs) -> None:
+    S.stats["candidates"] += 1
+    await send_all({"type": "candidate", "watch": w.id, "label": localize(w.label), "p": round(p_of(probs, w), 2)})
+    ok = await verify(w, frames)
+    await send_all({"type": "verdict", "watch": w.id, "label": localize(w.label), "ok": ok})
+    S.events.append({"t": round(t, 2), "watch": w.id, "p": round(p_of(probs, w), 4), "verified": ok,
+                     "verify_yes": round(w.verify_yes, 4)})
+    if ok:
+        S.stats["verified"] += 1
+        await make_moment(w, t, clip, frames, probs[w.id])
+        return
+    w.dismissed += 1
+    w.fires -= 1
+    # A rejected candidate often comes at the start of the real thing (reaching for the glass before
+    # drinking): re-arm so the next reading can be checked again, but back off after 3 quick rejections.
+    w.rejected = [x for x in w.rejected if t - x < 12.0] + [t]
+    if hasattr(w.trigger, "_last"):
+        w.trigger._run = 0
+        w.trigger._last = t - w.trigger.refractory_s + (10.0 if len(w.rejected) >= 3 else 0.9)
+    S.stats["dismissed"] += 1
+
+
+async def drop_clip(clip: Path, looks) -> None:
+    """The judged clip is only needed until every second look on it is done (a moment keeps its own copy)."""
+    if looks:
+        await asyncio.gather(*looks, return_exceptions=True)
+    clip.unlink(missing_ok=True)
+    clip.with_suffix(".txt").unlink(missing_ok=True)
+
+
+def p_of(probs, w):
+    return probs.get(w.id, 0.0)
 
 
 async def verify(w: Watch, frames) -> bool:
@@ -224,7 +251,8 @@ async def verify(w: Watch, frames) -> bool:
                                          [Question("v", "Do these frames show " + w.ask[len(PREFIX):], kind="noul")],
                                          [image_url(p) for p in picks])
         S.stats["brain"] += 1
-        return b.decisions["v"].probs.get("yes", 0.0) >= CFG["verify_threshold"]
+        w.verify_yes = b.decisions["v"].probs.get("yes", 0.0)
+        return w.verify_yes >= CFG["verify_threshold"]
     except Exception:
         return False
 
@@ -239,22 +267,28 @@ async def make_moment(w: Watch, t: float, clip: Path, frames, p: float) -> None:
         shutil.copy2(clip, clip_dst)
     wall = time.strftime("%H:%M:%S", time.localtime(S.t0_wall + t))
     card = mdir / f"{mid_id}_card.jpg"
-    title = re.sub(r"^\W+\s*", "", w.label)
+    title = re.sub(r"^\W+\s*", "", localize(w.label))
     sub = f"你说：“{w.said}”" if w.said and not w.said.isascii() else (f"You said: “{w.said}”" if w.said else
                                                                      "Watching for: " + title)
     await asyncio.to_thread(moment_card, frame, title, sub, wall, str(card))
-    reel = mdir / f"{mid_id}_reel.mp4"
-    if clip_dst.exists():
-        try:
-            await asyncio.to_thread(moment_reel, str(clip_dst), title, wall, str(reel))
-        except Exception:
-            reel = None
-    m = {"id": mid_id, "watch": w.id, "label": w.label, "t": round(t, 1), "wall": wall, "p": round(p, 2),
+    m = {"id": mid_id, "watch": w.id, "label": localize(w.label), "t": round(t, 1), "wall": wall, "p": round(p, 2),
          "frame": f"/m/{Path(frame).name}", "clip": f"/m/{clip_dst.name}" if clip_dst.exists() else None,
-         "card": f"/m/{card.name}", "reel": f"/m/{reel.name}" if reel and reel.exists() else None}
+         "card": f"/m/{card.name}", "reel": None}
     S.moments.append(m)
     S.stats["moments"] += 1
-    await send_all({"type": "moment", "moment": m})
+    await send_all({"type": "moment", "moment": m})          # tell the user now; the 9:16 reel follows
+    if clip_dst.exists():
+        asyncio.create_task(add_reel(m, clip_dst, title, wall, mdir / f"{mid_id}_reel.mp4"))
+
+
+async def add_reel(m: dict, clip_dst: Path, title: str, wall: str, reel: Path) -> None:
+    try:
+        await asyncio.to_thread(moment_reel, str(clip_dst), title, wall, str(reel))
+    except Exception:
+        return
+    if reel.exists():
+        m["reel"] = f"/m/{reel.name}"
+        await send_all({"type": "moment_reel", "id": m["id"], "reel": m["reel"]})
 
 
 async def pump() -> None:
@@ -289,13 +323,16 @@ async def ws(socket: WebSocket):
     await socket.accept()
     S.clients.add(socket)
     await socket.send_text(json.dumps(state_msg(), ensure_ascii=False, default=str))
+    offset = None     # each page counts from its own zero; continue the session clock instead of going back in time
     try:
         while True:
             msg = await socket.receive()
             if msg.get("bytes"):
                 data = msg["bytes"]
                 t = struct.unpack("<d", data[:8])[0]
-                add_frame(t, data[8:])
+                if offset is None:
+                    offset = (S.now + 0.25 - t) if S.stats["frames"] else 0.0
+                add_frame(t + offset, data[8:])
             elif msg.get("text"):
                 pass
             elif msg.get("type") == "websocket.disconnect":
@@ -331,6 +368,7 @@ async def add_watch(req: WatchIn):
         return JSONResponse({"error": f"could not turn that into a watch: {e}"}, status_code=400)
     ask = q["ask"].strip()
     ask = ask[len(PREFIX):] if ask.startswith(PREFIX) else ask[0].lower() + ask[1:]
+    ask = re.sub(r"\?\s+(?:Not|not)\b", ", not", ask).rstrip(" ?.")      # "...desk? Not just ..." -> "...desk, not just ..."
     wid = re.sub(r"[^a-z0-9_]", "_", q.get("id", "watch").lower())[:24] + "_" + uuid.uuid4().hex[:4]
     # Custom watches always go through candidate -> verifier: real actions often show up as one strong clip,
     # which a sustained-state rule would miss (the brain's "state" guess is only used without a verifier).
@@ -385,10 +423,26 @@ async def ask(req: AskIn):
             src = next((p for t, p in recent + S.keyframes if Path(p).stem == s.frame), None)
             if src:
                 frame = "/m/" + Path(keep_frame(s.t, src)).name
-        out = {"object": noun, "found": s.found, "place": s.place, "seconds_ago": round(S.now - s.t) if s.t else None,
+        where = await locate(noun, src) if s.found and src else None
+        out = {"object": noun, "found": s.found, "place": where or s.place, "seconds_ago": round(S.now - s.t) if s.t else None,
                "frame": frame, "confidence": s.visible_p, "frames_scanned": scanned}
         found.append(out)
         return out
+
+    async def locate(noun: str, path: str) -> str | None:
+        """The scan says which frame shows the object; one look at that frame says where it is in the room."""
+        try:
+            async with httpx.AsyncClient(timeout=40, trust_env=False) as c:
+                r = await c.post(CFG["video_djev_url"] + "/v1/raw/chat/completions", json={
+                    "model": "dgemma", "max_tokens": 30, "messages": [{"role": "user", "content": [
+                        {"type": "image_url", "image_url": {"url": image_url(path)}},
+                        {"type": "text", "text": f"Where exactly are the {noun} in this picture? Answer with one short "
+                                                 "phrase that names the surface and the nearest object, for example "
+                                                 "'on the desk, next to the laptop'."}]}]})
+            S.stats["judge"] += 1
+            return r.json()["choices"][0]["message"]["content"].strip().rstrip(".") if r.status_code == 200 else None
+        except Exception:
+            return None
 
     async def describe_recent(args: dict) -> dict:
         secs = min(8.0, float(args.get("seconds", 6) or 6))
@@ -428,12 +482,34 @@ async def ask(req: AskIn):
     return {"answer": run.text.strip(), "evidence": hit, "model": b.name, "ms": round(run.latency_ms)}
 
 
+class LangIn(BaseModel):
+    lang: str
+
+
+@app.post("/api/lang")
+async def set_lang(req: LangIn):
+    """Cards are rendered on the server, so it needs the page language for built-in (bilingual) labels."""
+    CFG["lang"] = "en" if req.lang == "en" else "zh"
+    return {"lang": CFG["lang"]}
+
+
+def localize(label: str) -> str:
+    """Built-in labels are "emoji 中文 · English"; keep the page's language only."""
+    m = re.match(r"^(\W*?\s*)(.+?) · (.+)$", label)
+    return label if not m else m.group(1) + (m.group(3) if CFG.get("lang") == "en" else m.group(2))
+
+
 @app.post("/api/reset")
 async def reset():
+    """Forget the data (frames, moments, history), keep what the user asked to watch for."""
     old = S
     clients = old.clients
     new_session()
     S.clients = clients
+    S.watches = old.watches
+    for w in S.watches.values():
+        w.fires, w.dismissed, w.last_p = 0, 0, 0.0
+        w.make_trigger()
     shutil.rmtree(old.dir, ignore_errors=True)        # "forget everything" really deletes
     await send_all(state_msg())
     return {"ok": True}
@@ -449,12 +525,18 @@ async def media(name: str):
 
 @app.get("/api/history")
 async def history():
-    return {"history": list(S.history)}
+    return {"history": list(S.history), "events": S.events}
 
 
 @app.get("/api/state")
 async def get_state():
     return state_msg()
+
+
+@app.get("/fonts/{name}")
+async def font(name: str):
+    f = ROOT / "web" / "fonts" / Path(name).name
+    return FileResponse(f, headers={"Cache-Control": "max-age=86400"}) if f.exists() else JSONResponse({}, status_code=404)
 
 
 @app.get("/")
