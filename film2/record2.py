@@ -106,8 +106,8 @@ class Take:
         raise TimeoutError(f"[{self.name}] gave up waiting for: {js}")
 
 
-async def run(scene, layout, port):
-    sc = SCENES[scene]; L = LAYOUT[layout]; name = f"{scene}_{layout}"
+async def run(scene, layout, port, details=False):
+    sc = SCENES[scene]; L = LAYOUT[layout]; name = f"{scene}_{layout}" + ("_det" if details else "")
     y4m, pre_s, clip_s = feed(name, sc, sc.get("pre", 10.0))
     api(port, "/api/reset", {})
     for w in api(port, "/api/state")["watches"]:
@@ -117,6 +117,7 @@ async def run(scene, layout, port):
         b = await pw.chromium.launch(args=["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream",
                                            f"--use-file-for-fake-video-capture={y4m}"])
         ctx = await b.new_context(viewport={"width": L["W"], "height": L["H"]}, permissions=["camera"], locale="en-US")
+        await ctx.add_init_script(f"localStorage.setItem('pulse_details','{'1' if details else '0'}')")
         page = await ctx.new_page(); page.on("dialog", lambda d: asyncio.ensure_future(d.accept()))
         await page.goto(f"http://127.0.0.1:{port}")
         await page.add_style_tag(content=f"html{{zoom:{L['zoom']}}} {L['css']}" + ("" if sc.get("gate") else " .gate{display:none!important}"))
@@ -180,10 +181,10 @@ async def run(scene, layout, port):
     print(name, "->", OUT / f"{name}.mp4", "| answer:", answer, "| events:", [(e["watch"], round(e["p"], 2), e["verified"]) for e in hist["events"]], flush=True)
 
 
-def run_retry(scene, layout, port, tries=4):
+def run_retry(scene, layout, port, tries=4, details=False):
     for k in range(tries):
         try:
-            return asyncio.run(run(scene, layout, port))
+            return asyncio.run(run(scene, layout, port, details))
         except TimeoutError as e:
             print("retry", scene, layout, k, e, flush=True)
     print("FAILED", scene, layout, flush=True)
@@ -191,8 +192,8 @@ def run_retry(scene, layout, port, tries=4):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("scenes", nargs="+"); ap.add_argument("--layout", default="both")
-    ap.add_argument("--port", type=int, default=18920)
+    ap.add_argument("--port", type=int, default=18920); ap.add_argument("--details", action="store_true")
     a = ap.parse_args()
     for s in a.scenes:
         for L in (["desk", "mobile"] if a.layout == "both" else [a.layout]):
-            run_retry(s, L, a.port)
+            run_retry(s, L, a.port, details=a.details)

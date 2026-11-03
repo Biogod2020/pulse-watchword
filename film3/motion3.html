@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Pulse · judges' cut scenes</title>
+<!--
+  Deterministic 1920x1080 scenes for the hackathon judges' cut. window.SCENES, await window.render(id, t).
+  Every number is a measurement from docs/validation_epic_P12_101.md (EPIC-KITCHENS P12_101, held-out 24 min,
+  2-s clips, thresholds tuned on the first 10 min) or from the recorded demo session (film2/ui/*.json).
+  Chart: one series (Pulse precision, #0e9fbd, validated for dark), chance as a gray dashed reference, direct labels.
+-->
+<style>
+@font-face{font-family:"Inter";src:url("InterVariable.ttf") format("truetype");font-weight:100 900}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#070b15;font-family:"Inter","Noto Color Emoji",sans-serif;color:#eef2ff;-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01","tnum"}
+.scene{position:absolute;inset:0;display:none}
+.bg{position:absolute;inset:0;background:radial-gradient(1200px 700px at 85% -10%,rgba(14,159,189,.16),transparent 60%),radial-gradient(900px 600px at -10% 110%,rgba(124,92,255,.12),transparent 60%),#070b15}
+.abs{position:absolute}.kick{font-size:22px;letter-spacing:.3em;text-transform:uppercase;color:#22d3ee;font-weight:650}
+.h{font-size:58px;font-weight:760;letter-spacing:-.025em;line-height:1.08}
+.mut{color:rgba(238,242,255,.66)}.card{background:rgba(17,24,43,.88);border:1px solid rgba(255,255,255,.09);border-radius:26px}
+.chip{display:inline-block;border-radius:999px;padding:10px 20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:26px;margin:6px}
+.big{font-size:84px;font-weight:780;letter-spacing:-.03em}
+.box{position:absolute;padding:26px 30px}
+.arrow{position:absolute;height:3px;background:#22d3ee;border-radius:2px}
+.thumb{position:absolute;width:96px;height:96px;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,.1)}.thumb img{width:100%;height:100%;object-fit:cover}
+.tile{position:absolute;padding:30px 34px}
+.tile .n{font-size:64px;font-weight:780;letter-spacing:-.02em}.tile .l{font-size:24px;margin-top:8px;color:rgba(238,242,255,.72);line-height:1.35}
+</style></head><body>
+
+<div class="scene" id="problem"><div class="bg"></div>
+  <div class="abs kick" style="left:120px;top:100px">The problem</div>
+  <div class="abs card box" id="pr_l" style="left:120px;top:200px;width:800px;height:560px">
+    <div class="h" style="font-size:44px">Fixed detectors</div>
+    <div class="mut" style="font-size:26px;margin-top:10px">a few labels, trained in advance</div>
+    <div style="margin-top:30px"><span class="chip">person</span><span class="chip">package</span><span class="chip">vehicle</span><span class="chip">pet</span></div>
+    <div id="pr_q" style="margin-top:44px;font-size:30px;padding:20px 24px;border-radius:18px;border:1px dashed rgba(255,255,255,.3);color:rgba(238,242,255,.85)">“Tell me when my cat walks across my laptop”<span id="pr_x" style="color:#f87171;font-weight:800;margin-left:14px">✕</span></div>
+  </div>
+  <div class="abs card box" id="pr_r" style="left:1000px;top:200px;width:800px;height:560px">
+    <div class="h" style="font-size:44px">A big vision model, every second</div>
+    <div class="mut" style="font-size:26px;margin-top:10px">understands anything you ask</div>
+    <div id="pr_grid" style="margin-top:34px;position:relative;height:250px"></div>
+    <div id="pr_cost" style="font-size:30px;margin-top:6px;color:rgba(238,242,255,.85)">every second × every camera = slow and costly</div>
+  </div>
+  <div class="abs h" id="pr_so" style="left:0;width:1920px;text-align:center;top:850px;font-size:52px">So nobody does it.</div>
+</div>
+
+<div class="scene" id="arch"><div class="bg"></div>
+  <div class="abs kick" style="left:120px;top:80px">How Pulse works</div>
+  <div class="abs card box" id="ar_s" style="left:120px;top:170px;width:520px"><div class="mut" style="font-size:22px">You type</div><div style="font-size:30px;margin-top:8px">“Tell me when the cat walks across my laptop”</div></div>
+  <div class="abs card box" id="ar_q" style="left:120px;top:400px;width:520px"><div class="mut" style="font-size:22px">Language model writes one yes/no question</div><div style="font-size:26px;margin-top:8px;color:#a5f3fc">Does this video show a cat walking across the laptop, not just sitting beside it?</div></div>
+  <div class="abs" id="ar_strip" style="left:740px;top:180px;width:420px;height:220px"></div>
+  <div class="abs mut" id="ar_striplab" style="left:740px;top:405px;font-size:22px">the last 2 seconds · every second</div>
+  <div class="abs card box" id="ar_fast" style="left:740px;top:450px;width:540px">
+    <div class="kick" style="font-size:18px">Fast model · always on</div>
+    <div style="font-size:32px;font-weight:700;margin-top:8px">DiffusionGemma 26B-A4B</div><div class="mut" style="font-size:20px;margin-top:4px">open weights · MoE, 4B active · int4 (AWQ)</div>
+    <div class="mut" style="font-size:24px;margin-top:8px;line-height:1.4">answers every watch in one pass<br>0.8 s per 2-second clip on one GPU</div>
+    <div style="display:flex;align-items:center;gap:16px;margin-top:20px"><div style="flex:1;height:14px;border-radius:7px;background:rgba(255,255,255,.08);position:relative;overflow:hidden"><i id="ar_bar" style="position:absolute;left:0;top:0;bottom:0;background:#0e9fbd;border-radius:7px"></i></div><b id="ar_val" style="font-size:34px;width:90px;text-align:right">0.00</b></div>
+    <div class="mut" style="font-size:20px;margin-top:6px">candidate when ≥ 0.5</div>
+  </div>
+  <div class="arrow" id="ar_a1" style="left:1270px;top:640px"></div>
+  <div class="abs card box" id="ar_slow" style="left:1360px;top:470px;width:440px">
+    <div class="kick" style="font-size:18px;color:#c4b5fd">Second look · rare</div>
+    <div style="font-size:32px;font-weight:700;margin-top:8px">Bigger cloud model</div><div class="mut" style="font-size:20px;margin-top:4px">gpt-6-luna · OpenAI Decisions API</div>
+    <div class="mut" style="font-size:24px;margin-top:8px;line-height:1.4">3 frames<br>about $0.0002 a look</div>
+    <div id="ar_ok" style="margin-top:20px;font-size:28px;font-weight:700;color:#6ee7b7">✓ Moment saved</div>
+  </div>
+  <div class="abs card box" id="ar_mem" style="left:1360px;top:170px;width:440px"><div class="mut" style="font-size:22px">Memory</div><div style="font-size:28px;margin-top:8px;line-height:1.35">Frames live 3 minutes in RAM.<br>Only moments are kept.</div></div>
+  <div class="abs h" id="ar_tag" style="left:0;width:1920px;text-align:center;top:900px;font-size:56px">Always watching. <span style="color:#22d3ee">Rarely thinking.</span></div>
+</div>
+
+<div class="scene" id="evidence"><div class="bg"></div>
+  <div class="abs kick" style="left:120px;top:80px">Evidence</div>
+  <div class="abs h" style="left:120px;top:130px;font-size:44px">Held-out test on 34 minutes of real kitchen video</div>
+  <div class="abs mut" style="left:120px;top:196px;font-size:24px">EPIC-KITCHENS P12_101 · human-labelled · 2-s clips at 4 frames/s, one per second · thresholds set on the first 10 min, scored on the other 24</div>
+  <div class="abs" id="ev_chart" style="left:120px;top:290px;width:980px;height:520px"></div>
+  <div class="abs card tile" id="ev_t1" style="left:1180px;top:290px;width:620px"><div class="n">282 s</div><div class="l">to read the whole 34-minute video<br>server benchmark: one H100 (≈7× real time)</div></div>
+  <div class="abs card tile" id="ev_t2" style="left:1180px;top:500px;width:620px"><div class="n">2 of 46</div><div class="l">clips needed the cloud model<br>in our demo session</div></div>
+  <div class="abs card tile" id="ev_t3" style="left:1180px;top:710px;width:620px"><div class="n">3%</div><div class="l">of frames kept (20 of 646);<br>the rest deleted from memory</div></div>
+</div>
+
+<div class="scene" id="limits"><div class="bg"></div>
+  <div class="abs card box" id="li_l" style="left:120px;top:150px;width:800px;height:700px">
+    <div class="kick" style="color:#fca5a5">Not good enough yet</div>
+    <div id="li_ll" style="margin-top:30px"></div>
+  </div>
+  <div class="abs card box" id="li_r" style="left:1000px;top:150px;width:800px;height:700px">
+    <div class="kick">Next</div>
+    <div id="li_rl" style="margin-top:30px"></div>
+  </div>
+</div>
+
+<div class="scene" id="end"><div class="bg"></div>
+  <div class="abs" id="en_lock" style="left:0;width:1920px;top:360px;text-align:center">
+    <div style="display:inline-flex;align-items:center;gap:28px"><div id="en_dot" style="width:46px;height:46px;border-radius:50%;background:#22d3ee"></div><div class="big" style="font-size:160px">Pulse</div></div>
+    <div style="font-size:52px;font-weight:560;margin-top:24px">Always watching. <span style="color:#22d3ee">Rarely thinking.</span></div>
+  </div>
+  <div class="abs mut" id="en_foot" style="left:0;width:1920px;text-align:center;top:990px;font-size:20px;color:rgba(238,242,255,.6)">Demo footage: Pexels &amp; Mixkit (real video). Every detection, card and answer shown is Pulse's real output. Numbers are our own measurements.</div>
+</div>
+
+<script>
+window.SCENES={problem:15.5,arch:25.0,evidence:27.5,limits:16.5,end:5.0};
+const $=id=>document.getElementById(id), cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), seg=(t,a,b)=>cl((t-a)/(b-a));
+const eout=k=>1-Math.pow(1-cl(k),3);
+function show(id,k,dy=24){const e=$(id);e.style.opacity=k;e.style.transform=`translateY(${(1-k)*dy}px)`}
+async function rProblem(t){
+  show('pr_l',eout(seg(t,0.2,0.9))); show('pr_r',eout(seg(t,4.2,4.9)));
+  $('pr_x').style.opacity=eout(seg(t,2.6,3.0));
+  const g=$('pr_grid'); if(!g.children.length){for(let i=0;i<4;i++)for(let j=0;j<10;j++){const d=document.createElement('div');d.style.cssText=`position:absolute;left:${j*72}px;top:${i*62}px;width:62px;height:52px;border-radius:8px;background:rgba(124,92,255,.5)`;g.appendChild(d)}}
+  [...g.children].forEach((d,i)=>{d.style.opacity=t>5+i*0.06?1:0.07});
+  show('pr_cost',eout(seg(t,8.6,9.2))); show('pr_so',eout(seg(t,12.6,13.2)));
+}
+async function rArch(t){
+  show('ar_s',eout(seg(t,0.2,0.8))); show('ar_q',eout(seg(t,3.0,3.6)));
+  const st=$('ar_strip'); if(!st.children.length){for(let i=0;i<8;i++){const d=document.createElement('div');d.className='thumb';d.style.left=(i%4)*104+'px';d.style.top=Math.floor(i/4)*110+'px';d.innerHTML=`<img src="strip/s_${String(i+1).padStart(2,'0')}.jpg">`;st.appendChild(d)}}
+  [...st.children].forEach((d,i)=>{d.style.opacity=eout(seg(t,6.0+i*0.1,6.4+i*0.1))}); show('ar_striplab',eout(seg(t,6.4,7.0)));
+  show('ar_fast',eout(seg(t,7.6,8.3)));
+  const p=0.95*eout(seg(t,10.5,12.5)); $('ar_bar').style.width=(p*100)+'%'; $('ar_val').textContent=p.toFixed(2);
+  $('ar_a1').style.width=(80*eout(seg(t,14.5,15.2)))+'px';
+  show('ar_slow',eout(seg(t,15.0,15.7))); $('ar_ok').style.opacity=eout(seg(t,18.5,19.0));
+  show('ar_mem',eout(seg(t,19.5,20.2))); show('ar_tag',eout(seg(t,21.5,22.3)));
+}
+const ROWS=[["Washing at the sink",67,7,"15 alerts"],["Turning a tap or knob",63,9,"27 alerts"]];
+async function rEvidence(t){
+  const c=$('ev_chart');
+  if(!c.children.length){
+    c.innerHTML=`<div class="mut" style="font-size:22px;margin-bottom:22px">Share of alerts that were right</div>`+ROWS.map((r,i)=>`
+      <div style="position:relative;height:150px">
+        <div style="font-size:28px;margin-bottom:14px">${r[0]} <span class="mut" style="font-size:22px">· ${r[3]}</span></div>
+        <div style="position:relative;height:24px;width:900px;background:rgba(255,255,255,.05);border-radius:0 4px 4px 0">
+          <i id="ev_b${i}" style="position:absolute;left:0;top:0;bottom:0;background:#0e9fbd;border-radius:0 4px 4px 0"></i>
+          <i style="position:absolute;left:${r[2]*9}px;top:-8px;bottom:-8px;border-left:3px dashed #94a3b8"></i>
+        </div>
+        <div style="display:flex;gap:30px;margin-top:12px;font-size:24px"><b id="ev_v${i}">0%</b><span class="mut">chance ${r[2]}%</span></div>
+      </div>`).join('')+`
+      <div style="position:relative;height:120px">
+        <div style="font-size:28px;margin-bottom:14px">Stirring a pot <span class="mut" style="font-size:22px">· episodes caught</span></div>
+        <div style="font-size:56px;font-weight:780" id="ev_stir">0 / 29</div></div>`;
+  }
+  ROWS.forEach((r,i)=>{const k=eout(seg(t,1.0+i*1.4,2.4+i*1.4));$('ev_b'+i).style.width=(r[1]*9*k)+'px';$('ev_v'+i).textContent=Math.round(r[1]*k)+'%'});
+  $('ev_stir').textContent=Math.round(28*eout(seg(t,4.4,6.0)))+' / 29';
+  show('ev_t1',eout(seg(t,11.0,11.6))); show('ev_t2',eout(seg(t,15.5,16.1))); show('ev_t3',eout(seg(t,18.5,19.1)));
+}
+const LL=[["Quick hand actions","“put something down” scores only 0.6–0.7 AUC"],["Finding objects","right on 28 of 53 questions"],["Wording","the same request, phrased differently, can be missed"]];
+const RL=[["Fast model on the device","phones, laptops, glasses"],["Phone alerts","a ping when it matters"],["Longer memory","ask about hours, not minutes"]];
+async function rLimits(t){
+  show('li_l',eout(seg(t,0.2,0.8))); show('li_r',eout(seg(t,9.0,9.6)));
+  const f=(id,L,t0,dt)=>{const e=$(id);if(!e.children.length)e.innerHTML=L.map(([a,b])=>`<div style="margin-bottom:40px"><div style="font-size:38px;font-weight:700">${a}</div><div class="mut" style="font-size:26px;margin-top:8px">${b}</div></div>`).join('');
+    [...e.children].forEach((d,i)=>{const k=eout(seg(t,t0+i*dt,t0+i*dt+0.5));d.style.opacity=k;d.style.transform=`translateY(${(1-k)*16}px)`})};
+  f('li_ll',LL,1.6,2.3); f('li_rl',RL,10.0,1.6);
+}
+async function rEnd(t){show('en_lock',eout(seg(t,0.1,0.8)));$('en_dot').style.boxShadow=`0 0 ${30+20*Math.sin(t*5)}px rgba(34,211,238,.85)`;show('en_foot',eout(seg(t,1.0,1.6)),0)}
+const R={problem:rProblem,arch:rArch,evidence:rEvidence,limits:rLimits,end:rEnd};
+window.render=async(id,t)=>{document.querySelectorAll('.scene').forEach(e=>e.style.display=e.id===id?'block':'none');await R[id](t);
+  await Promise.all([...document.querySelectorAll(`#${id} img`)].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));};
+</script></body></html>

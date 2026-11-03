@@ -1,0 +1,19 @@
+{
+  "title": "Pulse: always watching, rarely thinking (judges' cut, ~2:30, 16:9)",
+  "beats": [
+    {"id": "hook", "dur": 9, "visual": "real UI: cat walks across the laptop, 'Checking…' then 'Noticed: Cat walks across laptop'",
+     "vo": "I typed one sentence: tell me when the cat walks across my laptop. Pulse has been watching every second since, and it just caught him."},
+    {"id": "problem", "dur": 17, "visual": "motion: two failing options. Left: big vision model on every second of video (slow, about a dollar-plus per camera-day, cloud). Right: fixed detectors (person, package) that cannot understand 'my cat on my keyboard'.",
+     "vo": "Cameras can see a lot, but they can't take an instruction. Fixed detectors only know a few labels. A big vision model understands anything, but running it on every second of video is slow and expensive. So no one does it."},
+    {"id": "idea", "dur": 30, "visual": "motion: architecture with measured numbers. Sentence -> one yes/no question. Fast model reads a 2-second clip every second, all watches in one pass (0.8 s per clip, 7x real time on one H100). Score >= 0.5 -> second look by a bigger cloud model on 3 frames (about $0.0002). Then a moment. Frames live 3 minutes in memory; 3% kept.",
+     "vo": "Our idea is a cascade. A language model turns your sentence into one precise yes or no question. Every second, a fast open model, DiffusionGemma on a single GPU, reads the last two seconds of video and answers every question at once. That's cheap enough to run all day. Only when an answer crosses one half does a bigger model take a second look at three frames, for a fraction of a cent. Always watching, rarely thinking."},
+    {"id": "demo", "dur": 40, "visual": "real UI: typing the watch, the generated question, Checking -> Not quite (rejected) -> Checking -> Noticed; quick montage cake / coffee / table / wave (same model, no training); 'Where did I leave my keys?' -> answer + evidence replay; 'Did I take my pills today?' -> answer.",
+     "vo": "Here it is running live on real footage. The second look rejects a near miss, then confirms the real one. There's no training for any of this: the same model handles a cat at the cake, a coffee break, a cat on the table, a wave. And because it remembers the last few minutes, you can ask: where did I leave my keys? It scans back, answers, and shows the frame."},
+    {"id": "evidence", "dur": 22, "visual": "motion: held-out results on EPIC-KITCHENS P12_101 (34 min real first-person video, human narration as ground truth). Thresholds chosen on the first 10 minutes, scored on the other 24: washing 67% precise (random 7%), turning a knob 63% (random 9%), stirring 28 of 29 caught. Throughput: 2,044 clips in 282 s on one H100. Storage: 646 frames seen, 20 kept.",
+     "vo": "We tested it on a 34-minute real kitchen video with human labels. We set thresholds on the first ten minutes and scored the other twenty-four: about two-thirds of alerts were right, against seven to nine percent by chance, and it caught stirring 28 times out of 29. The whole video took under five minutes on one GPU."},
+    {"id": "limits", "dur": 16, "visual": "motion: honest limits + next. Limits: quick hand actions like putting something down are weak; finding objects is right about half the time; results depend on how the question is worded. Next: fast model on-device, phone alerts, longer memory, glasses.",
+     "vo": "It's not perfect. Quick actions, like putting something down, are still hard; finding objects is right about half the time; and wording matters. Next, we're moving the fast model onto the device and adding phone alerts and longer memory."},
+    {"id": "end", "dur": 7, "visual": "end card: Pulse · always watching, rarely thinking. Footnote: footage from Pexels/Mixkit; all detections and answers are real Pulse output; numbers from our own measurements.",
+     "vo": "Pulse. Tell your camera what matters."}
+  ]
+}

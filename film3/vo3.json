@@ -1,0 +1,11 @@
+[
+ {"id": "J1", "text": "One sentence: tell me when the cat walks across my laptop. Pulse has watched every second since, and it just caught him."},
+ {"id": "J2", "text": "Today's cameras only spot a few fixed things, like a person or a package. A large vision model can understand anything you ask, but running one on every second of video, for every camera, is slow and costly. So nobody does it."},
+ {"id": "J3", "text": "Pulse splits the work. A language model turns your sentence into one precise yes or no question. Every second, a small open video model reads the last two seconds and answers all your questions in one pass, in under a second on one GPU. Only when an answer crosses one half does a bigger cloud model take a second look, at three frames, for a tiny fraction of a cent."},
+ {"id": "J4", "text": "Here it is, live, on real footage. The first check fires on a near miss, and the second look rejects it. Moments later, the real thing, confirmed."},
+ {"id": "J5", "text": "No training, and no new model per task. The same system catches a cat at the cake, a coffee break, a cat on the dinner table. Just sentences."},
+ {"id": "J6", "text": "It also keeps a few minutes of memory, so you can ask: where did I leave my keys? It looks back, answers, and shows you the frame."},
+ {"id": "J7", "text": "We measured it on a thirty-four minute real kitchen video with human labels. We set thresholds on the first ten minutes and scored the other twenty-four. About two thirds of alerts were right, against under a tenth by chance, and it caught stirring twenty-eight times out of twenty-nine. One GPU read the whole video in under five minutes. And in our demo session, the cloud model looked at only two of forty-six clips."},
+ {"id": "J8", "text": "It's not perfect. Quick actions, like putting something down, are still hard. Finding objects is right about half the time, and wording matters. Next, we're moving the fast model onto the device, and adding phone alerts and longer memory."},
+ {"id": "J9", "text": "Pulse. Always watching, rarely thinking."}
+]
