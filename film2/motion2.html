@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Pulse film2 · motion</title>
+<!--
+  Deterministic scenes (frames are pure functions of t) for the real-footage Pulse films, in 16:9 (?o=h) and 9:16 (?o=v).
+  window.SCENES = {id: duration}; await window.render(id, t).
+  Cards, reel frames and thumbnails are Pulse's own output from the recorded takes. The phone notification is a CONCEPT
+  (Pulse does not push to phones yet) and is labelled as such on screen.
+-->
+<style>
+@font-face{font-family:"Inter";src:url("InterVariable.ttf") format("truetype");font-weight:100 900}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow:hidden;background:#060a14;font-family:"Inter","Noto Color Emoji",sans-serif;color:#eef2ff;font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased}
+.scene{position:absolute;inset:0;display:none;overflow:hidden}
+.bg{position:absolute;inset:0;background:radial-gradient(70% 60% at 80% -10%,rgba(34,211,238,.16),transparent 60%),radial-gradient(60% 60% at -10% 110%,rgba(124,92,255,.14),transparent 60%),#060a14}
+.abs{position:absolute}.big{font-weight:780;letter-spacing:-.035em;line-height:1.02}
+.mut{color:rgba(238,242,255,.66)}
+.concept{position:absolute;opacity:.6;font-size:18px;font-weight:650;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:6px 14px}
+.phone{position:absolute;border-radius:70px;background:#0b0d12;padding:16px;box-shadow:0 60px 120px rgba(0,0,0,.6),inset 0 0 0 2px rgba(255,255,255,.14)}
+.screen{position:relative;width:100%;height:100%;border-radius:56px;overflow:hidden;background:#000}
+.notif{position:absolute;left:18px;right:18px;border-radius:30px;background:rgba(245,245,250,.86);backdrop-filter:blur(20px);color:#111;padding:20px 22px;display:flex;gap:16px;align-items:center;box-shadow:0 20px 40px rgba(0,0,0,.35)}
+.notif .ic{width:54px;height:54px;border-radius:14px;background:#0b1020;display:grid;place-items:center;flex:none}
+.notif .ic i{width:22px;height:22px;border-radius:50%;background:#22d3ee;display:block;box-shadow:0 0 12px #22d3ee}
+.notif .tx{flex:1;min-width:0}.notif .ap{font-size:17px;font-weight:650;color:#555;display:flex;justify-content:space-between}
+.notif .ti{font-size:22px;font-weight:700;margin-top:3px}.notif .bd{font-size:18px;color:#333;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.notif img{width:74px;height:74px;border-radius:12px;object-fit:cover;flex:none}
+.pill{display:inline-flex;align-items:center;gap:12px;border-radius:999px;padding:14px 28px;font-weight:700}
+</style></head><body>
+
+<div class="scene" id="push">
+  <div class="abs" id="pu_wall" style="inset:0;background:url(card_catdesk.jpg) center/cover;filter:blur(50px) brightness(.35);transform:scale(1.2)"></div>
+  <div class="phone" id="pu_phone"><div class="screen">
+    <div class="abs" style="inset:0;background:linear-gradient(160deg,#1b2a4a,#3b1d4f 55%,#0f172a)"></div>
+    <div class="abs" id="pu_time" style="width:100%;text-align:center;top:120px;font-size:96px;font-weight:300;letter-spacing:-.02em;color:#fff">2:14</div>
+    <div class="abs" style="width:100%;text-align:center;top:92px;font-size:24px;font-weight:600;color:rgba(255,255,255,.85)">Tuesday, November 4</div>
+    <div id="pu_stack"></div>
+  </div></div>
+  <div class="concept" id="pu_concept">preview</div>
+</div>
+
+<div class="scene" id="title"><div class="bg"></div>
+  <div class="abs" id="ti_lock" style="left:0;width:100%;text-align:center">
+    <div style="display:inline-flex;align-items:center;gap:28px"><div id="ti_dot" style="width:44px;height:44px;border-radius:50%;background:#22d3ee"></div><div class="big" id="ti_word">Pulse</div></div>
+    <div id="ti_sub" style="font-weight:520;margin-top:26px;color:rgba(238,242,255,.85)">Tell your camera what to watch for.</div>
+  </div>
+</div>
+
+<div class="scene" id="share">
+  <div class="abs" style="inset:0;background:url(card_catdesk.jpg) center/cover;filter:blur(60px) brightness(.3);transform:scale(1.2)"></div>
+  <div class="abs" id="sh_card" style="border-radius:26px;overflow:hidden;box-shadow:0 50px 110px rgba(0,0,0,.6)"><img src="card_catdesk.jpg" style="width:100%;height:100%;display:block"></div>
+  <div class="phone" id="sh_phone"><div class="screen"><img id="sh_reel" style="width:100%;height:100%;object-fit:cover;display:block"></div></div>
+  <div class="abs big" id="sh_cap" style="width:100%;text-align:center">Every moment, ready to share.</div>
+</div>
+
+<div class="scene" id="end"><div class="bg"></div>
+  <div class="abs" id="en_lock" style="left:0;width:100%;text-align:center">
+    <div style="display:inline-flex;align-items:center;gap:28px"><div id="en_dot" style="width:46px;height:46px;border-radius:50%;background:#22d3ee"></div><div class="big" id="en_word">Pulse</div></div>
+    <div id="en_sub" style="font-weight:560;margin-top:26px;color:rgba(238,242,255,.9)">Tell your camera what matters.</div>
+    <div id="en_points" style="margin-top:40px;display:flex;justify-content:center;gap:16px;flex-wrap:wrap"></div>
+    <div class="pill" id="en_cta" style="margin-top:44px;background:#22d3ee;color:#05212a">Try it in your browser →</div>
+  </div>
+  <div class="abs mut" id="en_foot" style="left:0;width:100%;text-align:center;color:rgba(238,242,255,.55)">Real footage from Pexels &amp; Mixkit. The app, its detections and answers are real; phone alerts are a preview of an upcoming feature.</div>
+</div>
+
+<script>
+const O=new URLSearchParams(location.search).get('o')||'h', V=O==='v', W=V?1080:1920, H=V?1920:1080;
+document.documentElement.style.width=document.body.style.width=W+'px';document.documentElement.style.height=document.body.style.height=H+'px';
+window.SCENES={push:4.2,title:2.4,share:4.0,end:4.6};
+const $=id=>document.getElementById(id), cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), seg=(t,a,b)=>cl((t-a)/(b-a));
+const eout=k=>1-Math.pow(1-cl(k),3), ease=k=>{k=cl(k);return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2};
+const NOTIFS=[["Cat on laptop 🐈","You said: “tell me when the cat walks across my laptop”","card_catdesk.jpg",0.5],
+              ["Cat on the table 🐈","You said: “tell me when the cat is on the table”","card_glass.jpg",1.9],
+              ["Pills taken 💊","You said: “tell me when I take my pills”","card_pill.jpg",3.0]];
+function setImg(el,src){return new Promise(r=>{if(el.getAttribute('src')===src&&el.complete)return r();el.onload=el.onerror=()=>r();el.src=src})}
+
+async function rPush(t){
+  const pw=V?640:470, ph=pw*2.08, ph_=$('pu_phone'); ph_.style.width=pw+'px';ph_.style.height=ph+'px';
+  ph_.style.left=(W-pw)/2+'px';ph_.style.top=((H-ph)/2+(1-eout(seg(t,0,0.6)))*80)+'px';ph_.style.opacity=eout(seg(t,0,0.5));
+  const st=$('pu_stack');
+  if(!st.children.length) NOTIFS.forEach(([ti,bd,img])=>{const d=document.createElement('div');d.className='notif';
+    d.innerHTML=`<div class="ic"><i></i></div><div class="tx"><div class="ap"><span>PULSE</span><span>now</span></div><div class="ti">${ti}</div><div class="bd">${bd}</div></div><img src="${img}">`;st.appendChild(d)});
+  [...st.children].forEach((d,i)=>{const k=eout(seg(t,NOTIFS[i][3],NOTIFS[i][3]+0.45)); const after=NOTIFS.filter(n=>n[3]<=t&&n[3]>NOTIFS[i][3]).length;
+    d.style.top=(330+after*128)+'px';d.style.opacity=k;d.style.transform=`translateY(${(1-k)*-40}px) scale(${0.96+0.04*k})`;
+    d.style.transition='none';d.style.zIndex=10+i;});
+  const c=$('pu_concept'); c.style.left=V?'50%':'auto';c.style.right=V?'auto':'60px';c.style.bottom=V?'120px':'50px';c.style.transform=V?'translateX(-50%)':'none';c.style.opacity=eout(seg(t,0.4,0.9));
+}
+async function rTitle(t){
+  const l=$('ti_lock'); l.style.top=(H/2-(V?150:120))+'px'; $('ti_word').style.fontSize=(V?170:180)+'px'; $('ti_sub').style.fontSize=(V?50:52)+'px';
+  const k=eout(seg(t,0.05,0.6)); l.style.opacity=k; l.style.transform=`scale(${0.94+0.06*k})`; $('ti_sub').style.opacity=eout(seg(t,0.45,0.95));
+  $('ti_dot').style.boxShadow=`0 0 ${30+24*Math.sin(t*6)}px rgba(34,211,238,.85)`;
+}
+async function rShare(t){
+  const cw=V?560:470, c=$('sh_card'); c.style.width=cw+'px';c.style.height=cw*1.25+'px';
+  const pw=V?380:390, p=$('sh_phone'); p.style.width=pw+'px';p.style.height=pw*2.08+'px';
+  const ck=eout(seg(t,0,0.6)), pk=eout(seg(t,0.35,1.0));
+  if(V){c.style.left=(W/2-cw/2-140-(1-ck)*60)+'px';c.style.top='560px';c.style.transform=`rotate(${-4*ck}deg)`;
+        p.style.left=(W/2+20+(1-pk)*60)+'px';p.style.top='470px';}
+  else{c.style.left=(560-(1-ck)*60)+'px';c.style.top='200px';c.style.transform=`rotate(${-4*ck}deg)`;
+       p.style.left=(1080+(1-pk)*60)+'px';p.style.top='140px';}
+  c.style.opacity=ck;p.style.opacity=pk;
+  await setImg($('sh_reel'),`reel/r_${String(1+Math.floor((t*24)%144)).padStart(3,'0')}.jpg`);
+  const cap=$('sh_cap');cap.style.fontSize=(V?76:64)+'px';cap.style.top=(V?220:930)+'px';if(!V)cap.style.top='952px';
+  cap.style.opacity=eout(seg(t,0.5,1.0));if(V){cap.style.padding='0 60px'}
+}
+async function rEnd(t){
+  const l=$('en_lock'); l.style.top=(H/2-(V?330:260))+'px'; $('en_word').style.fontSize=(V?170:170)+'px';$('en_sub').style.fontSize=(V?50:50)+'px';
+  const pts=$('en_points'); if(!pts.children.length)['No app to install','No new camera','Just one sentence'].forEach(s=>{const d=document.createElement('div');d.className='pill';d.style.cssText+=';background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);font-size:'+(V?30:28)+'px;padding:12px 24px';d.textContent=s;pts.appendChild(d)});
+  if(V){pts.style.flexDirection='column';pts.style.alignItems='center'}
+  $('en_cta').style.fontSize=(V?40:36)+'px';
+  const k=eout(seg(t,0.05,0.6)); l.style.opacity=k; l.style.transform=`translateY(${(1-k)*24}px)`;
+  [...pts.children].forEach((d,i)=>d.style.opacity=eout(seg(t,0.5+i*0.18,0.9+i*0.18)));
+  $('en_cta').style.opacity=eout(seg(t,1.2,1.7));$('en_cta').style.transform=`scale(${1+0.03*Math.sin(Math.max(0,t-1.7)*4)})`;
+  $('en_dot').style.boxShadow=`0 0 ${30+20*Math.sin(t*5)}px rgba(34,211,238,.85)`;
+  const f=$('en_foot');f.style.top=(H-(V?150:70))+'px';f.style.fontSize=(V?24:20)+'px';f.style.padding=V?'0 70px':'0';f.style.opacity=eout(seg(t,1.4,2.0))*0.95;
+}
+const R={push:rPush,title:rTitle,share:rShare,end:rEnd};
+window.render=async(id,t)=>{document.querySelectorAll('.scene').forEach(e=>e.style.display=e.id===id?'block':'none');await R[id](t);
+  await Promise.all([...document.querySelectorAll(`#${id} img`)].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));};
+</script></body></html>

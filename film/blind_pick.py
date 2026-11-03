@@ -28,7 +28,7 @@ for r in range(a.runs):
     prompt = (a.brief + f"\n\nYou will hear {len(order)} candidates, in order: " + ", ".join(letters) +
               ". Listen to each completely. Reply with a short reason per candidate, then a final line exactly like "
               "'RANKING: B > A > C' (best first, every letter once).")
-    txt = ask(prompt, [enc[f] for f in order], temperature=0.3)
+    txt = ask(prompt, [enc[f] for f in order], model=__import__("os").environ.get("GEM_MODEL", "gemini-3.8-flash-high"), temperature=0.3)
     m = re.search(r"RANKING:\s*([A-Z](?:\s*>\s*[A-Z])+)", txt)
     if not m:
         print("no ranking in run", r, txt[-300:]); continue

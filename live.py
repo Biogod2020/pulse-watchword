@@ -437,8 +437,8 @@ async def ask(req: AskIn):
                     "model": "dgemma", "max_tokens": 30, "messages": [{"role": "user", "content": [
                         {"type": "image_url", "image_url": {"url": image_url(path)}},
                         {"type": "text", "text": f"Where exactly are the {noun} in this picture? Answer with one short "
-                                                 "phrase that names the surface and the nearest object, for example "
-                                                 "'on the desk, next to the laptop'."}]}]})
+                                                 "phrase that names the surface they lie on and one object right next "
+                                                 "to them. Only name things you can actually see in this picture."}]}]})
             S.stats["judge"] += 1
             return r.json()["choices"][0]["message"]["content"].strip().rstrip(".") if r.status_code == 200 else None
         except Exception:
