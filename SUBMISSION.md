@@ -119,4 +119,4 @@ python eval_heldout.py runs/video_windows_full_c2_s1.json runs/glimmer_windows_f
 ```
 
 ## Team
-`<names>`
+Jiahao Ji (solo)
