@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import json
 import re
+import asyncio
+import math
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -158,6 +160,80 @@ class DjevDecider:
                 else:
                     decisions[q.id] = Decision(q.id, a["choice"], {k: float(v) for k, v in a["probabilities"].items()})
         return DecisionBatch(decisions, (time.perf_counter() - t) * 1e3, self.name, calibrated=True)
+
+
+class ChatYesNoDecider:
+    """Yes/no probabilities from any OpenAI-compatible vision chat endpoint, one request per question (run
+    concurrently; the server batches them and shares the image prefix).
+
+    Used for Meta Muse models: Muse Glimmer served locally with vLLM (`tools/serve_glimmer.sh`) as the always-on
+    judge, and Muse Spark through the Meta Model API (https://api.meta.ai/v1) as the second look.
+    probability: "logprobs" reads P(yes) from the first answer token (needs logprobs; vLLM has them);
+    "json" asks for {"yes_probability": x} when an API does not return logprobs.
+    Glimmer's chat template lets the assistant pick a channel (to=self reasoning, to=user answer); `prefill`
+    continues an assistant message addressed to the user, so the next token is the answer.
+    """
+
+    def __init__(self, base_url: str, model: str, api_key: str = "none", name: str | None = None,
+                 max_images: int = 4, probability: str = "logprobs", prefill: bool = True, timeout: float = 60.0,
+                 effort: str = "low"):
+        self.base = base_url.rstrip("/"); self.model = model; self.key = api_key; self.effort = effort
+        self.name = name or model; self.max_images = max_images; self.probability = probability; self.prefill = prefill
+        self.client = httpx.AsyncClient(timeout=timeout, trust_env=False)
+
+    def _messages(self, context: str, ask: str, images: list[str]) -> list[dict]:
+        step = max(1, len(images) // self.max_images) if images else 1
+        imgs = (images or [])[::step][:self.max_images]
+        content = [{"type": "image_url", "image_url": {"url": u}} for u in imgs]
+        tail = {"logprobs": "Answer with exactly one word, yes or no.",
+                "reason": "Look carefully at every frame, then answer with exactly one word, yes or no.",
+                "json": 'Reply with JSON only: {"yes_probability": <number between 0 and 1>}.'}[self.probability]
+        content.append({"type": "text", "text": f"{context}\nThe images are frames in time order.\nQuestion: {ask}\n{tail}"})
+        msgs = [{"role": "system", "content": f"You are a careful visual judge.\n\nReasoning strength: {self.effort}."},
+                {"role": "user", "content": content}]
+        if self.prefill and self.probability == "logprobs":
+            msgs.append({"role": "assistant", "content": "Answer:"})
+        return msgs
+
+    async def _one(self, context: str, q: Question, images: list[str]) -> Decision:
+        body = {"model": self.model, "messages": self._messages(context, q.ask, images), "temperature": 0}
+        if self.probability == "logprobs":
+            body.update(max_tokens=1, logprobs=True, top_logprobs=20)
+            if self.prefill:
+                body.update(add_generation_prompt=False, continue_final_message=True)
+        elif self.probability == "reason":     # think first (Glimmer reasoning channel), then a plain yes/no
+            body.update(max_tokens=1200)
+        else:
+            body.update(max_tokens=40, response_format={"type": "json_object"})
+        h = {"Authorization": f"Bearer {self.key}"}
+        try:
+            r = await self.client.post(self.base + "/chat/completions", json=body, headers=h)
+        except httpx.HTTPError as e:
+            raise ProviderError(str(e)) from e
+        if r.status_code != 200:
+            raise ProviderError(f"{r.status_code}: {r.text[:300]}")
+        ch = r.json()["choices"][0]
+        if self.probability == "logprobs":
+            yes = no = 0.0
+            for t in ch["logprobs"]["content"][0]["top_logprobs"]:
+                w = t["token"].strip().lower()
+                if w in ("yes", "y"):
+                    yes += math.exp(t["logprob"])
+                elif w in ("no", "n"):
+                    no += math.exp(t["logprob"])
+            p = yes / (yes + no) if yes + no > 0 else 0.0
+        elif self.probability == "reason":
+            words = re.findall(r"[a-z]+", (ch["message"].get("content") or "").lower())
+            p = 1.0 if words and words[-1] == "yes" else 0.0
+        else:
+            p = float(_strip_json(ch["message"]["content"]).get("yes_probability", 0.0))
+        return Decision(q.id, "yes" if p >= 0.5 else "no", {"yes": p, "no": 1 - p})
+
+    async def decide(self, context: str, questions: list[Question],
+                     images: list[str] | None = None, videos: list[str] | None = None) -> DecisionBatch:
+        t = time.perf_counter()
+        out = await asyncio.gather(*[self._one(context, q, images or []) for q in questions])
+        return DecisionBatch({d.id: d for d in out}, (time.perf_counter() - t) * 1e3, self.name, calibrated=True)
 
 
 def _image_url(path: str) -> str:

@@ -6,3 +6,6 @@ film/out/
 __pycache__/
 film2/out/
 film3/out/
+film4/out
+data/
+*.wav

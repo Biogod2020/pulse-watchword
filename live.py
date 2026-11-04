@@ -32,7 +32,7 @@ from pydantic import BaseModel
 
 from pulse.autopack import DRAFT_SYSTEM, PREFIX, _chat, _json
 from pulse.cards import moment_card, moment_reel
-from pulse.providers import DjevDecider, LunaDecider, OpenAICompatAgent, Question, Tool, image_url
+from pulse.providers import ChatYesNoDecider, DjevDecider, LunaDecider, OpenAICompatAgent, Question, Tool, image_url
 from pulse.recall import where_is
 from pulse.stream import FrameRing, KeepPolicy, make_clip
 import base64
@@ -69,7 +69,7 @@ class Watch:
         if self.mode == "state":
             self.trigger = StateTracker(self.threshold, max(0.3, self.threshold - 0.3), 2)
         elif CFG.get("verifier"):
-            self.trigger = ConfirmedEdge(self.candidate, 1, 30)   # one moment per event, not one every few seconds
+            self.trigger = ConfirmedEdge(CFG.get("candidate", self.candidate), 1, 30)   # one moment per event, not one every few seconds
         else:
             self.trigger = ConfirmedEdge(self.threshold, 2, 8)
 
@@ -125,10 +125,30 @@ def new_session() -> Session:
 
 
 def brain() -> OpenAICompatAgent:
-    base = os.environ.get("PULSE_MODEL_BASE_URL", "http://127.0.0.1:8317/v1")
-    model = os.environ.get("PULSE_MODEL", "gpt-6-luna")
-    key = Path(os.environ.get("PULSE_MODEL_KEY_FILE", "/home1/jijh/tools/cliproxyapi/local_api_key")).read_text().strip()
-    return OpenAICompatAgent(base, model, api_key=key, name=model)
+    return OpenAICompatAgent(CFG["brain_url"], CFG["brain_model"], api_key=CFG["brain_key"], name=CFG["brain_model"],
+                             extra={"max_tokens": 1500} if CFG.get("brain_effort") else None)
+
+
+def brain_system(text: str) -> str:
+    """Muse Glimmer reads its reasoning effort from the system prompt."""
+    return text + (f"\n\nReasoning strength: {CFG['brain_effort']}." if CFG.get("brain_effort") else "")
+
+
+async def vision_text(parts: list[dict], max_tokens: int = 40) -> str | None:
+    """Free-text answer from the vision model (djev raw passthrough, or Muse Glimmer via vLLM)."""
+    V = CFG["vision"]; msgs = [{"role": "user", "content": parts}]
+    body = {"model": V["model"], "max_tokens": max_tokens, "temperature": 0}
+    if V["prefill"]:                        # Glimmer: answer straight to the user, low reasoning
+        msgs = [{"role": "system", "content": "You are a careful visual assistant.\n\nReasoning strength: low."}, *msgs,
+                {"role": "assistant", "content": "Answer:"}]
+        body.update(add_generation_prompt=False, continue_final_message=True)
+    body["messages"] = msgs
+    async with httpx.AsyncClient(timeout=60, trust_env=False) as c:
+        r = await c.post(V["url"], json=body)
+    S.stats["judge"] += 1
+    if r.status_code != 200:
+        return None
+    return r.json()["choices"][0]["message"]["content"].strip().strip('"').rstrip(".")
 
 
 async def send_all(msg: dict) -> None:
@@ -142,7 +162,7 @@ async def send_all(msg: dict) -> None:
 
 def state_msg() -> dict:
     return {"type": "state", "watches": [w.public() for w in S.watches.values()],
-            "moments": S.moments[-40:], "stats": S.stats, "verifier": CFG.get("verifier_name"), "storage_mb": round(dir_mb(S.dir / "moments"), 2)}
+            "moments": S.moments[-40:], "stats": S.stats, "verifier": CFG.get("verifier_name"), "engine": CFG.get("engine"), "candidate": CFG.get("candidate", 0.5), "storage_mb": round(dir_mb(S.dir / "moments"), 2)}
 
 
 def dir_mb(p: Path) -> float:
@@ -178,7 +198,11 @@ async def judge(t: float, frames: list[tuple[float, str]], watches: list[Watch])
     clip = S.dir / f"clip_{int(t * 1000)}.mp4"
     url = await asyncio.to_thread(make_clip, frames, 4, clip, 448)
     qs = [Question(w.id, w.ask, kind="noul") for w in watches]
-    b = await CFG["judge"].decide("A 2-second video from a webcam or a phone camera.", qs, None, [url])
+    if CFG["vision"]["video"]:
+        b = await CFG["judge"].decide("A 2-second video from a webcam or a phone camera.", qs, None, [url])
+    else:                                   # image-only judge (Muse Glimmer): 4 frames of the same 2 seconds
+        imgs = [image_url(p) for _, p in frames[1::2][:4]]
+        b = await CFG["judge"].decide("Four frames, in order, covering 2 seconds from a webcam or a phone camera.", qs, imgs)
     return t, clip, frames, {k: d.probs["yes"] for k, d in b.decisions.items()}, b.latency_ms
 
 
@@ -245,9 +269,10 @@ def p_of(probs, w):
 
 async def verify(w: Watch, frames) -> bool:
     """A stronger judge looks at 3 frames of the candidate clip; only candidates ever reach it."""
-    picks = [frames[0][1], frames[len(frames) // 2][1], frames[-1][1]]
+    picks = [frames[0][1], frames[len(frames) // 2][1], frames[-1][1]] if CFG.get("verify_frames", 3) == 3 else \
+        [p for _, p in frames[1::2]][:4]
     try:
-        b = await CFG["verifier"].decide("Three frames, in order, from a 2-second camera clip.",
+        b = await CFG["verifier"].decide(f"{'Three' if len(picks) == 3 else 'Four'} frames, in order, from a 2-second camera clip.",
                                          [Question("v", "Do these frames show " + w.ask[len(PREFIX):], kind="noul")],
                                          [image_url(p) for p in picks])
         S.stats["brain"] += 1
@@ -359,7 +384,7 @@ async def add_watch(req: WatchIn):
                           "\"mode\": \"state\" for ongoing activities (sleeping, typing, on the phone) or \"edge\" "
                           "for brief actions (waving, drinking, standing up).")
     try:
-        out = _json(await asyncio.to_thread(_chat, CFG["brain_url"], CFG["brain_model"], CFG["brain_key"], sys,
+        out = _json(await asyncio.to_thread(_chat, CFG["brain_url"], CFG["brain_model"], CFG["brain_key"], brain_system(sys),
                                             f"The user wants to be told when: {req.text}\nWrite 1 question."))
         q = out["questions"][0]
         label = out.get("label") or q.get("label") or req.text[:30]
@@ -411,10 +436,12 @@ async def ask(req: AskIn):
     async def find_object(args: dict) -> dict:
         noun = str(args.get("object", "")).strip().lower()
         recent = S.ring.sampled(1.0)
-        s = await where_is(noun, recent, S.now, CFG["frame_judge"], CFG["djev_url"], window_s=120)
+        wf = (lambda path, prompt: vision_text([{"type": "image_url", "image_url": {"url": image_url(path)}},
+                                                {"type": "text", "text": prompt}], 16)) if not CFG["vision"]["video"] else None
+        s = await where_is(noun, recent, S.now, CFG["frame_judge"], CFG["djev_url"], window_s=120, where_fn=wf)
         scanned = s.frames_scanned
         if not s.found and S.keyframes:
-            s2 = await where_is(noun, S.keyframes, S.now, CFG["frame_judge"], CFG["djev_url"], window_s=1e9)
+            s2 = await where_is(noun, S.keyframes, S.now, CFG["frame_judge"], CFG["djev_url"], window_s=1e9, where_fn=wf)
             scanned += s2.frames_scanned
             s = s2 if s2.found else s
         S.stats["judge"] += scanned
@@ -432,15 +459,10 @@ async def ask(req: AskIn):
     async def locate(noun: str, path: str) -> str | None:
         """The scan says which frame shows the object; one look at that frame says where it is in the room."""
         try:
-            async with httpx.AsyncClient(timeout=40, trust_env=False) as c:
-                r = await c.post(CFG["video_djev_url"] + "/v1/raw/chat/completions", json={
-                    "model": "dgemma", "max_tokens": 30, "messages": [{"role": "user", "content": [
-                        {"type": "image_url", "image_url": {"url": image_url(path)}},
-                        {"type": "text", "text": f"Where exactly are the {noun} in this picture? Answer with one short "
-                                                 "phrase that names the surface they lie on and one object right next "
-                                                 "to them. Only name things you can actually see in this picture."}]}]})
-            S.stats["judge"] += 1
-            return r.json()["choices"][0]["message"]["content"].strip().rstrip(".") if r.status_code == 200 else None
+            return await vision_text([{"type": "image_url", "image_url": {"url": image_url(path)}},
+                                      {"type": "text", "text": f"Where exactly are the {noun} in this picture? Answer with one short "
+                                       "phrase that names the surface they lie on and one object right next "
+                                       "to them. Only name things you can actually see in this picture."}], 30)
         except Exception:
             return None
 
@@ -454,13 +476,10 @@ async def ask(req: AskIn):
         url = await asyncio.to_thread(make_clip, frames, 2, clip, 448)
         clip.unlink(missing_ok=True)
         clip.with_suffix(".txt").unlink(missing_ok=True)
-        async with httpx.AsyncClient(timeout=60, trust_env=False) as c:
-            r = await c.post(CFG["video_djev_url"] + "/v1/raw/chat/completions", json={
-                "model": "dgemma", "max_tokens": 60, "messages": [{"role": "user", "content": [
-                    {"type": "video_url", "video_url": {"url": url}},
-                    {"type": "text", "text": "In one or two sentences, what is the person doing in this video?"}]}]})
-        S.stats["judge"] += 1
-        return {"seconds": secs, "description": r.json()["choices"][0]["message"]["content"].strip() if r.status_code == 200 else None}
+        media = ([{"type": "video_url", "video_url": {"url": url}}] if CFG["vision"]["video"] else
+                 [{"type": "image_url", "image_url": {"url": image_url(p)}} for _, p in frames[::max(1, len(frames) // 4)][:4]])
+        desc = await vision_text(media + [{"type": "text", "text": "In one or two sentences, what is the person doing here?"}], 60)
+        return {"seconds": secs, "description": desc}
 
     async def recent_moments(_: dict) -> dict:
         return {"now_s": S.now, "moments": [{**m, "seconds_ago": round(S.now - m["t"])} for m in S.moments[-10:]]}
@@ -474,10 +493,10 @@ async def ask(req: AskIn):
                   {"type": "object", "properties": {"seconds": {"type": "number"}}}, describe_recent)]
     S.stats["brain"] += 1
     b = brain()
-    run = await b.run("You are Pulse, a friendly camera assistant. Use the tools. For 'where is X' call find_object. "
+    run = await b.run(brain_system("You are Pulse, a friendly camera assistant. Use the tools. For 'where is X' call find_object. "
                       "For 'what happened / what am I doing' call describe_recent first; use recent_moments only as "
                       "supporting hints, since they can be wrong. Answer in one or two short sentences in the "
-                      "user's language, with the place or event and how long ago.", req.question, tools)
+                      "user's language, with the place or event and how long ago."), req.question, tools)
     hit = next((f for f in reversed(found) if f["found"]), found[-1] if found else None)
     return {"answer": run.text.strip(), "evidence": hit, "model": b.name, "ms": round(run.latency_ms)}
 
@@ -550,17 +569,48 @@ if __name__ == "__main__":
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--djev-url", default="http://127.0.0.1:18831", help="frame judge for where-is scans (same server as clips)")
     p.add_argument("--video-djev-url", default="http://127.0.0.1:18831", help="video-capable judge for clips")
-    p.add_argument("--data", default="/cwStorage/home/jijh/pulse_data/live")
-    p.add_argument("--verifier", choices=["luna", "none"], default="luna",
-                   help="stronger judge that checks candidate moments (OpenAI gpt-6-luna Decisions; needs a key)")
+    p.add_argument("--data", default=os.environ.get("PULSE_DATA", "data/live"))
+    p.add_argument("--judge", choices=["djev", "glimmer"], default="djev",
+                   help="always-on judge: djev (DiffusionGemma, video clips) or Meta Muse Glimmer (open weights, 4 frames)")
+    p.add_argument("--glimmer-url", default="http://127.0.0.1:18850/v1", help="vLLM serving Muse Glimmer (tools/serve_glimmer.sh)")
+    p.add_argument("--brain", choices=["cliproxy", "glimmer", "muse"], default="cliproxy",
+                   help="writes watch questions and answers 'ask': local proxy model, Muse Glimmer (same local server), "
+                        "or Muse Spark via the Meta Model API")
+    p.add_argument("--meta-key-file", default="~/.config/pulse/meta_key", help="Meta Model API key (for --brain/--verifier muse)")
+    p.add_argument("--muse-model", default="muse-spark-1.3")
+    p.add_argument("--verifier", choices=["luna", "muse", "glimmer", "none"], default="luna",
+                   help="second look on candidate moments: gpt-6-luna, Muse Spark (Meta Model API), Muse Glimmer, or none")
     p.add_argument("--verify-threshold", type=float, default=0.2)
+    p.add_argument("--candidate-threshold", type=float, default=None, help="fast-judge score that proposes a moment")
     p.add_argument("--openai-key-file", default="~/.config/pulse/openai_key")
     a = p.parse_args()
-    CFG.update(djev_url=a.djev_url, video_djev_url=a.video_djev_url, judge=DjevDecider(a.video_djev_url), frame_judge=DjevDecider(a.djev_url),
-               data=a.data, brain_url=os.environ.get("PULSE_MODEL_BASE_URL", "http://127.0.0.1:8317/v1"),
-               brain_model=os.environ.get("PULSE_MODEL", "gpt-6-luna"),
-               brain_key=Path(os.environ.get("PULSE_MODEL_KEY_FILE", "/home1/jijh/tools/cliproxyapi/local_api_key")).read_text().strip())
+    CFG.update(djev_url=a.djev_url, video_djev_url=a.video_djev_url, data=a.data)
+    if a.judge == "glimmer":
+        g = ChatYesNoDecider(a.glimmer_url, "muse-glimmer", name="muse-glimmer")
+        CFG.update(judge=g, frame_judge=g, judge_name="Muse Glimmer 30B (open weights)", engine="Muse Glimmer 30B · open weights · 1 GPU",
+                   vision=dict(url=a.glimmer_url.rstrip("/") + "/chat/completions", model="muse-glimmer", video=False, prefill=True))
+    else:
+        CFG.update(judge=DjevDecider(a.video_djev_url), frame_judge=DjevDecider(a.djev_url), judge_name="DiffusionGemma (djev)",
+                   vision=dict(url=a.video_djev_url + "/v1/raw/chat/completions", model="dgemma", video=True, prefill=False))
+    meta_key = Path(a.meta_key_file).expanduser()
+    if a.brain == "glimmer":
+        CFG.update(brain_url=a.glimmer_url, brain_model="muse-glimmer", brain_key="none", brain_effort="low")
+    elif a.brain == "muse":
+        CFG.update(brain_url="https://api.meta.ai/v1", brain_model=a.muse_model, brain_key=meta_key.read_text().strip())
+    else:
+        CFG.update(brain_url=os.environ.get("PULSE_MODEL_BASE_URL", "http://127.0.0.1:8317/v1"),
+                   brain_model=os.environ.get("PULSE_MODEL", "gpt-6-luna"),
+                   brain_key=Path(os.environ.get("PULSE_MODEL_KEY_FILE", "~/.config/pulse/model_key")).expanduser().read_text().strip())
     if a.verifier == "luna" and Path(a.openai_key_file).expanduser().exists():
-        CFG.update(verifier=LunaDecider(key_file=a.openai_key_file), verifier_name="gpt-6-luna",
-                   verify_threshold=a.verify_threshold)
+        CFG.update(verifier=LunaDecider(key_file=a.openai_key_file), verifier_name="gpt-6-luna")
+    elif a.verifier == "muse":
+        CFG.update(verifier=ChatYesNoDecider("https://api.meta.ai/v1", a.muse_model, meta_key.read_text().strip(),
+                                             name=a.muse_model, probability="json", prefill=False), verifier_name=a.muse_model)
+    elif a.verifier == "glimmer":           # same model, more thought: reasoning strength medium on 4 frames
+        CFG.update(verifier=ChatYesNoDecider(a.glimmer_url, "muse-glimmer", name="muse-glimmer (second look)",
+                                             probability="reason", prefill=False, effort="medium"),
+                   verifier_name="Muse Glimmer · reasoning", verify_frames=4)
+    CFG["verify_threshold"] = a.verify_threshold if a.verifier != "glimmer" else 0.5
+    # Glimmer's fast read is conservative (cross questions stay < 0.1 on our clips): propose candidates from 0.15
+    CFG["candidate"] = a.candidate_threshold or (0.15 if a.judge == "glimmer" else 0.5)
     uvicorn.run(app, host=a.host, port=a.port, log_level="warning")

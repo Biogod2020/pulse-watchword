@@ -1,0 +1,9 @@
+# Pulse Live (app host). Python 3.11+; ffmpeg must be on PATH (or set PULSE_FFMPEG).
+fastapi>=0.110
+uvicorn>=0.29
+httpx>=0.27
+pydantic>=2.6
+numpy>=1.26
+pillow>=10
+# GPU node: vLLM >= 0.32 serves Meta Muse Glimmer 30B (tools/serve_glimmer.sh).
+# Evaluations / film tooling need extra packages (librosa, parselmouth, pyloudnorm, pedalboard, playwright, sherpa-onnx).

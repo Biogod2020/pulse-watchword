@@ -12,6 +12,8 @@ button{font:inherit;cursor:pointer}input{font:inherit}
 .dot{width:12px;height:12px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 0 rgba(34,211,238,.7);animation:pulse 1.6s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,211,238,.6)}70%{box-shadow:0 0 0 14px rgba(34,211,238,0)}100%{box-shadow:0 0 0 0 rgba(34,211,238,0)}}
 .tag{color:var(--mut);font-size:13px}
+.eng{display:none;margin-left:12px;padding:3px 10px 3px 8px;border:1px solid rgba(255,255,255,.14);border-radius:99px;font-size:12px;color:var(--mut)}
+.eng.on{display:inline-flex;align-items:center;gap:6px}.eng.on::before{content:"";width:7px;height:7px;border-radius:50%;background:#0a7cff}
 .top .sp{flex:1}.pill{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px}
 .counter{font-variant-numeric:tabular-nums;color:var(--mut);font-size:13px}.counter b{color:var(--ink)}
 main{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(340px,1fr);gap:18px;padding:0 22px 22px;height:calc(100vh - 64px)}
@@ -85,7 +87,7 @@ body.simple .w input[type=range]{opacity:0;transition:opacity .2s}body.simple .w
   <div class="err" id="gateErr"></div>
 </div></div>
 
-<div class="top"><div class="logo"><span class="dot"></span>Pulse</div><span class="tag" data-i="tagline">always watching, rarely thinking</span><span class="sp"></span>
+<div class="top"><div class="logo"><span class="dot"></span>Pulse</div><span class="tag" data-i="tagline">always watching, rarely thinking</span><span class="eng" id="engine"></span><span class="sp"></span>
   <span class="counter" id="counter"></span><button class="pill" id="details">details</button><button class="pill" id="lang">EN</button></div>
 <main>
   <section class="left"><div class="stage"><video id="video" autoplay playsinline muted></video>
@@ -113,7 +115,7 @@ let L=(navigator.language||'zh').startsWith('zh')?'zh':'en';
 document.body.classList.toggle('simple',localStorage.getItem('pulse_details')!=='1');
 function lbl(s){const m=/^(\W*?\s*)(.+?) · (.+)$/u.exec(s||'');return m?m[1]+(L==='en'?m[3]:m[2]):(s||'')}
 const $=id=>document.getElementById(id);
-function i18n(){document.querySelectorAll('[data-i]').forEach(e=>{const v=T[L][e.dataset.i];if(typeof v==='string')e.innerHTML=v});document.querySelectorAll('[data-ph]').forEach(e=>e.placeholder=T[L][e.dataset.ph]);
+function i18n(){document.querySelectorAll('[data-i]').forEach(e=>{let v=T[L][e.dataset.i];if(typeof v==='string'){if(e.dataset.i==='liveHint')v=v.replace('0.5',String(CAND));e.innerHTML=v}});document.querySelectorAll('[data-ph]').forEach(e=>e.placeholder=T[L][e.dataset.ph]);
  $('lang').textContent=L==='zh'?'EN':'中文';fetch('/api/lang',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({lang:L})}).catch(()=>{});$('hud').textContent=T[L].watching;$('ideas').innerHTML=T[L].ideas.map(x=>`<span>${x}</span>`).join('');
  $('ideas').querySelectorAll('span').forEach(s=>s.onclick=()=>{$('watchIn').value=s.textContent;addWatch()});renderCounter()}
 $('lang').onclick=()=>{L=L==='zh'?'en':'zh';i18n();renderWatches();renderFeed()};
@@ -123,7 +125,7 @@ function renderCounter(){const s=state.stats||{};$('counter').innerHTML=T[L].cou
 function connect(){ws=new WebSocket((location.protocol==='https:'?'wss':'ws')+'://'+location.host+'/ws');ws.binaryType='arraybuffer';
  ws.onmessage=e=>onMsg(JSON.parse(e.data));ws.onclose=()=>setTimeout(connect,1000)}
 function onMsg(m){
- if(m.type==='state'){state=m;renderWatches();renderFeed();renderCounter();$('storage').textContent=`${m.storage_mb} MB`}
+ if(m.type==='state'){state=m;if(m.candidate&&m.candidate!==CAND){CAND=m.candidate;document.querySelectorAll('[data-i=liveHint]').forEach(e=>e.innerHTML=T[L].liveHint.replace('0.5',String(CAND)))}if(m.engine){$('engine').textContent=m.engine;$('engine').classList.add('on')}renderWatches();renderFeed();renderCounter();$('storage').textContent=`${m.storage_mb} MB`}
  if(m.type==='tick'){state.stats=m.stats;for(const w of state.watches){if(m.probs[w.id]!=null){w.p=m.probs[w.id];(H[w.id]=H[w.id]||[]).push(w.p);if(H[w.id].length>60)H[w.id].shift()}w.active=m.active[w.id]}renderMeters();renderCounter()}
  if(m.type==='moment'){$('check').classList.remove('show');state.moments.push(m.moment);renderFeed(true);celebrate(m.moment)}
  if(m.type==='moment_reel'){const x=state.moments.find(q=>q.id===m.id);if(x){x.reel=m.reel;renderFeed()}}
@@ -131,8 +133,9 @@ function onMsg(m){
  if(m.type==='verdict'&&!m.ok){const c=$('check');c.classList.add('no');c.querySelector('span').textContent=T[L].notQuite(lbl(m.label));setTimeout(()=>c.classList.remove('show'),1400)}
  if(m.type==='error')console.warn(m.message)}
 const H={};
+let CAND=0.5;
 function spark(h){const n=60,pts=(h||[]).map((p,i)=>`${(n-(h.length-1-i)-1)*100/(n-1)},${(1-p)*34}`);
- return `<svg viewBox="0 0 100 34" preserveAspectRatio="none"><line class="th" x1="0" x2="100" y1="17" y2="17"/>`+(pts.length>1?`<polygon class="ar" points="${pts[0].split(',')[0]},34 ${pts.join(' ')} 100,34"/><polyline class="ln" points="${pts.join(' ')}"/>`:'')+`</svg>`}
+ return `<svg viewBox="0 0 100 34" preserveAspectRatio="none"><line class="th" x1="0" x2="100" y1="${(1-CAND)*34}" y2="${(1-CAND)*34}"/>`+(pts.length>1?`<polygon class="ar" points="${pts[0].split(',')[0]},34 ${pts.join(' ')} 100,34"/><polyline class="ln" points="${pts.join(' ')}"/>`:'')+`</svg>`}
 function renderMeters(){$('meters').innerHTML=[...state.watches.filter(w=>!w.builtin).reverse(),...state.watches.filter(w=>w.builtin)].map(w=>`<div class="meter ${w.active?'on':''}"><div class="n">${lbl(w.label)}</div>${spark(H[w.id])}<div class="v">${(w.p||0).toFixed(2)}</div></div>`).join('')}
 function renderWatches(){renderMeters();$('wlist').innerHTML=[...state.watches.filter(w=>!w.builtin).reverse(),...state.watches.filter(w=>w.builtin)].map(w=>`<div class="w${w.builtin?'':' new'}"><span>${lbl(w.label)}<span class="q" title="${w.ask}">${w.ask}</span></span>
  <input type="range" min="5" max="95" value="${Math.round((1-w.threshold)*100)}" title="${T[L].sens}" data-w="${w.id}"><button class="x" data-x="${w.id}">✕</button></div>`).join('');

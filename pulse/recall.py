@@ -26,8 +26,9 @@ class Sighting:
     place_checks: int
 
 
-async def where_is(noun: str, frames: list[tuple[float, str]], now: float, djev: DjevDecider, djev_url: str,
-                   window_s: float = 60, threshold: float = 0.6, max_checks: int = 4, concurrency: int = 6) -> Sighting:
+async def where_is(noun: str, frames: list[tuple[float, str]], now: float, djev: DjevDecider, djev_url: str | None,
+                   window_s: float = 60, threshold: float = 0.6, max_checks: int = 4, concurrency: int = 6,
+                   where_fn=None) -> Sighting:
     """frames: (t, path) seen so far; only frames within [now - window_s, now] are scanned."""
     pool = sorted(((t, p) for t, p in frames if now - window_s <= t <= now), reverse=True)
     sem = asyncio.Semaphore(concurrency)
@@ -41,6 +42,9 @@ async def where_is(noun: str, frames: list[tuple[float, str]], now: float, djev:
             return b.decisions["v"].probs["yes"]
 
     async def where(path: str) -> str:
+        if where_fn is not None:            # any vision chat model (e.g. Muse Glimmer) answers the short place
+            return (await where_fn(path, f"Where is the {noun} in this image? Answer with only a short place, e.g. "
+                                         f"countertop, cutting board, stove, sink, shelf, hand.")).splitlines()[0].strip(" .").lower()
         r = await client.post(djev_url.rstrip("/") + "/v1/raw/chat/completions", json={
             "model": "dgemma", "max_tokens": 16, "messages": [{"role": "user", "content": [
                 {"type": "image_url", "image_url": {"url": image_url(path)}},

@@ -9,12 +9,14 @@
 from __future__ import annotations
 
 import base64
+import os
+import shutil
 import subprocess
 from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
 
-FFMPEG = "/home1/jijh/micromamba/envs/imgprocess/bin/ffmpeg"
+FFMPEG = os.environ.get("PULSE_FFMPEG") or shutil.which("ffmpeg") or "ffmpeg"   # set PULSE_FFMPEG to override
 
 
 @dataclass

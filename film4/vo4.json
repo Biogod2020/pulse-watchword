@@ -1,0 +1,46 @@
+[
+ {
+  "id": "M1",
+  "text": "One sentence: tell me when the cat walks across my laptop. Pulse has watched every second since, and it just caught him."
+ },
+ {
+  "id": "M2",
+  "text": "Today's cameras only spot a few fixed things, like a person or a package. A large vision model can understand anything you ask, but running one on every second of video, for every camera, is slow and costly. So nobody does it."
+ },
+ {
+  "id": "M3",
+  "text": "Pulse runs on one open model, Meta's Muse Glimmer, on our own GPU. Glimmer turns your sentence into one precise yes or no question. Every second, at low reasoning effort, it looks at four frames and answers with a single token, so we can read the probability of yes. Only when that score rises does the same model look again, and think it through."
+ },
+ {
+  "id": "M4",
+  "text": "Here it is, running live on real footage. Glimmer writes the question, the quick look flags a candidate, and the second look confirms it."
+ },
+ {
+  "id": "M5",
+  "text": "No training, and no new model per task. The same system catches a cat going for the cake, a cat on the dinner table, and a coffee break. Just sentences."
+ },
+ {
+  "id": "M6",
+  "text": "It keeps three minutes of memory. Ask where you left your keys, and Glimmer calls a tool that looks back, answers, and shows you the frame."
+ },
+ {
+  "id": "M7",
+  "text": "We tested it on thirty-four minutes of real head-camera video with human labels. Thresholds were set on the first ten minutes, and scored on the rest. Compared with the open model we started with, Glimmer's alerts were right far more often: washing, stirring, pouring, even putting things down. Turning a knob got worse. One GPU read the whole video in about eight minutes."
+ },
+ {
+  "id": "M8",
+  "text": "A head camera is where this belongs. Meta's wearables toolkit already streams the Ray-Ban Meta camera to a phone. This is real head-camera footage, and these are Glimmer's real alerts. The glasses part is our next step. It isn't built yet."
+ },
+ {
+  "id": "M9",
+  "text": "Everything you've seen was built during the hackathon: the runtime, the Glimmer integration, the app, and the evaluation."
+ },
+ {
+  "id": "M10",
+  "text": "It's not perfect. Small, quick actions, like a short wave, are often missed, and the second look takes several seconds. Next come glasses, a Muse Spark second opinion, and longer memory."
+ },
+ {
+  "id": "M11",
+  "text": "Pulse. Always watching, rarely thinking."
+ }
+]

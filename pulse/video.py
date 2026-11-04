@@ -6,6 +6,8 @@ so slow changes are not missed. The same filter runs in the browser for live inp
 """
 from __future__ import annotations
 
+import os
+import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,7 +17,7 @@ from PIL import Image
 
 from .heartbeat import Event
 
-FFMPEG = "/home1/jijh/micromamba/envs/imgprocess/bin/ffmpeg"
+FFMPEG = os.environ.get("PULSE_FFMPEG") or shutil.which("ffmpeg") or "ffmpeg"   # set PULSE_FFMPEG to override
 
 
 def extract_frames(video: str, out_dir: str, fps: float = 1.0, width: int = 640, start: float = 0.0,

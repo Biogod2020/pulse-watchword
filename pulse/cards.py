@@ -4,12 +4,23 @@ Portrait 1080x1350 (feeds on Instagram/X/WeChat Moments crop it cleanly).
 """
 from __future__ import annotations
 
+import os
+import shutil
+import subprocess
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-FONT_BOLD = "/home1/jijh/.fonts/noto-cjk/NotoSansCJKsc-Bold.otf"
-FONT_REG = "/home1/jijh/.fonts/noto-cjk/NotoSansCJKsc-Regular.otf"
+def _font(env, names):
+    """Cards carry bilingual (Chinese/English) labels, so they need a CJK font: env var, then common install paths."""
+    cands = [os.environ.get(env)] + [str(Path(d).expanduser() / n) for d in
+             ("~/.fonts/noto-cjk", "/usr/share/fonts/opentype/noto", "/usr/share/fonts/noto-cjk",
+              "/usr/share/fonts/google-noto-cjk", "/System/Library/Fonts") for n in names]
+    return next((c for c in cands if c and Path(c).exists()), names[0])
+
+
+FONT_BOLD = _font("PULSE_FONT_BOLD", ["NotoSansCJKsc-Bold.otf", "NotoSansCJK-Bold.ttc", "PingFang.ttc"])
+FONT_REG = _font("PULSE_FONT_REGULAR", ["NotoSansCJKsc-Regular.otf", "NotoSansCJK-Regular.ttc", "PingFang.ttc"])
 W, H = 1080, 1350
 
 
@@ -98,7 +109,7 @@ def moment_reel(clip: str, title: str, stamp: str, out: str, loops: int = 3) -> 
     """A 9:16 shareable reel: the moment clip looped, padded on a blurred copy, with the label and brand burned in."""
     import subprocess
     import tempfile
-    ffmpeg = "/home1/jijh/micromamba/envs/imgprocess/bin/ffmpeg"
+    ffmpeg = os.environ.get("PULSE_FFMPEG") or shutil.which("ffmpeg") or "ffmpeg"
     tmp = Path(tempfile.mkdtemp(prefix="pulse_reel_"))
     (tmp / "title.txt").write_text(strip_emoji(title))
     (tmp / "brand.txt").write_text(f"pulse noticed · {stamp}")

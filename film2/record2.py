@@ -6,12 +6,12 @@ Each scene: the stock clip becomes the fake camera (pre-roll = first seconds pin
 a watch is typed (or not), we wait for the real moment (and optionally ask a real question), and the screen is
 captured with CDP screencast. Output: /cwStorage/home/jijh/pulse_data/film2/ui/<scene>_<layout>.{mp4,json} + media/.
 """
-import argparse, asyncio, base64, json, shutil, subprocess, time, urllib.request
+import os, argparse, asyncio, base64, json, shutil, subprocess, time, urllib.request
 from pathlib import Path
 from playwright.async_api import async_playwright
 
 FF = "/home1/jijh/micromamba/envs/imgprocess/bin/ffmpeg"
-ST = Path("/cwStorage/home/jijh/pulse_data/film2/stock"); OUT = Path("/cwStorage/home/jijh/pulse_data/film2/ui")
+ST = Path("/cwStorage/home/jijh/pulse_data/film2/stock"); OUT = Path(os.environ.get("PULSE_UI_OUT", "/cwStorage/home/jijh/pulse_data/film2/ui"))
 TMP = Path("/tmp/jijh-pulse-film2")
 LAYOUT = {"desk": dict(W=2560, H=1440, zoom=2560 / 1536, css="main{height:800px}"),
           "mobile": dict(W=864, H=1536, zoom=2.0, css="")}

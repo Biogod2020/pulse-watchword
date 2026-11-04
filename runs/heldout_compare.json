@@ -1,0 +1,124 @@
+[
+ {
+  "judge": "djev (DiffusionGemma 26B-A4B AWQ, 1x H100)",
+  "wall_s": 282,
+  "clips": 2044,
+  "cues": {
+   "washing": {
+    "events_heldout": 20,
+    "event_auc_heldout": 0.956,
+    "random_precision": 0.071,
+    "threshold": 0.05,
+    "fires": 37,
+    "precision": 0.541,
+    "caught": "18/20"
+   },
+   "stirring": {
+    "events_heldout": 29,
+    "event_auc_heldout": 0.892,
+    "random_precision": 0.362,
+    "threshold": 0.95,
+    "fires": 89,
+    "precision": 0.18,
+    "caught": "12/29"
+   },
+   "pouring": {
+    "events_heldout": 20,
+    "event_auc_heldout": 0.787,
+    "random_precision": 0.093,
+    "threshold": 0.95,
+    "fires": 29,
+    "precision": 0.345,
+    "caught": "9/20"
+   },
+   "opening": {
+    "events_heldout": 28,
+    "event_auc_heldout": 0.802,
+    "random_precision": 0.1,
+    "threshold": 0.9,
+    "fires": 38,
+    "precision": 0.237,
+    "caught": "10/28"
+   },
+   "tap_or_knob": {
+    "events_heldout": 36,
+    "event_auc_heldout": 0.936,
+    "random_precision": 0.091,
+    "threshold": 0.4,
+    "fires": 27,
+    "precision": 0.63,
+    "caught": "18/36"
+   },
+   "putting_down": {
+    "events_heldout": 36,
+    "event_auc_heldout": 0.712,
+    "random_precision": 0.114,
+    "threshold": 0.6,
+    "fires": 126,
+    "precision": 0.198,
+    "caught": "24/36"
+   }
+  }
+ },
+ {
+  "judge": "muse-glimmer (Muse Glimmer 30B, BF16, vLLM, 1x H100)",
+  "wall_s": 495,
+  "clips": 2044,
+  "cues": {
+   "washing": {
+    "events_heldout": 20,
+    "event_auc_heldout": 0.971,
+    "random_precision": 0.071,
+    "threshold": 0.2,
+    "fires": 23,
+    "precision": 0.783,
+    "caught": "16/20"
+   },
+   "stirring": {
+    "events_heldout": 29,
+    "event_auc_heldout": 0.888,
+    "random_precision": 0.362,
+    "threshold": 0.95,
+    "fires": 43,
+    "precision": 0.744,
+    "caught": "19/29"
+   },
+   "pouring": {
+    "events_heldout": 20,
+    "event_auc_heldout": 0.919,
+    "random_precision": 0.093,
+    "threshold": 0.7,
+    "fires": 11,
+    "precision": 0.727,
+    "caught": "8/20"
+   },
+   "opening": {
+    "events_heldout": 28,
+    "event_auc_heldout": 0.805,
+    "random_precision": 0.1,
+    "threshold": 0.7,
+    "fires": 6,
+    "precision": 0.667,
+    "caught": "8/28"
+   },
+   "tap_or_knob": {
+    "events_heldout": 36,
+    "event_auc_heldout": 0.895,
+    "random_precision": 0.091,
+    "threshold": 0.15,
+    "fires": 34,
+    "precision": 0.5,
+    "caught": "18/36"
+   },
+   "putting_down": {
+    "events_heldout": 36,
+    "event_auc_heldout": 0.867,
+    "random_precision": 0.114,
+    "threshold": 0.6,
+    "fires": 41,
+    "precision": 0.415,
+    "caught": "17/36"
+   }
+  }
+ }
+]
