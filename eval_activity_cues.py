@@ -93,7 +93,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--video-id", default="P12_101")
     p.add_argument("--frames", default="/cwStorage/home/jijh/pulse_data/epic/frames/P12_101")
-    p.add_argument("--annotations", default="/cwStorage/home/jijh/pulse_data/epic/EPIC_100_train.csv")
+    p.add_argument("--annotations", default="eval_data/EPIC_100_P12_101.csv")
     p.add_argument("--djev-url", default="http://127.0.0.1:18811")
     p.add_argument("--out", default="runs/activity_cues_full.json")
     p.add_argument("--provider", choices=["djev", "luna"], default="djev")

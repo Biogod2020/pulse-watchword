@@ -103,7 +103,7 @@ if __name__ == "__main__":
     p.add_argument("--video-id", default="P12_101")
     p.add_argument("--frames", default="/cwStorage/home/jijh/pulse_data/epic/frames/P12_101_4fps_10min")
     p.add_argument("--clips", default="/cwStorage/home/jijh/pulse_data/epic/clips/windows")
-    p.add_argument("--annotations", default="/cwStorage/home/jijh/pulse_data/epic/EPIC_100_train.csv")
+    p.add_argument("--annotations", default="eval_data/EPIC_100_P12_101.csv")
     p.add_argument("--base-fps", type=float, default=4)
     p.add_argument("--clip-s", type=float, default=4)
     p.add_argument("--stride-s", type=float, default=2)

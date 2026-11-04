@@ -90,7 +90,7 @@ Everything in this repository was written during the hackathon (see the git hist
 - Pulse Live (browser webcam app, moment cards and reels);
 - the evaluations (`eval_glimmer_windows.py`, `eval_heldout.py`, `tools/glimmer_scan.py`) and the demo-film tooling.
 
-**Not ours / pre-existing:** Muse Glimmer weights (Meta); vLLM; the demo-video narration voice (AI-generated with MOSS-TTS v1.5, open weights); stock footage (Pexels, Mixkit, see
+**Not ours / pre-existing:** Muse Glimmer weights (Meta); vLLM; the demo-video narration voice (AI-generated: MOSS-TTS v1.5, cloning a narrator voice designed with Qwen3-TTS, both open weights); stock footage (Pexels, Mixkit, see
 `film2/CREDITS.md`); EPIC-KITCHENS-100 (CC BY-NC 4.0). Before switching to Muse Glimmer we prototyped with
 DiffusionGemma 26B-A4B (Google, open weights) through a pre-existing structured-output server ("djev", not in this
 repo; we added video input to it during the hackathon). It remains as a

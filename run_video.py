@@ -157,7 +157,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--video-id", default="P12_101")
     p.add_argument("--frames", required=True)
-    p.add_argument("--annotations", default="/cwStorage/home/jijh/pulse_data/epic/EPIC_100_train.csv")
+    p.add_argument("--annotations", default="eval_data/EPIC_100_P12_101.csv")
     p.add_argument("--fps", type=float, default=1.0)
     p.add_argument("--start", type=float, default=0.0)
     p.add_argument("--minutes", type=float, default=0.0)

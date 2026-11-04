@@ -1,0 +1,502 @@
+narration_id,participant_id,video_id,narration_timestamp,start_timestamp,stop_timestamp,start_frame,stop_frame,narration,verb,verb_class,noun,noun_class,all_nouns,all_noun_classes
+P12_101_0,P12,P12_101,00:00:05.264,00:00:04.38,00:00:05.48,219,274,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_1,P12,P12_101,00:00:05.794,00:00:05.59,00:00:06.11,279,305,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_10,P12,P12_101,00:00:19.369,00:00:19.21,00:00:20.28,960,1014,take out meat from fridge,take-out,12,meat,28,"['meat', 'fridge']","[28, 12]"
+P12_101_100,P12,P12_101,00:04:18.560,00:04:16.72,00:04:18.62,12836,12931,put plastic bag with trash into cupboard,put-with,1,bag:plastic,19,"['bag:plastic', 'trash', 'cupboard']","[19, 54, 3]"
+P12_101_101,P12,P12_101,00:04:19.681,00:04:19.04,00:04:20.15,12952,13007,close cupboard,close,4,cupboard,3,['cupboard'],[3]
+P12_101_102,P12,P12_101,00:04:20.703,00:04:22.23,00:04:23.38,13111,13169,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_103,P12,P12_101,00:04:23.402,00:04:23.43,00:04:26.00,13171,13300,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_104,P12,P12_101,00:04:26.560,00:04:25.78,00:04:26.73,13288,13336,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_105,P12,P12_101,00:04:28.922,00:04:28.19,00:04:29.14,13409,13457,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_106,P12,P12_101,00:04:29.013,00:04:29.08,00:04:30.09,13454,13504,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_107,P12,P12_101,00:04:30.221,00:04:30.19,00:04:31.27,13509,13563,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_108,P12,P12_101,00:04:34.424,00:04:32.90,00:04:34.55,13644,13727,move saucepan within stove,move-within,11,saucepan,5,"['saucepan', 'stove']","[5, 24]"
+P12_101_109,P12,P12_101,00:04:37.202,00:04:36.07,00:04:37.32,13803,13866,pick up meat from cutting board,pick-up,0,meat,28,"['meat', 'board:cutting']","[28, 18]"
+P12_101_11,P12,P12_101,00:00:22.624,00:00:22.29,00:00:28.97,1114,1448,throw meat onto countertop,throw-onto,13,meat,28,"['meat', 'countertop']","[28, 42]"
+P12_101_110,P12,P12_101,00:04:37.203,00:04:37.42,00:04:39.24,13871,13962,put meat into saucepan,put-into,5,meat,28,"['meat', 'saucepan']","[28, 5]"
+P12_101_111,P12,P12_101,00:04:43.263,00:04:40.61,00:04:42.53,14030,14126,move meat from cutting board into saucepan,move,11,meat,28,"['meat', 'board:cutting', 'saucepan']","[28, 18, 5]"
+P12_101_112,P12,P12_101,00:04:52.643,00:04:52.45,00:04:53.29,14622,14664,open cupboard,open,3,cupboard,3,['cupboard'],[3]
+P12_101_113,P12,P12_101,00:04:57.621,00:04:55.73,00:04:57.44,14786,14872,take out saucepan lid from cupboard,take-out,12,lid:saucepan,6,"['lid:saucepan', 'cupboard']","[6, 3]"
+P12_101_114,P12,P12_101,00:04:58.321,00:04:57.52,00:04:58.68,14876,14934,close cupboard,close,4,cupboard,3,['cupboard'],[3]
+P12_101_115,P12,P12_101,00:04:59.481,00:04:59.48,00:05:00.78,14974,15038,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_116,P12,P12_101,00:05:00.364,00:05:00.13,00:05:02.40,15006,15119,wash saucepan lid,wash,2,lid:saucepan,6,['lid:saucepan'],[6]
+P12_101_117,P12,P12_101,00:05:03.701,00:05:03.07,00:05:03.58,15153,15179,put saucepan lid onto saucepan,put-onto,1,lid:saucepan,6,"['lid:saucepan', 'saucepan']","[6, 5]"
+P12_101_118,P12,P12_101,00:05:05.441,00:05:05.04,00:05:05.87,15252,15293,put meat into saucepan from cutting board,put-into,5,meat,28,"['meat', 'saucepan', 'board:cutting']","[28, 5, 18]"
+P12_101_119,P12,P12_101,00:05:07.623,00:05:07.45,00:05:08.19,15372,15409,put meat into saucepan from cutting board,put-into,5,meat,28,"['meat', 'saucepan', 'board:cutting']","[28, 5, 18]"
+P12_101_12,P12,P12_101,00:00:23.563,00:00:22.45,00:00:23.92,1122,1196,throw meat onto countertop,throw-onto,13,meat,28,"['meat', 'countertop']","[28, 42]"
+P12_101_120,P12,P12_101,00:05:09.665,00:05:08.23,00:05:10.37,15411,15518,put meat into saucepan from cutting board,put-into,5,meat,28,"['meat', 'saucepan', 'board:cutting']","[28, 5, 18]"
+P12_101_121,P12,P12_101,00:05:10.861,00:05:10.47,00:05:17.43,15523,15871,put meat into saucepan from cutting board,put-into,5,meat,28,"['meat', 'saucepan', 'board:cutting']","[28, 5, 18]"
+P12_101_122,P12,P12_101,00:05:11.762,00:05:09.92,00:05:10.70,15496,15535,put meat into saucepan from cutting board,put-into,5,meat,28,"['meat', 'saucepan', 'board:cutting']","[28, 5, 18]"
+P12_101_123,P12,P12_101,00:05:12.642,00:05:10.56,00:05:11.30,15528,15565,put meat into saucepan from cutting board,put-into,5,meat,28,"['meat', 'saucepan', 'board:cutting']","[28, 5, 18]"
+P12_101_124,P12,P12_101,00:05:14.442,00:05:11.37,00:05:12.22,15568,15611,put meat into saucepan from cutting board,put-into,5,meat,28,"['meat', 'saucepan', 'board:cutting']","[28, 5, 18]"
+P12_101_125,P12,P12_101,00:05:16.500,00:05:13.39,00:05:16.96,15669,15847,put meat into saucepan from cutting board,put-into,5,meat,28,"['meat', 'saucepan', 'board:cutting']","[28, 5, 18]"
+P12_101_126,P12,P12_101,00:05:19.741,00:05:19.46,00:05:20.32,15972,16016,put lid onto saucepan,put-onto,1,lid,6,"['lid', 'saucepan']","[6, 5]"
+P12_101_127,P12,P12_101,00:05:20.500,00:05:20.41,00:05:21.25,16020,16062,open drawer,open,3,drawer,8,['drawer'],[8]
+P12_101_128,P12,P12_101,00:05:23.023,00:05:22.65,00:05:23.40,16132,16169,take spoon from drawer,take-from,0,spoon,1,"['spoon', 'drawer']","[1, 8]"
+P12_101_129,P12,P12_101,00:05:24.881,00:05:22.81,00:05:24.56,16140,16228,open lid of saucepan,open,3,lid:saucepan,6,['lid:saucepan'],[6]
+P12_101_13,P12,P12_101,00:00:24.940,00:00:24.27,00:00:25.48,1213,1274,pick up meat from fridge,pick-up,0,meat,28,"['meat', 'fridge']","[28, 12]"
+P12_101_130,P12,P12_101,00:05:25.152,00:05:24.56,00:05:26.01,16228,16300,close drawer,close,4,drawer,8,['drawer'],[8]
+P12_101_131,P12,P12_101,00:05:27.041,00:05:26.11,00:05:28.24,16305,16412,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_132,P12,P12_101,00:05:28.142,00:05:27.90,00:05:28.78,16395,16439,wash spoon,wash,2,spoon,1,['spoon'],[1]
+P12_101_133,P12,P12_101,00:05:29.002,00:05:28.88,00:05:29.72,16444,16486,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_134,P12,P12_101,00:05:31.404,00:05:30.37,00:05:35.87,16518,16793,stir meat in saucepan using spoon,stir-in,10,meat,28,"['meat', 'saucepan', 'spoon']","[28, 5, 1]"
+P12_101_135,P12,P12_101,00:05:37.561,00:05:35.79,00:05:38.20,16789,16910,put down saucepan lid onto countertop,put-down,1,lid:saucepan,6,"['lid:saucepan', 'countertop']","[6, 42]"
+P12_101_136,P12,P12_101,00:05:39.160,00:05:38.30,00:05:39.86,16915,16993,adjust heat on stove,adjust-on,17,heat,65,"['heat', 'stove']","[65, 24]"
+P12_101_137,P12,P12_101,00:05:40.662,00:05:39.85,00:05:58.71,16992,17935,stir meat using spoon in saucepan,stir,10,meat,28,"['meat', 'spoon', 'saucepan']","[28, 1, 5]"
+P12_101_138,P12,P12_101,00:06:00.460,00:05:58.85,00:06:00.97,17942,18048,open salt,open,3,salt,38,['salt'],[38]
+P12_101_139,P12,P12_101,00:06:00.644,00:06:00.75,00:06:01.52,18037,18076,pick up salt container from countertop,pick-up,0,container:salt,21,"['container:salt', 'countertop']","[21, 42]"
+P12_101_14,P12,P12_101,00:00:26.221,00:00:25.75,00:00:26.53,1287,1326,take out meat from fridge,take-out,12,meat,28,"['meat', 'fridge']","[28, 12]"
+P12_101_140,P12,P12_101,00:06:03.127,00:06:02.00,00:06:04.52,18100,18226,pour salt into saucepan with meat,pour-into,9,salt,38,"['salt', 'saucepan', 'meat']","[38, 5, 28]"
+P12_101_141,P12,P12_101,00:06:05.046,00:06:04.58,00:06:11.50,18229,18575,stir meat using spoon in saucepan,stir,10,meat,28,"['meat', 'spoon', 'saucepan']","[28, 1, 5]"
+P12_101_142,P12,P12_101,00:06:05.276,00:06:04.74,00:06:05.70,18237,18285,put down salt onto cutting board,put-down,1,salt,38,"['salt', 'board:cutting']","[38, 18]"
+P12_101_143,P12,P12_101,00:06:06.361,00:06:06.34,00:06:07.31,18317,18365,put down salt onto countertop,put-down,1,salt,38,"['salt', 'countertop']","[38, 42]"
+P12_101_144,P12,P12_101,00:06:07.222,00:06:06.85,00:06:11.10,18342,18555,stir meat using spoon in saucepan,stir,10,meat,28,"['meat', 'spoon', 'saucepan']","[28, 1, 5]"
+P12_101_145,P12,P12_101,00:06:12.561,00:06:12.13,00:06:12.98,18606,18649,put down spoon onto countertop,put-down,1,spoon,1,"['spoon', 'countertop']","[1, 42]"
+P12_101_146,P12,P12_101,00:06:14.841,00:06:14.10,00:06:14.87,18705,18743,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_147,P12,P12_101,00:06:15.084,00:06:14.75,00:06:15.75,18737,18787,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_148,P12,P12_101,00:06:19.403,00:06:18.81,00:06:19.63,18940,18981,pick up minced meat from cutting board,pick-up,0,meat:minced,28,"['meat:minced', 'board:cutting']","[28, 18]"
+P12_101_149,P12,P12_101,00:06:21.120,00:06:19.70,00:06:22.45,18985,19122,break apart minced meat using hands,break,30,meat:minced,28,"['meat:minced', 'hand']","[28, 11]"
+P12_101_15,P12,P12_101,00:00:27.342,00:00:26.62,00:00:27.79,1331,1389,throw meat onto countertop,throw-onto,13,meat,28,"['meat', 'countertop']","[28, 42]"
+P12_101_150,P12,P12_101,00:06:24.504,00:06:22.70,00:06:32.13,19135,19606,break apart minced meat using hands,break,30,meat:minced,28,"['meat:minced', 'hand']","[28, 11]"
+P12_101_151,P12,P12_101,00:06:33.123,00:06:31.95,00:06:33.80,19597,19690,pick up minced meat from cutting board,pick-up,0,meat:minced,28,"['meat:minced', 'board:cutting']","[28, 18]"
+P12_101_152,P12,P12_101,00:06:34.982,00:06:34.58,00:06:43.76,19729,20188,break apart minced meat using hands,break,30,meat:minced,28,"['meat:minced', 'hand']","[28, 11]"
+P12_101_153,P12,P12_101,00:06:45.441,00:06:44.58,00:06:45.51,20229,20275,pick up spoon from countertop,pick-up,0,spoon,1,"['spoon', 'countertop']","[1, 42]"
+P12_101_154,P12,P12_101,00:06:46.844,00:06:45.94,00:06:59.88,20297,20994,stir minced meat using spoon in saucepan,stir,10,meat:minced,28,"['meat:minced', 'spoon', 'saucepan']","[28, 1, 5]"
+P12_101_155,P12,P12_101,00:07:03.202,00:07:02.59,00:07:03.47,21129,21173,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_156,P12,P12_101,00:07:04.041,00:07:03.88,00:07:05.88,21194,21294,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_157,P12,P12_101,00:07:07.260,00:07:06.53,00:07:07.50,21326,21375,pick up mug,pick-up,0,mug,13,['mug'],[13]
+P12_101_158,P12,P12_101,00:07:07.614,00:07:07.80,00:07:08.66,21390,21433,wash mug,wash,2,mug,13,['mug'],[13]
+P12_101_159,P12,P12_101,00:07:09.244,00:07:08.77,00:07:09.62,21438,21481,wash hand,wash,2,hand,11,['hand'],[11]
+P12_101_16,P12,P12_101,00:00:28.243,00:00:27.70,00:00:28.97,1385,1448,throw meat onto countertop,throw-onto,13,meat,28,"['meat', 'countertop']","[28, 42]"
+P12_101_160,P12,P12_101,00:07:10.483,00:07:09.64,00:07:10.47,21482,21523,fill mug with some water,fill-with,26,mug,13,"['mug', 'water']","[13, 27]"
+P12_101_161,P12,P12_101,00:07:12.203,00:07:11.58,00:07:13.93,21579,21696,pour water into saucepan using mug,pour-into,9,water,27,"['water', 'saucepan', 'mug']","[27, 5, 13]"
+P12_101_162,P12,P12_101,00:07:14.402,00:07:13.87,00:07:14.79,21693,21739,put down mug onto countertop,put-down,1,mug,13,"['mug', 'countertop']","[13, 42]"
+P12_101_163,P12,P12_101,00:07:16.363,00:07:15.67,00:07:16.70,21783,21835,put down mug onto countertop,put-down,1,mug,13,"['mug', 'countertop']","[13, 42]"
+P12_101_164,P12,P12_101,00:07:17.708,00:07:17.25,00:07:18.23,21862,21911,pick up salt from countertop,pick-up,0,salt,38,"['salt', 'countertop']","[38, 42]"
+P12_101_165,P12,P12_101,00:07:18.721,00:07:18.22,00:07:19.16,21911,21958,open lid of salt container,open,3,lid:salt:container,6,['lid:salt:container'],[6]
+P12_101_166,P12,P12_101,00:07:19.401,00:07:19.12,00:07:21.26,21956,22063,pour salt into saucepan with meat,pour-into,9,salt,38,"['salt', 'saucepan', 'meat']","[38, 5, 28]"
+P12_101_167,P12,P12_101,00:07:22.201,00:07:21.85,00:07:22.69,22092,22134,put down salt container onto countertop,put-down,1,container:salt,21,"['container:salt', 'countertop']","[21, 42]"
+P12_101_168,P12,P12_101,00:07:24.406,00:07:22.48,00:07:24.59,22124,22229,pick up spice from countertop,pick-up,0,spice,85,"['spice', 'countertop']","[85, 42]"
+P12_101_169,P12,P12_101,00:07:27.204,00:07:26.10,00:07:31.73,22305,22586,pour some spice over meat in saucepan,pour-over,9,spice,85,"['spice', 'meat', 'saucepan']","[85, 28, 5]"
+P12_101_17,P12,P12_101,00:00:31.660,00:00:29.90,00:00:33.50,1495,1675,take out onions from fridge,take-out,12,onion,16,"['onion', 'fridge']","[16, 12]"
+P12_101_170,P12,P12_101,00:07:32.603,00:07:31.83,00:07:33.65,22591,22682,close lid of spice container,close,4,lid:spice:container,6,['lid:spice:container'],[6]
+P12_101_171,P12,P12_101,00:07:33.964,00:07:33.75,00:07:34.54,22687,22727,put down spice container onto countertop,put-down,1,container:spice,21,"['container:spice', 'countertop']","[21, 42]"
+P12_101_172,P12,P12_101,00:07:35.321,00:07:34.97,00:07:35.50,22748,22775,pick up spoon from countertop,pick-up,0,spoon,1,"['spoon', 'countertop']","[1, 42]"
+P12_101_173,P12,P12_101,00:07:38.982,00:07:35.69,00:07:39.73,22784,22986,stir meat in saucepan using spoon,stir-in,10,meat,28,"['meat', 'saucepan', 'spoon']","[28, 5, 1]"
+P12_101_174,P12,P12_101,00:07:40.482,00:07:39.70,00:07:40.45,22985,23022,lift up saucepan with meat and spoon from stove,lift-up,33,saucepan,5,"['saucepan', 'meat', 'stove']","[5, 28, 24]"
+P12_101_175,P12,P12_101,00:07:41.480,00:07:40.66,00:07:41.33,23033,23066,put down saucepan with meat and spoon onto stove,put-down,1,saucepan,5,"['saucepan', 'meat', 'stove']","[5, 28, 24]"
+P12_101_176,P12,P12_101,00:07:42.543,00:07:41.90,00:08:01.15,23095,24057,stir meat in saucepan using spoon,stir-in,10,meat,28,"['meat', 'saucepan', 'spoon']","[28, 5, 1]"
+P12_101_177,P12,P12_101,00:08:02.501,00:08:01.73,00:08:03.13,24086,24156,lift up frying pan from stove,lift-up,33,pan:frying,5,"['pan:frying', 'stove']","[5, 24]"
+P12_101_178,P12,P12_101,00:08:04.201,00:08:03.52,00:08:04.37,24176,24218,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_179,P12,P12_101,00:08:04.602,00:08:04.44,00:08:05.20,24222,24260,wash frying pan,wash,2,pan:frying,5,['pan:frying'],[5]
+P12_101_18,P12,P12_101,00:00:35.702,00:00:34.70,00:00:37.23,1735,1861,put down onions onto countertop,put-down,1,onion,16,"['onion', 'countertop']","[16, 42]"
+P12_101_180,P12,P12_101,00:08:07.522,00:08:06.90,00:08:07.80,24345,24390,put down frying pan onto stove,put-down,1,pan:frying,5,"['pan:frying', 'stove']","[5, 24]"
+P12_101_181,P12,P12_101,00:08:08.621,00:08:07.96,00:08:08.91,24398,24445,pick up oil from countertop,pick-up,0,oil,31,"['oil', 'countertop']","[31, 42]"
+P12_101_182,P12,P12_101,00:08:10.722,00:08:10.06,00:08:13.13,24503,24656,adjust heat on stove,adjust-on,17,heat,65,"['heat', 'stove']","[65, 24]"
+P12_101_183,P12,P12_101,00:08:14.263,00:08:13.89,00:08:14.54,24694,24727,lift up frying pan from stove,lift-up,33,pan:frying,5,"['pan:frying', 'stove']","[5, 24]"
+P12_101_184,P12,P12_101,00:08:15.224,00:08:14.64,00:08:15.52,24732,24776,put down frying pan onto stove,put-down,1,pan:frying,5,"['pan:frying', 'stove']","[5, 24]"
+P12_101_185,P12,P12_101,00:08:17.207,00:08:16.39,00:08:17.31,24819,24865,open lid of oil container,open,3,lid:oil:container,6,['lid:oil:container'],[6]
+P12_101_186,P12,P12_101,00:08:19.468,00:08:18.32,00:08:20.68,24916,25034,pour oil into frying pan,pour-into,9,oil,31,"['oil', 'pan:frying']","[31, 5]"
+P12_101_187,P12,P12_101,00:08:21.481,00:08:21.27,00:08:22.17,25063,25108,close lid of oil container,close,4,lid:oil:container,6,['lid:oil:container'],[6]
+P12_101_188,P12,P12_101,00:08:23.484,00:08:23.17,00:08:23.84,25158,25192,put down oil container onto countertop,put-down,1,container:oil,21,"['container:oil', 'countertop']","[21, 42]"
+P12_101_189,P12,P12_101,00:08:25.581,00:08:24.71,00:08:28.46,25235,25423,spread out oil by lifting frying pan,spread-out,27,oil,31,"['oil', 'pan:frying']","[31, 5]"
+P12_101_19,P12,P12_101,00:00:43.084,00:00:41.48,00:00:44.82,2074,2241,take out stock from fridge,take-out,12,stock,95,"['stock', 'fridge']","[95, 12]"
+P12_101_190,P12,P12_101,00:08:29.542,00:08:27.67,00:08:29.82,25383,25491,put down frying pan onto stove,put-down,1,pan:frying,5,"['pan:frying', 'stove']","[5, 24]"
+P12_101_191,P12,P12_101,00:08:34.620,00:08:33.50,00:08:36.38,25675,25819,grab minced meat,grab,0,meat:minced,28,['meat:minced'],[28]
+P12_101_192,P12,P12_101,00:08:35.083,00:08:33.99,00:08:36.27,25699,25813,break mince meat apart using hands,break,30,meat:mince,28,"['meat:mince', 'hand']","[28, 11]"
+P12_101_193,P12,P12_101,00:08:38.668,00:08:37.75,00:08:43.19,25887,26159,break mince meat apart using hands,break,30,meat:mince,28,"['meat:mince', 'hand']","[28, 11]"
+P12_101_194,P12,P12_101,00:08:48.163,00:08:43.57,00:08:52.79,26178,26639,break mince meat apart using hands,break,30,meat:mince,28,"['meat:mince', 'hand']","[28, 11]"
+P12_101_195,P12,P12_101,00:08:54.603,00:08:53.61,00:08:55.49,26680,26774,pick up meat from cutting board,pick-up,0,meat,28,"['meat', 'board:cutting']","[28, 18]"
+P12_101_196,P12,P12_101,00:08:56.608,00:08:55.94,00:09:05.43,26797,27271,break minced meat apart using hands,break,30,meat:minced,28,"['meat:minced', 'hand']","[28, 11]"
+P12_101_197,P12,P12_101,00:09:06.541,00:09:05.94,00:09:06.54,27297,27327,pick up meat from cutting board,pick-up,0,meat,28,"['meat', 'board:cutting']","[28, 18]"
+P12_101_198,P12,P12_101,00:09:08.242,00:09:06.90,00:09:15.56,27345,27777,break minced meat apart using hands,break,30,meat:minced,28,"['meat:minced', 'hand']","[28, 11]"
+P12_101_199,P12,P12_101,00:09:17.140,00:09:16.03,00:09:17.64,27801,27882,pick up minced meat from cutting board,pick-up,0,meat:minced,28,"['meat:minced', 'board:cutting']","[28, 18]"
+P12_101_2,P12,P12_101,00:00:06.721,00:00:06.25,00:00:07.19,312,359,pick up knives,pick-up,0,knife,4,['knife'],[4]
+P12_101_20,P12,P12_101,00:00:46.060,00:00:45.48,00:00:46.60,2274,2330,take out cheese from fridge,take-out,12,cheese,32,"['cheese', 'fridge']","[32, 12]"
+P12_101_200,P12,P12_101,00:09:18.263,00:09:17.36,00:09:17.97,27868,27898,put down mince meat onto cutting board,put-down,1,meat:mince,28,"['meat:mince', 'board:cutting']","[28, 18]"
+P12_101_201,P12,P12_101,00:09:18.602,00:09:18.07,00:09:28.99,27903,28449,stir meat in saucepan using spoon,stir-in,10,meat,28,"['meat', 'saucepan', 'spoon']","[28, 5, 1]"
+P12_101_202,P12,P12_101,00:09:34.284,00:09:33.49,00:09:34.45,28674,28722,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_203,P12,P12_101,00:09:34.461,00:09:34.21,00:09:35.35,28710,28767,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_204,P12,P12_101,00:09:35.522,00:09:35.50,00:09:36.04,28775,28802,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_205,P12,P12_101,00:09:37.380,00:09:37.30,00:09:37.97,28864,28898,pick up salt from countertop,pick-up,0,salt,38,"['salt', 'countertop']","[38, 42]"
+P12_101_206,P12,P12_101,00:09:39.480,00:09:39.28,00:09:42.89,28964,29144,pour salt into saucepan,pour-into,9,salt,38,"['salt', 'saucepan']","[38, 5]"
+P12_101_207,P12,P12_101,00:09:44.142,00:09:43.80,00:09:44.50,29189,29225,put salt container onto countertop,put-onto,1,container:salt,21,"['container:salt', 'countertop']","[21, 42]"
+P12_101_208,P12,P12_101,00:09:44.143,00:09:44.20,00:09:44.54,29210,29227,close salt container,close,4,container:salt,21,['container:salt'],[21]
+P12_101_209,P12,P12_101,00:09:44.908,00:09:44.31,00:09:45.55,29215,29277,pick up spice container from countertop,pick-up,0,container:spice,21,"['container:spice', 'countertop']","[21, 42]"
+P12_101_21,P12,P12_101,00:00:49.505,00:00:46.63,00:00:49.98,2331,2499,put down cheese and stock onto countertop,put-down,1,cheese,32,"['cheese', 'stock', 'countertop']","[32, 95, 42]"
+P12_101_210,P12,P12_101,00:09:46.220,00:09:45.52,00:09:46.19,29276,29309,open salt container,open,3,container:salt,21,['container:salt'],[21]
+P12_101_211,P12,P12_101,00:09:46.345,00:09:46.53,00:09:50.14,29326,29507,pour spice into frying pan,pour-into,9,spice,85,"['spice', 'pan:frying']","[85, 5]"
+P12_101_212,P12,P12_101,00:09:50.544,00:09:50.24,00:09:51.25,29512,29562,close spice container,close,4,container:spice,21,['container:spice'],[21]
+P12_101_213,P12,P12_101,00:09:51.761,00:09:51.74,00:09:52.36,29587,29618,put down spice container onto countertop,put-down,1,container:spice,21,"['container:spice', 'countertop']","[21, 42]"
+P12_101_214,P12,P12_101,00:09:54.082,00:09:53.02,00:09:54.28,29651,29714,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_215,P12,P12_101,00:09:54.234,00:09:54.24,00:09:55.71,29712,29785,fill mug with water,fill-with,26,mug,13,"['mug', 'water']","[13, 27]"
+P12_101_216,P12,P12_101,00:09:57.542,00:09:56.90,00:10:00.40,29845,30020,pour water into frying pan with meat,pour-into,9,water,27,"['water', 'pan:frying', 'meat']","[27, 5, 28]"
+P12_101_217,P12,P12_101,00:10:01.104,00:10:00.62,00:10:01.97,30031,30098,put down mug with water onto countertop,put-down,1,mug,13,"['mug', 'water', 'countertop']","[13, 27, 42]"
+P12_101_218,P12,P12_101,00:10:03.901,00:10:02.54,00:10:03.63,30127,30181,pick up spoon from saucepan,pick-up,0,spoon,1,"['spoon', 'saucepan']","[1, 5]"
+P12_101_219,P12,P12_101,00:10:03.996,00:10:03.88,00:10:59.45,30194,32972,stir meat in saucepan using spoon,stir-in,10,meat,28,"['meat', 'saucepan', 'spoon']","[28, 5, 1]"
+P12_101_22,P12,P12_101,00:00:53.090,00:00:53.01,00:00:55.16,2650,2758,take out cheese from fridge,take-out,12,cheese,32,"['cheese', 'fridge']","[32, 12]"
+P12_101_220,P12,P12_101,00:11:01.260,00:10:59.67,00:11:08.80,32983,33440,stir meat in saucepan using spoon,stir-in,10,meat,28,"['meat', 'saucepan', 'spoon']","[28, 5, 1]"
+P12_101_221,P12,P12_101,00:11:09.841,00:11:08.90,00:11:10.18,33445,33509,stir meat in frying pan using spoon,stir-in,10,meat,28,"['meat', 'pan:frying', 'spoon']","[28, 5, 1]"
+P12_101_222,P12,P12_101,00:11:10.625,00:11:08.98,00:11:10.88,33449,33544,lift up frying pan with meat,lift-up,33,pan:frying,5,"['pan:frying', 'meat']","[5, 28]"
+P12_101_223,P12,P12_101,00:11:12.783,00:11:11.59,00:11:14.94,33579,33747,pour meat from frying pan into saucepan using spoon,pour-from,9,meat,28,"['meat', 'pan:frying', 'saucepan', 'spoon']","[28, 5, 5, 1]"
+P12_101_224,P12,P12_101,00:11:15.684,00:11:15.24,00:11:16.47,33762,33823,put down frying pan onto stove,put-down,1,pan:frying,5,"['pan:frying', 'stove']","[5, 24]"
+P12_101_225,P12,P12_101,00:11:18.100,00:11:17.54,00:11:18.37,33877,33918,pick up oil container,pick-up,0,container:oil,21,['container:oil'],[21]
+P12_101_226,P12,P12_101,00:11:18.862,00:11:18.42,00:11:19.42,33921,33971,open oil container,open,3,container:oil,21,['container:oil'],[21]
+P12_101_227,P12,P12_101,00:11:20.588,00:11:19.72,00:11:22.45,33986,34122,pour oil into frying pan,pour-into,9,oil,31,"['oil', 'pan:frying']","[31, 5]"
+P12_101_228,P12,P12_101,00:11:22.783,00:11:22.51,00:11:23.37,34125,34168,close oil container,close,4,container:oil,21,['container:oil'],[21]
+P12_101_229,P12,P12_101,00:11:24.041,00:11:23.26,00:11:24.81,34163,34240,put oil container onto countertop,put-onto,1,container:oil,21,"['container:oil', 'countertop']","[21, 42]"
+P12_101_23,P12,P12_101,00:00:55.680,00:00:54.84,00:00:56.09,2742,2804,pick up cheese from floor,pick-up,0,cheese,32,"['cheese', 'floor']","[32, 159]"
+P12_101_230,P12,P12_101,00:11:25.141,00:11:24.47,00:11:25.93,34223,34296,pick up minced meat from cutting board,pick-up,0,meat:minced,28,"['meat:minced', 'board:cutting']","[28, 18]"
+P12_101_231,P12,P12_101,00:11:26.563,00:11:26.03,00:11:36.78,34301,34839,break mince meat apart using hands,break,30,meat:mince,28,"['meat:mince', 'hand']","[28, 11]"
+P12_101_232,P12,P12_101,00:11:45.124,00:11:43.80,00:11:44.49,35190,35224,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_233,P12,P12_101,00:11:45.255,00:11:44.47,00:11:47.16,35223,35358,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_234,P12,P12_101,00:11:47.321,00:11:47.23,00:11:47.78,35361,35389,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_235,P12,P12_101,00:11:49.623,00:11:49.30,00:11:50.05,35465,35502,pick up spoon from cutting board,pick-up,0,spoon,1,"['spoon', 'board:cutting']","[1, 18]"
+P12_101_236,P12,P12_101,00:11:51.481,00:11:51.03,00:11:51.96,35551,35598,pick up salt container from countertop,pick-up,0,container:salt,21,"['container:salt', 'countertop']","[21, 42]"
+P12_101_237,P12,P12_101,00:11:52.641,00:11:52.48,00:11:53.08,35624,35654,open salt container,open,3,container:salt,21,['container:salt'],[21]
+P12_101_238,P12,P12_101,00:11:53.868,00:11:53.73,00:11:58.00,35686,35900,pour salt into meat in frying pan,pour-into,9,salt,38,"['salt', 'meat', 'pan:frying']","[38, 28, 5]"
+P12_101_239,P12,P12_101,00:11:58.966,00:11:58.76,00:11:59.76,35938,35988,pick up pepper container,pick-up,0,container:pepper,21,['container:pepper'],[21]
+P12_101_24,P12,P12_101,00:01:01.583,00:01:00.94,00:01:01.80,3047,3090,move meat,move,11,meat,28,['meat'],[28]
+P12_101_240,P12,P12_101,00:12:01.443,00:12:00.89,00:12:01.59,36044,36079,open lid of pepper container,open,3,lid:pepper:container,6,['lid:pepper:container'],[6]
+P12_101_241,P12,P12_101,00:12:03.983,00:12:01.56,00:12:06.22,36078,36311,pour pepper over meat in frying pan,pour-over,9,pepper,37,"['pepper', 'meat', 'pan:frying']","[37, 28, 5]"
+P12_101_242,P12,P12_101,00:12:06.843,00:12:06.14,00:12:07.76,36307,36388,close lid of pepper container,close,4,lid:pepper:container,6,['lid:pepper:container'],[6]
+P12_101_243,P12,P12_101,00:12:07.924,00:12:07.65,00:12:08.76,36382,36438,put down pepper container onto countertop,put-down,1,container:pepper,21,"['container:pepper', 'countertop']","[21, 42]"
+P12_101_244,P12,P12_101,00:12:11.103,00:12:09.95,00:12:11.32,36497,36566,pick up mug,pick-up,0,mug,13,['mug'],[13]
+P12_101_245,P12,P12_101,00:12:11.701,00:12:11.42,00:12:13.56,36571,36678,pour water into frying pan with meat,pour-into,9,water,27,"['water', 'pan:frying', 'meat']","[27, 5, 28]"
+P12_101_246,P12,P12_101,00:12:14.203,00:12:13.66,00:12:14.87,36683,36743,put down mug with water onto countertop,put-down,1,mug,13,"['mug', 'water', 'countertop']","[13, 27, 42]"
+P12_101_247,P12,P12_101,00:12:14.967,00:12:14.95,00:12:15.55,36747,36777,pick up spoon from cutting board,pick-up,0,spoon,1,"['spoon', 'board:cutting']","[1, 18]"
+P12_101_248,P12,P12_101,00:12:16.382,00:12:15.72,00:12:37.35,36786,37867,stir meat in frying pan,stir-in,10,meat,28,"['meat', 'pan:frying']","[28, 5]"
+P12_101_249,P12,P12_101,00:12:39.641,00:12:38.89,00:12:39.85,37944,37992,move saucepan with meat on stove,move-with,11,saucepan,5,"['saucepan', 'meat', 'stove']","[5, 28, 24]"
+P12_101_25,P12,P12_101,00:01:03.010,00:01:02.12,00:01:05.13,3106,3256,move cheeses,move,11,cheese,32,['cheese'],[32]
+P12_101_250,P12,P12_101,00:12:40.865,00:12:40.20,00:12:41.71,38010,38085,adjust heat on stove,adjust-on,17,heat,65,"['heat', 'stove']","[65, 24]"
+P12_101_251,P12,P12_101,00:12:46.462,00:12:41.76,00:12:45.97,38088,38298,adjust heat on stove,adjust-on,17,heat,65,"['heat', 'stove']","[65, 24]"
+P12_101_252,P12,P12_101,00:12:52.983,00:12:50.16,00:13:00.01,38508,39000,stir meat in frying pan,stir-in,10,meat,28,"['meat', 'pan:frying']","[28, 5]"
+P12_101_253,P12,P12_101,00:13:00.385,00:13:00.19,00:13:15.77,39009,39788,stir meat in saucepan,stir-in,10,meat,28,"['meat', 'saucepan']","[28, 5]"
+P12_101_254,P12,P12_101,00:13:17.121,00:13:15.70,00:13:18.05,39785,39902,adjust heat on stove,adjust-on,17,heat,65,"['heat', 'stove']","[65, 24]"
+P12_101_255,P12,P12_101,00:13:19.401,00:13:17.92,00:13:20.45,39896,40022,move saucepan,move,11,saucepan,5,['saucepan'],[5]
+P12_101_256,P12,P12_101,00:13:20.981,00:13:20.36,00:13:21.03,40018,40051,stir meat using spoon in saucepan,stir,10,meat,28,"['meat', 'spoon', 'saucepan']","[28, 1, 5]"
+P12_101_257,P12,P12_101,00:13:21.762,00:13:21.53,00:13:33.74,40076,40687,stir meat in frying pan using spoon,stir-in,10,meat,28,"['meat', 'pan:frying', 'spoon']","[28, 5, 1]"
+P12_101_258,P12,P12_101,00:13:36.421,00:13:34.72,00:13:38.72,40736,40936,pour meat from frying pan into saucepan,pour-from,9,meat,28,"['meat', 'pan:frying', 'saucepan']","[28, 5, 5]"
+P12_101_259,P12,P12_101,00:13:39.922,00:13:39.08,00:13:40.70,40954,41035,put down frying pan onto stove,put-down,1,pan:frying,5,"['pan:frying', 'stove']","[5, 24]"
+P12_101_26,P12,P12_101,00:01:06.621,00:01:05.99,00:01:06.74,3299,3336,pick up saucepan from stove,pick-up,0,saucepan,5,"['saucepan', 'stove']","[5, 24]"
+P12_101_260,P12,P12_101,00:13:49.687,00:13:45.97,00:13:48.56,41298,41428,put down garlic onto cutting board,put-down,1,garlic,51,"['garlic', 'board:cutting']","[51, 18]"
+P12_101_261,P12,P12_101,00:13:50.089,00:13:49.74,00:14:00.95,41487,42047,cut garlic using knife on cutting board,cut,7,garlic,51,"['garlic', 'knife', 'board:cutting']","[51, 4, 18]"
+P12_101_262,P12,P12_101,00:14:23.500,00:14:23.09,00:14:23.75,43154,43187,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_263,P12,P12_101,00:14:24.301,00:14:23.83,00:14:24.76,43191,43238,wash knife,wash,2,knife,4,['knife'],[4]
+P12_101_264,P12,P12_101,00:14:27.902,00:14:25.09,00:14:37.44,43254,43872,cut garlic on cutting board using knife,cut-on,7,garlic,51,"['garlic', 'board:cutting', 'knife']","[51, 18, 4]"
+P12_101_265,P12,P12_101,00:14:31.000,00:14:37.51,00:14:42.25,43875,44112,chop garlic,chop,7,garlic,51,['garlic'],[51]
+P12_101_266,P12,P12_101,00:14:43.901,00:14:42.33,00:14:45.35,44116,44267,sweep up garlic from cutting board into hand,sweep-up,57,garlic,51,"['garlic', 'board:cutting', 'hand']","[51, 18, 11]"
+P12_101_267,P12,P12_101,00:14:48.521,00:14:47.45,00:14:52.05,44372,44602,put down garlic into saucepan with meat,put-down,1,garlic,51,"['garlic', 'saucepan', 'meat']","[51, 5, 28]"
+P12_101_268,P12,P12_101,00:14:53.663,00:14:53.25,00:14:53.98,44662,44699,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_269,P12,P12_101,00:14:54.163,00:14:54.04,00:14:55.29,44702,44764,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_27,P12,P12_101,00:01:07.861,00:01:07.45,00:01:08.75,3372,3437,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_270,P12,P12_101,00:14:56.864,00:14:55.75,00:14:57.31,44787,44865,pick up plate with onions,pick-up,0,plate,2,"['plate', 'onion']","[2, 16]"
+P12_101_271,P12,P12_101,00:14:59.160,00:14:58.44,00:15:09.20,44922,45460,pour onions from plate into frying pan using fork,pour-from,9,onion,16,"['onion', 'plate', 'pan:frying', 'fork']","[16, 2, 5, 14]"
+P12_101_272,P12,P12_101,00:15:11.143,00:15:09.25,00:15:17.50,45462,45875,stir onion in frying pan using fork,stir-in,10,onion,16,"['onion', 'pan:frying', 'fork']","[16, 5, 14]"
+P12_101_273,P12,P12_101,00:15:18.341,00:15:17.93,00:15:18.93,45896,45946,put down plate onto countertop,put-down,1,plate,2,"['plate', 'countertop']","[2, 42]"
+P12_101_274,P12,P12_101,00:15:21.228,00:15:20.96,00:15:21.68,46048,46084,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_275,P12,P12_101,00:15:22.145,00:15:21.64,00:15:22.80,46082,46140,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_276,P12,P12_101,00:15:24.383,00:15:23.84,00:15:24.53,46192,46226,pick up spoon from cutting board,pick-up,0,spoon,1,"['spoon', 'board:cutting']","[1, 18]"
+P12_101_277,P12,P12_101,00:15:26.302,00:15:25.10,00:15:31.52,46255,46576,stir onions in frying pan,stir-in,10,onion,16,"['onion', 'pan:frying']","[16, 5]"
+P12_101_278,P12,P12_101,00:15:33.663,00:15:31.83,00:15:34.04,46591,46702,stir minced meat in saucepan,stir,10,meat:minced,28,"['meat:minced', 'saucepan']","[28, 5]"
+P12_101_279,P12,P12_101,00:15:35.222,00:15:35.18,00:15:35.95,46759,46797,pick up pepper container,pick-up,0,container:pepper,21,['container:pepper'],[21]
+P12_101_28,P12,P12_101,00:01:08.262,00:01:07.96,00:01:09.33,3397,3466,fill saucepan with water,fill-with,26,saucepan,5,"['saucepan', 'water']","[5, 27]"
+P12_101_280,P12,P12_101,00:15:38.082,00:15:37.70,00:15:42.70,46885,47135,pour spice over meat in saucepan,pour-over,9,spice,85,"['spice', 'meat', 'saucepan']","[85, 28, 5]"
+P12_101_281,P12,P12_101,00:15:43.883,00:15:43.38,00:15:44.65,47169,47232,put down spice container onto countertop,put-down,1,container:spice,21,"['container:spice', 'countertop']","[21, 42]"
+P12_101_282,P12,P12_101,00:15:46.280,00:15:44.73,00:15:59.28,47236,47964,stir meat in saucepan using spoon,stir-in,10,meat,28,"['meat', 'saucepan', 'spoon']","[28, 5, 1]"
+P12_101_283,P12,P12_101,00:16:01.723,00:16:01.31,00:16:03.15,48065,48157,pick up spoon from saucepan,pick-up,0,spoon,1,"['spoon', 'saucepan']","[1, 5]"
+P12_101_284,P12,P12_101,00:16:03.800,00:16:03.16,00:16:33.03,48158,49651,stir onions in frying pan using spoon,stir-in,10,onion,16,"['onion', 'pan:frying', 'spoon']","[16, 5, 1]"
+P12_101_285,P12,P12_101,00:16:34.383,00:16:33.71,00:16:34.56,49685,49728,put down spoon onto cutting board,put-down,1,spoon,1,"['spoon', 'board:cutting']","[1, 18]"
+P12_101_286,P12,P12_101,00:16:36.923,00:16:34.91,00:16:36.83,49745,49841,pick up onions from plate,pick-up,0,onion,16,"['onion', 'plate']","[16, 2]"
+P12_101_287,P12,P12_101,00:16:38.874,00:16:37.86,00:16:39.58,49893,49979,pour down onions into frying pan,pour-down,9,onion,16,"['onion', 'pan:frying']","[16, 5]"
+P12_101_288,P12,P12_101,00:16:41.102,00:16:40.50,00:16:43.25,50025,50162,pick up onions from plate,pick-up,0,onion,16,"['onion', 'plate']","[16, 2]"
+P12_101_289,P12,P12_101,00:16:43.623,00:16:43.36,00:16:45.28,50168,50264,pour down onions into frying pan,pour-down,9,onion,16,"['onion', 'pan:frying']","[16, 5]"
+P12_101_29,P12,P12_101,00:01:09.643,00:01:09.43,00:01:10.49,3471,3524,pour out water from saucepan,pour-out,9,water,27,"['water', 'saucepan']","[27, 5]"
+P12_101_290,P12,P12_101,00:16:46.803,00:16:45.88,00:16:47.34,50294,50367,pick up spoon from cutting board,pick-up,0,spoon,1,"['spoon', 'board:cutting']","[1, 18]"
+P12_101_291,P12,P12_101,00:16:49.702,00:16:47.45,00:16:58.44,50372,50922,stir onions in frying pan,stir-in,10,onion,16,"['onion', 'pan:frying']","[16, 5]"
+P12_101_292,P12,P12_101,00:17:01.420,00:17:00.38,00:17:01.27,51019,51063,move mozzarella on countertop,move-on,11,mozzarella,32,"['mozzarella', 'countertop']","[32, 42]"
+P12_101_293,P12,P12_101,00:17:02.369,00:17:01.83,00:17:02.74,51091,51137,pick up stock from countertop,pick-up,0,stock,95,"['stock', 'countertop']","[95, 42]"
+P12_101_294,P12,P12_101,00:17:04.261,00:17:02.82,00:17:11.90,51141,51595,open stock packaging,open,3,packaging:stock,26,['packaging:stock'],[26]
+P12_101_295,P12,P12_101,00:17:13.723,00:17:13.31,00:17:15.35,51665,51767,put down stock onto cutting board,put-down,1,stock,95,"['stock', 'board:cutting']","[95, 18]"
+P12_101_296,P12,P12_101,00:17:17.483,00:17:15.09,00:17:23.98,51754,52199,open stock container,open,3,container:stock,21,['container:stock'],[21]
+P12_101_297,P12,P12_101,00:17:25.221,00:17:24.82,00:17:26.16,52241,52308,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_298,P12,P12_101,00:17:26.007,00:17:25.59,00:17:26.59,52279,52329,wash fork,wash,2,fork,14,['fork'],[14]
+P12_101_299,P12,P12_101,00:17:29.922,00:17:27.60,00:17:30.75,52379,52537,pour stock into saucepan with meat,pour-into,9,stock,95,"['stock', 'saucepan', 'meat']","[95, 5, 28]"
+P12_101_3,P12,P12_101,00:00:07.700,00:00:07.20,00:00:08.99,360,449,wash knives,wash,2,knife,4,['knife'],[4]
+P12_101_30,P12,P12_101,00:01:13.622,00:01:12.14,00:01:14.31,3607,3715,pick up trash from stove,pick-up,0,trash,54,"['trash', 'stove']","[54, 24]"
+P12_101_300,P12,P12_101,00:17:31.862,00:17:30.79,00:17:31.79,52539,52589,put down stock container,put-down,1,container:stock,21,['container:stock'],[21]
+P12_101_301,P12,P12_101,00:17:33.141,00:17:31.82,00:17:32.73,52591,52636,pick up stock container,pick-up,0,container:stock,21,['container:stock'],[21]
+P12_101_302,P12,P12_101,00:17:33.623,00:17:33.61,00:17:39.26,52680,52963,open stock container,open,3,container:stock,21,['container:stock'],[21]
+P12_101_303,P12,P12_101,00:17:41.388,00:17:40.49,00:17:41.54,53024,53077,pour stock into saucepan with meat,pour-into,9,stock,95,"['stock', 'saucepan', 'meat']","[95, 5, 28]"
+P12_101_304,P12,P12_101,00:17:42.162,00:17:41.69,00:17:42.53,53084,53126,put down stock container,put-down,1,container:stock,21,['container:stock'],[21]
+P12_101_305,P12,P12_101,00:17:43.340,00:17:42.57,00:17:43.53,53128,53176,pick up stock container,pick-up,0,container:stock,21,['container:stock'],[21]
+P12_101_306,P12,P12_101,00:17:45.228,00:17:43.97,00:17:49.92,53198,53496,open stock container,open,3,container:stock,21,['container:stock'],[21]
+P12_101_307,P12,P12_101,00:17:51.780,00:17:50.72,00:17:51.86,53536,53592,pour stock into saucepan with meat,pour-into,9,stock,95,"['stock', 'saucepan', 'meat']","[95, 5, 28]"
+P12_101_308,P12,P12_101,00:17:52.502,00:17:51.90,00:17:52.34,53595,53616,put down stock container,put-down,1,container:stock,21,['container:stock'],[21]
+P12_101_309,P12,P12_101,00:17:52.948,00:17:52.67,00:17:53.66,53633,53683,pick up stock container,pick-up,0,container:stock,21,['container:stock'],[21]
+P12_101_31,P12,P12_101,00:01:15.521,00:01:14.76,00:01:15.56,3738,3778,throw away trash into sink,throw-into,13,trash,54,"['trash', 'sink']","[54, 63]"
+P12_101_310,P12,P12_101,00:17:55.902,00:17:54.34,00:17:59.24,53716,53962,open stock container,open,3,container:stock,21,['container:stock'],[21]
+P12_101_311,P12,P12_101,00:18:03.106,00:18:02.33,00:18:03.68,54116,54184,put down stock container,put-down,1,container:stock,21,['container:stock'],[21]
+P12_101_312,P12,P12_101,00:18:04.841,00:18:04.37,00:18:05.71,54218,54285,pick up stock container box,pick-up,0,box:stock:container,23,['box:stock:container'],[23]
+P12_101_313,P12,P12_101,00:18:22.721,00:18:05.81,00:18:25.10,54290,55254,reading instructions from box,read,38,instruction,149,"['instruction', 'box']","[149, 23]"
+P12_101_314,P12,P12_101,00:18:25.706,00:18:25.09,00:18:26.62,55254,55330,put down stock container box onto countertop,put-down,1,box:stock:container,23,"['box:stock:container', 'countertop']","[23, 42]"
+P12_101_315,P12,P12_101,00:18:28.302,00:18:27.35,00:18:28.82,55367,55441,pick up stock container box from countertop,pick-up,0,box:stock:container,23,"['box:stock:container', 'countertop']","[23, 42]"
+P12_101_316,P12,P12_101,00:18:42.880,00:18:41.64,00:18:43.11,56082,56155,pick up water boiler,pick-up,0,boiler:water,44,['boiler:water'],[44]
+P12_101_317,P12,P12_101,00:18:44.065,00:18:43.19,00:18:45.36,56159,56267,pour out contents of water boiler,pour-out,9,content:water:boiler,44,['content:water:boiler'],[44]
+P12_101_318,P12,P12_101,00:18:45.241,00:18:45.22,00:18:46.52,56261,56326,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_319,P12,P12_101,00:18:46.661,00:18:46.66,00:18:53.11,56333,56655,fill water boiler with water,fill-with,26,boiler:water,44,"['boiler:water', 'water']","[44, 27]"
+P12_101_32,P12,P12_101,00:01:16.941,00:01:15.87,00:01:23.68,3793,4184,pick up trash from stove,pick-up,0,trash,54,"['trash', 'stove']","[54, 24]"
+P12_101_320,P12,P12_101,00:18:52.660,00:18:52.53,00:18:53.33,56626,56666,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_321,P12,P12_101,00:18:53.782,00:18:53.40,00:18:54.77,56670,56738,close water boiler,close,4,boiler:water,44,['boiler:water'],[44]
+P12_101_322,P12,P12_101,00:19:00.902,00:18:58.60,00:19:00.83,56929,57041,reattach water boiler,reattach,64,boiler:water,44,['boiler:water'],[44]
+P12_101_323,P12,P12_101,00:19:02.141,00:18:59.75,00:19:01.42,56987,57071,put down water boiler,put-down,1,boiler:water,44,['boiler:water'],[44]
+P12_101_324,P12,P12_101,00:19:04.268,00:19:03.00,00:19:08.54,57150,57427,stir onions in frying pan using spoon,stir-in,10,onion,16,"['onion', 'pan:frying', 'spoon']","[16, 5, 1]"
+P12_101_325,P12,P12_101,00:19:09.622,00:19:08.59,00:19:09.94,57429,57497,lift up frying pan,lift-up,33,pan:frying,5,['pan:frying'],[5]
+P12_101_326,P12,P12_101,00:19:10.780,00:19:10.04,00:19:17.31,57502,57865,pour onions from frying pan into saucepan,pour-from,9,onion,16,"['onion', 'pan:frying', 'saucepan']","[16, 5, 5]"
+P12_101_327,P12,P12_101,00:19:26.422,00:19:24.62,00:19:26.84,58230,58341,pick up onions in bowl,pick-up,0,onion,16,"['onion', 'bowl']","[16, 7]"
+P12_101_328,P12,P12_101,00:19:31.323,00:19:28.01,00:19:37.96,58400,58898,pour onions into frying pan from bowl,pour-into,9,onion,16,"['onion', 'pan:frying', 'bowl']","[16, 5, 7]"
+P12_101_329,P12,P12_101,00:19:41.004,00:19:40.01,00:19:41.54,59000,59077,pick up spoon,pick-up,0,spoon,1,['spoon'],[1]
+P12_101_33,P12,P12_101,00:01:23.821,00:01:23.56,00:01:24.53,4178,4226,put down saucepan onto stove,put-down,1,saucepan,5,"['saucepan', 'stove']","[5, 24]"
+P12_101_330,P12,P12_101,00:19:41.124,00:19:40.97,00:19:42.11,59048,59105,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_331,P12,P12_101,00:19:41.840,00:19:42.21,00:19:43.20,59110,59160,wash spoon,wash,2,spoon,1,['spoon'],[1]
+P12_101_332,P12,P12_101,00:19:53.062,00:19:52.51,00:19:53.31,59625,59665,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_333,P12,P12_101,00:19:53.540,00:19:53.65,00:19:55.66,59682,59783,pour water into mug,pour-into,9,water,27,"['water', 'mug']","[27, 13]"
+P12_101_334,P12,P12_101,00:19:55.821,00:19:55.73,00:19:56.30,59786,59815,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_335,P12,P12_101,00:19:57.345,00:19:56.87,00:19:59.37,59843,59968,pour water into frying pan,pour-into,9,water,27,"['water', 'pan:frying']","[27, 5]"
+P12_101_336,P12,P12_101,00:20:00.682,00:20:00.23,00:20:01.39,60011,60069,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_337,P12,P12_101,00:20:00.950,00:20:01.33,00:20:02.22,60066,60111,pour water into mug,pour-into,9,water,27,"['water', 'mug']","[27, 13]"
+P12_101_338,P12,P12_101,00:20:03.200,00:20:02.78,00:20:04.17,60139,60208,pour water into frying pan,pour-into,9,water,27,"['water', 'pan:frying']","[27, 5]"
+P12_101_339,P12,P12_101,00:20:05.140,00:20:04.72,00:20:05.69,60236,60284,put down mug on countertop,put-down,1,mug,13,"['mug', 'countertop']","[13, 42]"
+P12_101_34,P12,P12_101,00:01:25.180,00:01:24.90,00:01:26.27,4245,4313,throw away trash into sink,throw-into,13,trash,54,"['trash', 'sink']","[54, 63]"
+P12_101_340,P12,P12_101,00:20:08.063,00:20:07.78,00:20:08.70,60389,60435,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_341,P12,P12_101,00:20:08.464,00:20:08.50,00:20:09.19,60425,60459,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_342,P12,P12_101,00:20:10.420,00:20:09.72,00:20:13.55,60486,60677,pick up onions using hands,pick-up,0,onion,16,"['onion', 'hand']","[16, 11]"
+P12_101_343,P12,P12_101,00:20:10.871,00:20:11.59,00:20:13.28,60579,60664,pick up onions using hand from bowl,pick-up,0,onion,16,"['onion', 'hand', 'bowl']","[16, 11, 7]"
+P12_101_344,P12,P12_101,00:20:16.887,00:20:14.72,00:20:16.47,60736,60823,put down onions into frying pan,put-down,1,onion,16,"['onion', 'pan:frying']","[16, 5]"
+P12_101_345,P12,P12_101,00:20:23.001,00:20:22.08,00:20:24.48,61104,61224,pick up onions using hand from bowl,pick-up,0,onion,16,"['onion', 'hand', 'bowl']","[16, 11, 7]"
+P12_101_346,P12,P12_101,00:20:26.001,00:20:25.35,00:20:27.11,61267,61355,put down chopped onions into frying pan,put-down,1,onion:chopped,16,"['onion:chopped', 'pan:frying']","[16, 5]"
+P12_101_347,P12,P12_101,00:20:28.460,00:20:28.24,00:20:30.53,61412,61526,pick up chopped onions from bowl,pick-up,0,onion:chopped,16,"['onion:chopped', 'bowl']","[16, 7]"
+P12_101_348,P12,P12_101,00:20:32.103,00:20:31.16,00:20:33.09,61558,61654,put down chopped onions into frying pan,put-down,1,onion:chopped,16,"['onion:chopped', 'pan:frying']","[16, 5]"
+P12_101_349,P12,P12_101,00:20:35.642,00:20:35.15,00:20:43.70,61757,62185,stir onions in frying pan using spoon,stir-in,10,onion,16,"['onion', 'pan:frying', 'spoon']","[16, 5, 1]"
+P12_101_35,P12,P12_101,00:01:30.806,00:01:30.20,00:01:31.86,4510,4593,open cupboard,open,3,cupboard,3,['cupboard'],[3]
+P12_101_350,P12,P12_101,00:20:47.183,00:20:46.04,00:21:14.83,62302,63741,stir onions and meat in saucepan using spoon,stir,10,onion,16,"['onion', 'meat', 'saucepan', 'spoon']","[16, 28, 5, 1]"
+P12_101_351,P12,P12_101,00:21:20.900,00:21:17.85,00:21:22.71,63892,64135,stir meat and onions in saucepan using spoon,stir,10,meat,28,"['meat', 'onion', 'saucepan', 'spoon']","[28, 16, 5, 1]"
+P12_101_352,P12,P12_101,00:21:27.360,00:21:26.63,00:21:46.38,64331,65319,stir onions using spoon in frying pan,stir,10,onion,16,"['onion', 'spoon', 'pan:frying']","[16, 1, 5]"
+P12_101_353,P12,P12_101,00:21:54.343,00:21:48.64,00:21:55.62,65432,65781,throw away empty containers into plastic bag,throw-into,13,container:empty,21,"['container:empty', 'bag:plastic']","[21, 19]"
+P12_101_354,P12,P12_101,00:21:56.661,00:21:55.69,00:21:57.56,65784,65878,close plastic bag,close,4,bag:plastic,19,['bag:plastic'],[19]
+P12_101_355,P12,P12_101,00:21:57.761,00:21:57.66,00:21:59.11,65883,65955,put plastic bag into cupboard,put-into,5,bag:plastic,19,"['bag:plastic', 'cupboard']","[19, 3]"
+P12_101_356,P12,P12_101,00:21:59.481,00:21:59.52,00:22:01.58,65976,66079,close cupboard,close,4,cupboard,3,['cupboard'],[3]
+P12_101_357,P12,P12_101,00:22:05.221,00:22:01.96,00:22:05.88,66098,66294,pick up cheese,pick-up,0,cheese,32,['cheese'],[32]
+P12_101_358,P12,P12_101,00:22:09.301,00:22:05.95,00:22:14.69,66297,66734,open cheese bag,open,3,bag:cheese,19,['bag:cheese'],[19]
+P12_101_359,P12,P12_101,00:22:15.583,00:22:15.23,00:22:16.32,66761,66816,take out cheese,take-out,12,cheese,32,['cheese'],[32]
+P12_101_36,P12,P12_101,00:01:32.981,00:01:31.92,00:01:33.43,4596,4671,take out oil from cupboard,take-out,12,oil,31,"['oil', 'cupboard']","[31, 3]"
+P12_101_360,P12,P12_101,00:22:18.881,00:22:16.58,00:22:23.14,66829,67157,throw away plastic,throw,13,plastic,26,['plastic'],[26]
+P12_101_361,P12,P12_101,00:22:23.783,00:22:24.06,00:22:25.11,67203,67255,close cupboard,close,4,cupboard,3,['cupboard'],[3]
+P12_101_362,P12,P12_101,00:22:26.343,00:22:25.65,00:22:26.55,67282,67327,open drawer,open,3,drawer,8,['drawer'],[8]
+P12_101_363,P12,P12_101,00:22:27.703,00:22:27.07,00:22:28.26,67353,67413,open drawer,open,3,drawer,8,['drawer'],[8]
+P12_101_364,P12,P12_101,00:22:29.005,00:22:28.30,00:22:29.45,67415,67472,close drawers,close,4,drawer,8,['drawer'],[8]
+P12_101_365,P12,P12_101,00:22:29.900,00:22:29.44,00:22:30.65,67472,67532,open drawer,open,3,drawer,8,['drawer'],[8]
+P12_101_366,P12,P12_101,00:22:31.381,00:22:30.74,00:22:31.56,67537,67578,close drawer,close,4,drawer,8,['drawer'],[8]
+P12_101_367,P12,P12_101,00:22:32.722,00:22:32.39,00:22:34.38,67619,67719,open cupboard,open,3,cupboard,3,['cupboard'],[3]
+P12_101_368,P12,P12_101,00:22:37.564,00:22:35.49,00:22:36.74,67774,67837,pick up grinder,pick-up,0,grinder,50,['grinder'],[50]
+P12_101_369,P12,P12_101,00:22:39.020,00:22:38.31,00:22:39.63,67915,67981,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_37,P12,P12_101,00:01:34.101,00:01:33.50,00:01:34.70,4675,4735,close cupboard,close,4,cupboard,3,['cupboard'],[3]
+P12_101_370,P12,P12_101,00:22:39.168,00:22:38.91,00:22:40.79,67945,68039,wash grinder,wash,2,grinder,50,['grinder'],[50]
+P12_101_371,P12,P12_101,00:22:41.920,00:22:41.09,00:22:42.65,68054,68132,put down grinder,put-down,1,grinder,50,['grinder'],[50]
+P12_101_372,P12,P12_101,00:22:43.426,00:22:42.65,00:22:43.82,68132,68191,pick up water boiler,pick-up,0,boiler:water,44,['boiler:water'],[44]
+P12_101_373,P12,P12_101,00:22:46.120,00:22:45.52,00:22:50.51,68276,68525,pour water from water boiler into saucepan,pour-from,9,water,27,"['water', 'boiler:water', 'saucepan']","[27, 44, 5]"
+P12_101_374,P12,P12_101,00:22:51.703,00:22:50.61,00:22:52.49,68530,68624,put down water cooker,put-down,1,cooker:water,44,['cooker:water'],[44]
+P12_101_375,P12,P12_101,00:22:56.544,00:22:55.76,00:22:56.79,68788,68839,turn off water cooker,turn-off,8,cooker:water,44,['cooker:water'],[44]
+P12_101_376,P12,P12_101,00:22:58.321,00:22:56.51,00:23:14.54,68825,69727,stir meat and onions using spoon in saucepan,stir,10,meat,28,"['meat', 'onion', 'spoon', 'saucepan']","[28, 16, 1, 5]"
+P12_101_377,P12,P12_101,00:23:16.062,00:23:14.61,00:23:16.74,69730,69837,pick up frying pan with onions,pick-up,0,pan:frying,5,"['pan:frying', 'onion']","[5, 16]"
+P12_101_378,P12,P12_101,00:23:18.582,00:23:16.84,00:23:23.86,69842,70193,pour onions into saucepan,pour-into,9,onion,16,"['onion', 'saucepan']","[16, 5]"
+P12_101_379,P12,P12_101,00:23:26.921,00:23:23.73,00:23:49.23,70186,71461,stir onions and meat in saucepan using spoon,stir,10,onion,16,"['onion', 'meat', 'saucepan', 'spoon']","[16, 28, 5, 1]"
+P12_101_38,P12,P12_101,00:01:35.102,00:01:34.64,00:01:36.69,4732,4834,open cupboard,open,3,cupboard,3,['cupboard'],[3]
+P12_101_380,P12,P12_101,00:23:52.083,00:23:49.10,00:24:12.40,71455,72620,grind cheese using grinder,grind,49,cheese,32,"['cheese', 'grinder']","[32, 50]"
+P12_101_381,P12,P12_101,00:24:20.003,00:24:12.65,00:24:29.67,72632,73483,grind cheese using grinder,grind,49,cheese,32,"['cheese', 'grinder']","[32, 50]"
+P12_101_382,P12,P12_101,00:24:53.061,00:24:52.33,00:24:53.35,74616,74667,eat cheese,eat,35,cheese,32,['cheese'],[32]
+P12_101_383,P12,P12_101,00:25:01.221,00:25:00.49,00:25:01.63,75024,75081,eat cheese,eat,35,cheese,32,['cheese'],[32]
+P12_101_384,P12,P12_101,00:25:02.700,00:25:02.32,00:25:03.12,75116,75156,eat cheese,eat,35,cheese,32,['cheese'],[32]
+P12_101_385,P12,P12_101,00:25:08.983,00:25:05.97,00:25:14.68,75298,75734,pick out cheese from cheese grinder,pick-out,12,cheese,32,"['cheese', 'grinder:cheese']","[32, 96]"
+P12_101_386,P12,P12_101,00:25:17.984,00:25:14.40,00:25:18.21,75720,75910,shake cheese grinder to get out cheese,shake,15,grinder:cheese,96,"['grinder:cheese', 'cheese']","[96, 32]"
+P12_101_387,P12,P12_101,00:25:21.622,00:25:21.23,00:25:22.50,76061,76125,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_388,P12,P12_101,00:25:22.423,00:25:22.40,00:25:24.63,76120,76231,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_389,P12,P12_101,00:25:24.780,00:25:24.76,00:25:25.63,76238,76281,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_39,P12,P12_101,00:01:36.330,00:01:35.27,00:01:36.60,4763,4830,put down oil onto countertop,put-down,1,oil,31,"['oil', 'countertop']","[31, 42]"
+P12_101_390,P12,P12_101,00:25:27.204,00:25:26.83,00:25:28.03,76341,76401,open drawer,open,3,drawer,8,['drawer'],[8]
+P12_101_391,P12,P12_101,00:25:30.741,00:25:30.45,00:25:31.70,76522,76585,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_392,P12,P12_101,00:25:31.090,00:25:31.12,00:25:31.96,76556,76598,wash spoon,wash,2,spoon,1,['spoon'],[1]
+P12_101_393,P12,P12_101,00:25:32.041,00:25:32.05,00:25:32.72,76602,76636,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_394,P12,P12_101,00:25:36.981,00:25:33.37,00:25:36.98,76668,76849,pick up soup with spoon,pick-up,0,soup,126,"['soup', 'spoon']","[126, 1]"
+P12_101_395,P12,P12_101,00:25:37.866,00:25:36.97,00:25:40.04,76848,77002,taste soup,taste,35,soup,126,['soup'],[126]
+P12_101_396,P12,P12_101,00:25:42.040,00:25:39.31,00:25:42.20,76965,77110,put down spoon on cutting board,put-down,1,spoon,1,"['spoon', 'board:cutting']","[1, 18]"
+P12_101_397,P12,P12_101,00:25:44.361,00:25:43.48,00:25:54.22,77174,77711,stir soup using spoon,stir,10,soup,126,"['soup', 'spoon']","[126, 1]"
+P12_101_398,P12,P12_101,00:25:56.407,00:25:55.05,00:26:00.34,77752,78017,pour onions into soup,pour-into,9,onion,16,"['onion', 'soup']","[16, 126]"
+P12_101_399,P12,P12_101,00:26:07.781,00:26:05.53,00:26:12.74,78276,78637,scrape up remaining onions from frying pan into saucepan with soup,scrape-up,25,onion:remaining,16,"['onion:remaining', 'pan:frying', 'saucepan', 'soup']","[16, 5, 5, 126]"
+P12_101_4,P12,P12_101,00:00:10.785,00:00:09.61,00:00:11.98,480,599,move cutting board,move,11,board:cutting,18,['board:cutting'],[18]
+P12_101_40,P12,P12_101,00:01:39.221,00:01:36.64,00:01:39.48,4832,4973,take out salt from cupboard,take-out,12,salt,38,"['salt', 'cupboard']","[38, 3]"
+P12_101_400,P12,P12_101,00:26:15.421,00:26:14.77,00:26:15.67,78738,78783,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_401,P12,P12_101,00:26:16.102,00:26:15.91,00:26:21.19,78795,79059,wash frying pan,wash,2,pan:frying,5,['pan:frying'],[5]
+P12_101_402,P12,P12_101,00:26:25.560,00:26:24.95,00:26:26.26,79247,79313,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_403,P12,P12_101,00:26:27.383,00:26:26.26,00:26:28.28,79313,79414,return frying pan onto stove,return,1,pan:frying,5,"['pan:frying', 'stove']","[5, 24]"
+P12_101_404,P12,P12_101,00:26:29.602,00:26:28.29,00:26:37.74,79414,79887,stir soup in saucepan using spoon,stir-in,10,soup,126,"['soup', 'saucepan', 'spoon']","[126, 5, 1]"
+P12_101_405,P12,P12_101,00:26:38.742,00:26:38.12,00:26:39.26,79906,79963,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_406,P12,P12_101,00:26:39.222,00:26:39.34,00:26:40.13,79967,80006,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_407,P12,P12_101,00:26:41.804,00:26:41.30,00:26:42.49,80065,80124,pick up cheese with hand,pick-up,0,cheese,32,"['cheese', 'hand']","[32, 11]"
+P12_101_408,P12,P12_101,00:26:44.200,00:26:42.70,00:26:46.73,80135,80336,pour grated cheese into saucepan with soup,pour-into,9,cheese:grated,32,"['cheese:grated', 'saucepan', 'soup']","[32, 5, 126]"
+P12_101_409,P12,P12_101,00:26:48.545,00:26:46.83,00:26:49.21,80341,80460,pick up grated cheese with hands,pick-up,0,cheese:grated,32,"['cheese:grated', 'hand']","[32, 11]"
+P12_101_41,P12,P12_101,00:01:39.862,00:01:39.46,00:01:40.80,4973,5040,put down salt onto countertop,put-down,1,salt,38,"['salt', 'countertop']","[38, 42]"
+P12_101_410,P12,P12_101,00:26:49.743,00:26:49.08,00:26:53.03,80454,80651,pour grated cheese into saucepan with soup,pour-into,9,cheese:grated,32,"['cheese:grated', 'saucepan', 'soup']","[32, 5, 126]"
+P12_101_411,P12,P12_101,00:26:55.142,00:26:53.55,00:26:56.20,80677,80810,pick up grated cheese from cutting board using hands,pick-up,0,cheese:grated,32,"['cheese:grated', 'board:cutting', 'hand']","[32, 18, 11]"
+P12_101_412,P12,P12_101,00:26:56.642,00:26:55.24,00:26:57.08,80762,80854,pour down cheese into saucepan with soup,pour-down,9,cheese,32,"['cheese', 'saucepan', 'soup']","[32, 5, 126]"
+P12_101_413,P12,P12_101,00:26:57.921,00:26:57.67,00:26:58.35,80883,80917,eat cheese,eat,35,cheese,32,['cheese'],[32]
+P12_101_414,P12,P12_101,00:27:02.201,00:26:58.71,00:27:03.40,80935,81170,scrape up cheese using hands,scrape-up,25,cheese,32,"['cheese', 'hand']","[32, 11]"
+P12_101_415,P12,P12_101,00:27:03.572,00:27:03.45,00:27:04.42,81172,81221,put cheese into saucepan with soup,put-into,5,cheese,32,"['cheese', 'saucepan', 'soup']","[32, 5, 126]"
+P12_101_416,P12,P12_101,00:27:10.380,00:27:10.02,00:27:10.54,81501,81527,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_417,P12,P12_101,00:27:11.162,00:27:10.74,00:27:12.53,81537,81626,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_418,P12,P12_101,00:27:16.263,00:27:15.26,00:27:16.84,81763,81842,pick up cream cheese,pick-up,0,cheese:cream,32,['cheese:cream'],[32]
+P12_101_419,P12,P12_101,00:27:17.283,00:27:17.44,00:27:17.95,81872,81897,put down cream cheese onto countertop,put-down,1,cheese:cream,32,"['cheese:cream', 'countertop']","[32, 42]"
+P12_101_42,P12,P12_101,00:01:46.322,00:01:45.06,00:01:46.02,5253,5301,take out tea from cupboard,take-out,12,tea,132,"['tea', 'cupboard']","[132, 3]"
+P12_101_420,P12,P12_101,00:27:18.883,00:27:18.19,00:27:19.63,81909,81981,pick up mozzarella,pick-up,0,mozzarella,32,['mozzarella'],[32]
+P12_101_421,P12,P12_101,00:27:21.868,00:27:21.89,00:27:26.87,82094,82343,open mozzarella bag,open,3,bag:mozzarella,19,['bag:mozzarella'],[19]
+P12_101_422,P12,P12_101,00:27:23.561,00:27:21.26,00:27:24.10,82063,82205,open mozzarella bag using knife,open,3,bag:mozzarella,19,"['bag:mozzarella', 'knife']","[19, 4]"
+P12_101_423,P12,P12_101,00:27:26.161,00:27:25.60,00:27:26.63,82280,82331,take out mozzarella from mozzarella bag,take-out,12,mozzarella,32,"['mozzarella', 'bag:mozzarella']","[32, 19]"
+P12_101_424,P12,P12_101,00:27:27.442,00:27:26.51,00:27:28.49,82325,82424,put mozzarella and knife onto cutting board,put-onto,1,mozzarella,32,"['mozzarella', 'knife', 'board:cutting']","[32, 4, 18]"
+P12_101_425,P12,P12_101,00:27:29.281,00:27:28.84,00:27:29.96,82442,82498,pick up mozzarella bag,pick-up,0,bag:mozzarella,19,['bag:mozzarella'],[19]
+P12_101_426,P12,P12_101,00:27:30.808,00:27:29.52,00:27:31.65,82476,82582,pick up knife,pick-up,0,knife,4,['knife'],[4]
+P12_101_427,P12,P12_101,00:27:33.283,00:27:31.71,00:27:35.49,82585,82774,open mozzarella bag with knife,open-with,3,bag:mozzarella,19,"['bag:mozzarella', 'knife']","[19, 4]"
+P12_101_428,P12,P12_101,00:27:36.524,00:27:35.28,00:27:36.84,82764,82842,take out mozzarella from mozzarella bag,take-out,12,mozzarella,32,"['mozzarella', 'bag:mozzarella']","[32, 19]"
+P12_101_429,P12,P12_101,00:27:38.541,00:27:36.83,00:27:39.06,82841,82953,put down mozzarella onto cutting board,put-down,1,mozzarella,32,"['mozzarella', 'board:cutting']","[32, 18]"
+P12_101_43,P12,P12_101,00:01:46.922,00:01:46.05,00:01:47.52,5302,5376,put down tea on countertop,put-down,1,tea,132,"['tea', 'countertop']","[132, 42]"
+P12_101_430,P12,P12_101,00:27:39.060,00:27:38.75,00:27:40.34,82937,83017,pick up mozzarella from cutting board,pick-up,0,mozzarella,32,"['mozzarella', 'board:cutting']","[32, 18]"
+P12_101_431,P12,P12_101,00:27:39.767,00:27:40.23,00:27:48.93,83011,83446,cut mozzarella with knife on cutting board,cut-with,7,mozzarella,32,"['mozzarella', 'knife', 'board:cutting']","[32, 4, 18]"
+P12_101_432,P12,P12_101,00:27:41.260,00:27:40.84,00:27:41.59,83042,83079,throw away plastic bag from cutting board,throw-from,13,bag:plastic,19,"['bag:plastic', 'board:cutting']","[19, 18]"
+P12_101_433,P12,P12_101,00:27:42.803,00:27:42.19,00:27:50.42,83109,83521,cut mozzarella with knife on cutting board,cut-with,7,mozzarella,32,"['mozzarella', 'knife', 'board:cutting']","[32, 4, 18]"
+P12_101_434,P12,P12_101,00:27:51.483,00:27:50.52,00:27:52.15,83526,83607,eat mozzarella,eat,35,mozzarella,32,['mozzarella'],[32]
+P12_101_435,P12,P12_101,00:27:54.881,00:27:52.25,00:28:03.85,83612,84192,cut mozzarella with knife on cutting board,cut-with,7,mozzarella,32,"['mozzarella', 'knife', 'board:cutting']","[32, 4, 18]"
+P12_101_436,P12,P12_101,00:28:04.726,00:28:04.45,00:28:05.15,84222,84257,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_437,P12,P12_101,00:28:05.260,00:28:05.24,00:28:06.28,84262,84314,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_438,P12,P12_101,00:28:09.403,00:28:08.59,00:28:09.61,84429,84480,pick up cream cheese,pick-up,0,cheese:cream,32,['cheese:cream'],[32]
+P12_101_439,P12,P12_101,00:28:10.601,00:28:10.05,00:28:15.30,84502,84765,open cream cheese packaging,open,3,packaging:cream:cheese,26,['packaging:cream:cheese'],[26]
+P12_101_44,P12,P12_101,00:01:49.240,00:01:47.41,00:01:50.59,5370,5529,take out tea from cupboard,take-out,12,tea,132,"['tea', 'cupboard']","[132, 3]"
+P12_101_440,P12,P12_101,00:28:17.723,00:28:17.64,00:28:18.14,84882,84907,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_441,P12,P12_101,00:28:18.220,00:28:18.24,00:28:18.99,84912,84949,wash spoon,wash,2,spoon,1,['spoon'],[1]
+P12_101_442,P12,P12_101,00:28:21.161,00:28:21.21,00:28:23.46,85060,85173,scoop out cream cheese from box into saucepan with soup,scoop-out,16,cheese:cream,32,"['cheese:cream', 'box', 'saucepan', 'soup']","[32, 23, 5, 126]"
+P12_101_443,P12,P12_101,00:28:37.782,00:28:37.06,00:28:39.00,85853,85950,pick up cream cheese container,pick-up,0,container:cream:cheese,21,['container:cream:cheese'],[21]
+P12_101_444,P12,P12_101,00:28:39.223,00:28:38.96,00:28:43.42,85948,86171,open cream cheese container,open,3,container:cream:cheese,21,['container:cream:cheese'],[21]
+P12_101_445,P12,P12_101,00:28:45.543,00:28:45.17,00:28:45.70,86258,86285,pick up spoon,pick-up,0,spoon,1,['spoon'],[1]
+P12_101_446,P12,P12_101,00:28:46.162,00:28:45.80,00:28:53.79,86290,86689,scoop out cream cheese from cream cheese container into saucepan with soup,scoop-out,16,container:cream:cheese,21,"['container:cream:cheese', 'saucepan', 'soup']","[21, 5, 126]"
+P12_101_447,P12,P12_101,00:28:54.562,00:28:53.89,00:28:55.01,86694,86750,throw away cream cheese container,throw,13,container:cream:cheese,21,['container:cream:cheese'],[21]
+P12_101_448,P12,P12_101,00:28:57.063,00:28:54.80,00:28:59.34,86740,86967,stir soup using spoon,stir,10,soup,126,"['soup', 'spoon']","[126, 1]"
+P12_101_449,P12,P12_101,00:28:59.862,00:28:59.34,00:29:00.26,86967,87013,put down spoon onto cutting board,put-down,1,spoon,1,"['spoon', 'board:cutting']","[1, 18]"
+P12_101_45,P12,P12_101,00:01:50.823,00:01:49.70,00:01:51.32,5485,5566,put down tea on countertop,put-down,1,tea,132,"['tea', 'countertop']","[132, 42]"
+P12_101_450,P12,P12_101,00:29:00.642,00:29:00.19,00:30:03.00,87009,90150,stir soup using spoon,stir,10,soup,126,"['soup', 'spoon']","[126, 1]"
+P12_101_451,P12,P12_101,00:30:04.322,00:30:03.71,00:30:04.51,90185,90225,pick up mozzarella from cutting board,pick-up,0,mozzarella,32,"['mozzarella', 'board:cutting']","[32, 18]"
+P12_101_452,P12,P12_101,00:30:06.203,00:30:04.66,00:30:09.92,90233,90496,put down mozzarella slices into soup in saucepan,put-down,1,slice:mozzarella,32,"['slice:mozzarella', 'soup', 'saucepan']","[32, 126, 5]"
+P12_101_453,P12,P12_101,00:30:10.082,00:30:09.58,00:30:10.87,90479,90543,eat mozzarella,eat,35,mozzarella,32,['mozzarella'],[32]
+P12_101_454,P12,P12_101,00:30:12.421,00:30:11.16,00:30:11.73,90558,90586,put down mozzarella slices into soup in saucepan,put-down,1,slice:mozzarella,32,"['slice:mozzarella', 'soup', 'saucepan']","[32, 126, 5]"
+P12_101_455,P12,P12_101,00:30:16.502,00:30:12.20,00:30:25.40,90610,91270,stir sauce soup with spoon,stir-with,10,soup:sauce,126,"['soup:sauce', 'spoon']","[126, 1]"
+P12_101_456,P12,P12_101,00:30:27.128,00:30:26.38,00:30:27.66,91319,91383,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_457,P12,P12_101,00:30:28.141,00:30:27.74,00:30:28.26,91387,91413,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_458,P12,P12_101,00:30:28.880,00:30:28.29,00:30:29.82,91414,91491,pick up spoon from cutting board,pick-up,0,spoon,1,"['spoon', 'board:cutting']","[1, 18]"
+P12_101_459,P12,P12_101,00:30:29.782,00:30:28.88,00:30:29.64,91444,91482,pick up spoon,pick-up,0,spoon,1,['spoon'],[1]
+P12_101_46,P12,P12_101,00:02:06.081,00:01:52.21,00:02:14.59,5610,6729,take out spices from cupboard,take-out,12,spice,85,"['spice', 'cupboard']","[85, 3]"
+P12_101_460,P12,P12_101,00:30:31.561,00:30:30.99,00:30:37.27,91549,91863,wash spoon,wash,2,spoon,1,['spoon'],[1]
+P12_101_461,P12,P12_101,00:30:37.365,00:30:37.37,00:30:38.52,91868,91926,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_462,P12,P12_101,00:30:42.500,00:30:42.11,00:30:44.96,92105,92248,taste soup using spoon,taste,35,soup,126,"['soup', 'spoon']","[126, 1]"
+P12_101_463,P12,P12_101,00:30:50.540,00:30:49.90,00:31:06.81,92495,93340,stir soup using spoon,stir,10,soup,126,"['soup', 'spoon']","[126, 1]"
+P12_101_464,P12,P12_101,00:31:08.121,00:31:07.52,00:31:08.16,93376,93408,pick up spice container,pick-up,0,container:spice,21,['container:spice'],[21]
+P12_101_465,P12,P12_101,00:31:08.922,00:31:08.40,00:31:09.07,93420,93453,open spice container,open,3,container:spice,21,['container:spice'],[21]
+P12_101_466,P12,P12_101,00:31:10.122,00:31:10.06,00:31:15.03,93503,93751,pour out spice into saucepan with soup,pour-out,9,spice,85,"['spice', 'saucepan', 'soup']","[85, 5, 126]"
+P12_101_467,P12,P12_101,00:31:20.183,00:31:18.69,00:31:30.13,93934,94506,stir soup using spoon,stir,10,soup,126,"['soup', 'spoon']","[126, 1]"
+P12_101_468,P12,P12_101,00:31:30.980,00:31:30.53,00:31:31.45,94526,94572,pick up salt container,pick-up,0,container:salt,21,['container:salt'],[21]
+P12_101_469,P12,P12_101,00:31:32.180,00:31:31.27,00:31:32.47,94563,94623,open salt container,open,3,container:salt,21,['container:salt'],[21]
+P12_101_47,P12,P12_101,00:02:14.483,00:02:14.35,00:02:15.41,6717,6770,take out spice from cupboard,take-out,12,spice,85,"['spice', 'cupboard']","[85, 3]"
+P12_101_470,P12,P12_101,00:31:33.922,00:31:32.78,00:31:35.60,94639,94780,pour out salt from salt container into saucepan with soup,pour-out,9,salt,38,"['salt', 'container:salt', 'saucepan', 'soup']","[38, 21, 5, 126]"
+P12_101_471,P12,P12_101,00:31:36.855,00:31:36.70,00:31:37.19,94835,94859,put down salt container,put-down,1,container:salt,21,['container:salt'],[21]
+P12_101_472,P12,P12_101,00:31:38.100,00:31:36.82,00:32:01.87,94841,96093,stir soup using spoon,stir,10,soup,126,"['soup', 'spoon']","[126, 1]"
+P12_101_473,P12,P12_101,00:31:39.146,00:32:01.42,00:32:07.81,96071,96390,stir soup using spoon,stir,10,soup,126,"['soup', 'spoon']","[126, 1]"
+P12_101_474,P12,P12_101,00:32:08.460,00:32:08.09,00:32:09.14,96404,96457,pick up spoon from cutting board,pick-up,0,spoon,1,"['spoon', 'board:cutting']","[1, 18]"
+P12_101_475,P12,P12_101,00:32:09.441,00:32:09.09,00:32:10.20,96454,96510,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_476,P12,P12_101,00:32:10.220,00:32:10.38,00:32:11.63,96519,96581,wash spoon,wash,2,spoon,1,['spoon'],[1]
+P12_101_477,P12,P12_101,00:32:13.543,00:32:14.76,00:32:17.33,96738,96866,taste soup using spoon,taste,35,soup,126,"['soup', 'spoon']","[126, 1]"
+P12_101_478,P12,P12_101,00:32:38.841,00:32:16.65,00:32:21.34,96832,97067,put down spoon onto cutting board,put-down,1,spoon,1,"['spoon', 'board:cutting']","[1, 18]"
+P12_101_479,P12,P12_101,00:32:39.067,00:32:39.30,00:32:40.26,97965,98013,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_48,P12,P12_101,00:02:17.723,00:02:15.61,00:02:18.09,6780,6904,put in tea into cupboard,put-in,5,tea,132,"['tea', 'cupboard']","[132, 3]"
+P12_101_480,P12,P12_101,00:32:40.225,00:32:40.29,00:32:41.56,98014,98078,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_481,P12,P12_101,00:32:41.001,00:32:41.61,00:32:43.04,98080,98152,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_482,P12,P12_101,00:32:44.541,00:32:43.58,00:32:44.30,98179,98215,pick up saucepan lid,pick-up,0,lid:saucepan,6,['lid:saucepan'],[6]
+P12_101_483,P12,P12_101,00:32:44.895,00:32:44.99,00:32:45.90,98249,98295,put saucepan lid onto saucepan,put-onto,1,lid:saucepan,6,"['lid:saucepan', 'saucepan']","[6, 5]"
+P12_101_484,P12,P12_101,00:32:47.122,00:32:46.64,00:32:52.59,98332,98629,adjust heat on stove,adjust-on,17,heat,65,"['heat', 'stove']","[65, 24]"
+P12_101_485,P12,P12_101,00:32:56.886,00:32:56.67,00:32:57.39,98833,98869,pick up frying pan from stove,pick-up,0,pan:frying,5,"['pan:frying', 'stove']","[5, 24]"
+P12_101_486,P12,P12_101,00:32:58.041,00:32:57.76,00:32:58.29,98888,98914,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_487,P12,P12_101,00:32:59.221,00:32:58.19,00:33:03.52,98909,99176,wash frying pan,wash,2,pan:frying,5,['pan:frying'],[5]
+P12_101_488,P12,P12_101,00:33:03.902,00:33:03.99,00:33:04.24,99199,99212,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_489,P12,P12_101,00:33:06.281,00:33:04.50,00:33:09.85,99225,99492,scrape off remaining bits from frying pan,scrape-off,25,pan:frying,5,['pan:frying'],[5]
+P12_101_49,P12,P12_101,00:02:19.321,00:02:18.94,00:02:19.94,6947,6997,pick up tea from countertop,pick-up,0,tea,132,"['tea', 'countertop']","[132, 42]"
+P12_101_490,P12,P12_101,00:33:10.604,00:33:10.30,00:33:11.53,99515,99576,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_491,P12,P12_101,00:33:12.981,00:33:12.79,00:33:13.79,99639,99689,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_492,P12,P12_101,00:33:15.146,00:33:15.02,00:33:16.07,99751,99803,put back frying pan onto stove,put-back,1,pan:frying,5,"['pan:frying', 'stove']","[5, 24]"
+P12_101_493,P12,P12_101,00:33:21.162,00:33:20.29,00:33:21.08,100014,100054,pick up paper roll,pick-up,0,roll:paper,93,['roll:paper'],[93]
+P12_101_494,P12,P12_101,00:33:22.465,00:33:21.64,00:33:22.59,100082,100129,take paper from paper roll,take-from,0,paper,49,"['paper', 'roll:paper']","[49, 93]"
+P12_101_495,P12,P12_101,00:33:27.884,00:33:25.48,00:33:29.76,100274,100488,clean up using paper,clean-up,2,paper,49,['paper'],[49]
+P12_101_496,P12,P12_101,00:33:32.342,00:33:30.12,00:33:42.15,100506,101107,clean up floor using paper,clean-up,2,floor,159,"['floor', 'paper']","[159, 49]"
+P12_101_497,P12,P12_101,00:33:45.804,00:33:44.84,00:33:46.91,101242,101345,take paper from paper roll,take-from,0,paper,49,"['paper', 'roll:paper']","[49, 93]"
+P12_101_498,P12,P12_101,00:33:48.940,00:33:48.33,00:33:49.28,101416,101464,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_5,P12,P12_101,00:00:12.801,00:00:12.05,00:00:12.71,602,635,pick up trash,pick-up,0,trash,54,['trash'],[54]
+P12_101_50,P12,P12_101,00:02:20.161,00:02:19.31,00:02:21.52,6965,7076,put in tea into cupboard,put-in,5,tea,132,"['tea', 'cupboard']","[132, 3]"
+P12_101_500,P12,P12_101,00:33:49.816,00:33:50.23,00:33:50.98,101511,101549,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_501,P12,P12_101,00:33:51.382,00:33:51.08,00:33:57.10,101554,101855,clean surfaces using paper,clean,2,surface,42,"['surface', 'paper']","[42, 49]"
+P12_101_51,P12,P12_101,00:02:22.121,00:02:21.63,00:02:22.45,7081,7122,pick up tea,pick-up,0,tea,132,['tea'],[132]
+P12_101_52,P12,P12_101,00:02:22.122,00:02:22.20,00:02:23.11,7109,7155,put tea into cupboard,put-into,5,tea,132,"['tea', 'cupboard']","[132, 3]"
+P12_101_53,P12,P12_101,00:02:28.781,00:02:27.54,00:02:29.95,7377,7497,start fan,start,6,fan,179,['fan'],[179]
+P12_101_54,P12,P12_101,00:02:34.602,00:02:31.61,00:02:39.52,7580,7976,adjust heat on stove,adjust-on,17,heat,65,"['heat', 'stove']","[65, 24]"
+P12_101_55,P12,P12_101,00:02:40.463,00:02:39.37,00:02:40.95,7968,8047,put down saucepan onto stove,put-down,1,saucepan,5,"['saucepan', 'stove']","[5, 24]"
+P12_101_56,P12,P12_101,00:02:42.261,00:02:40.84,00:02:42.00,8042,8100,pick up oil from countertop,pick-up,0,oil,31,"['oil', 'countertop']","[31, 42]"
+P12_101_57,P12,P12_101,00:02:45.741,00:02:42.48,00:02:50.49,8123,8524,open oil flask,open,3,flask:oil,15,['flask:oil'],[15]
+P12_101_58,P12,P12_101,00:02:51.521,00:02:50.25,00:02:53.78,8512,8689,pour oil into saucepan,pour-into,9,oil,31,"['oil', 'saucepan']","[31, 5]"
+P12_101_59,P12,P12_101,00:02:55.802,00:02:55.32,00:02:56.40,8766,8820,put down oil onto countertop,put-down,1,oil,31,"['oil', 'countertop']","[31, 42]"
+P12_101_6,P12,P12_101,00:00:13.222,00:00:12.72,00:00:13.55,636,677,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_60,P12,P12_101,00:02:59.724,00:02:58.50,00:02:59.64,8925,8982,pick up fork,pick-up,0,fork,14,['fork'],[14]
+P12_101_61,P12,P12_101,00:03:00.820,00:02:59.85,00:03:01.72,8992,9086,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_62,P12,P12_101,00:03:00.909,00:03:00.70,00:03:01.35,9035,9067,wash fork,wash,2,fork,14,['fork'],[14]
+P12_101_63,P12,P12_101,00:03:02.668,00:03:02.00,00:03:03.05,9100,9152,pick up knife,pick-up,0,knife,4,['knife'],[4]
+P12_101_64,P12,P12_101,00:03:03.782,00:03:02.71,00:03:03.53,9135,9176,put down fork,put-down,1,fork,14,['fork'],[14]
+P12_101_65,P12,P12_101,00:03:03.911,00:03:03.80,00:03:04.35,9190,9217,open tap,turn-on,6,tap,0,['tap'],[0]
+P12_101_66,P12,P12_101,00:03:04.146,00:03:04.51,00:03:05.00,9225,9250,wash fork,wash,2,fork,14,['fork'],[14]
+P12_101_67,P12,P12_101,00:03:04.941,00:03:04.06,00:03:04.85,9203,9242,wash knife,wash,2,knife,4,['knife'],[4]
+P12_101_68,P12,P12_101,00:03:05.941,00:03:05.25,00:03:07.00,9262,9350,open meat box using knife,open,3,box:meat,23,"['box:meat', 'knife']","[23, 4]"
+P12_101_69,P12,P12_101,00:03:12.382,00:03:06.92,00:03:07.95,9346,9397,move meat boxes on countertop,move-on,11,box:meat,23,"['box:meat', 'countertop']","[23, 42]"
+P12_101_7,P12,P12_101,00:00:14.201,00:00:13.42,00:00:15.72,671,786,wash hands,wash,2,hand,11,['hand'],[11]
+P12_101_70,P12,P12_101,00:03:13.424,00:03:12.31,00:03:14.85,9615,9742,put down meat,put-down,1,meat,28,['meat'],[28]
+P12_101_71,P12,P12_101,00:03:15.181,00:03:12.66,00:03:16.35,9633,9817,take out meat from box,take-out,12,meat,28,"['meat', 'box']","[28, 23]"
+P12_101_72,P12,P12_101,00:03:16.623,00:03:16.00,00:03:17.00,9800,9850,put down meat on cutting board,put-down,1,meat,28,"['meat', 'board:cutting']","[28, 18]"
+P12_101_73,P12,P12_101,00:03:19.040,00:03:17.59,00:03:19.04,9879,9952,pick up meat box,pick-up,0,box:meat,23,['box:meat'],[23]
+P12_101_74,P12,P12_101,00:03:21.281,00:03:19.40,00:03:22.15,9970,10107,open meat box,open,3,box:meat,23,['box:meat'],[23]
+P12_101_75,P12,P12_101,00:03:23.084,00:03:22.17,00:03:23.97,10108,10198,take out meat from box,take-out,12,meat,28,"['meat', 'box']","[28, 23]"
+P12_101_76,P12,P12_101,00:03:24.243,00:03:24.02,00:03:25.14,10201,10257,put down meat onto cutting board,put-down,1,meat,28,"['meat', 'board:cutting']","[28, 18]"
+P12_101_77,P12,P12_101,00:03:26.782,00:03:25.62,00:03:26.72,10281,10336,put down box,put-down,1,box,23,['box'],[23]
+P12_101_78,P12,P12_101,00:03:26.810,00:03:26.72,00:03:27.78,10336,10389,pick up meat box from countertop,pick-up,0,box:meat,23,"['box:meat', 'countertop']","[23, 42]"
+P12_101_79,P12,P12_101,00:03:28.224,00:03:27.86,00:03:28.71,10393,10435,open meat box using knife,open,3,box:meat,23,"['box:meat', 'knife']","[23, 4]"
+P12_101_8,P12,P12_101,00:00:16.022,00:00:15.82,00:00:16.48,791,824,close tap,turn-off,8,tap,0,['tap'],[0]
+P12_101_80,P12,P12_101,00:03:30.423,00:03:29.78,00:03:31.60,10489,10580,take out meat from box,take-out,12,meat,28,"['meat', 'box']","[28, 23]"
+P12_101_81,P12,P12_101,00:03:32.000,00:03:31.72,00:03:32.75,10586,10637,put down meat onto cutting board,put-down,1,meat,28,"['meat', 'board:cutting']","[28, 18]"
+P12_101_82,P12,P12_101,00:03:33.687,00:03:33.00,00:03:34.00,10650,10700,put down box onto countertop,put-down,1,box,23,"['box', 'countertop']","[23, 42]"
+P12_101_83,P12,P12_101,00:03:35.264,00:03:34.31,00:03:35.76,10715,10788,pick up meat box from countertop,pick-up,0,box:meat,23,"['box:meat', 'countertop']","[23, 42]"
+P12_101_84,P12,P12_101,00:03:37.102,00:03:35.50,00:03:37.87,10775,10893,open meat box using knife,open,3,box:meat,23,"['box:meat', 'knife']","[23, 4]"
+P12_101_85,P12,P12_101,00:03:39.128,00:03:38.99,00:03:40.03,10949,11001,open meat box,open,3,box:meat,23,['box:meat'],[23]
+P12_101_86,P12,P12_101,00:03:40.582,00:03:40.00,00:03:41.17,11000,11058,move knives from cutting board,move-from,11,knife,4,"['knife', 'board:cutting']","[4, 18]"
+P12_101_87,P12,P12_101,00:03:42.305,00:03:40.93,00:03:46.37,11046,11318,pour down meat onto cutting board,pour-down,9,meat,28,"['meat', 'board:cutting']","[28, 18]"
+P12_101_88,P12,P12_101,00:03:49.068,00:03:47.75,00:03:49.29,11387,11464,put down knife onto cutting board,put-down,1,knife,4,"['knife', 'board:cutting']","[4, 18]"
+P12_101_89,P12,P12_101,00:03:51.844,00:03:50.45,00:03:51.95,11522,11597,put down meat box onto countertop,put-down,1,box:meat,23,"['box:meat', 'countertop']","[23, 42]"
+P12_101_9,P12,P12_101,00:00:17.981,00:00:17.46,00:00:18.87,873,943,open fridge,open,3,fridge,12,['fridge'],[12]
+P12_101_90,P12,P12_101,00:03:54.146,00:03:52.12,00:03:54.40,11606,11720,take boxes from countertop,take-from,0,box,23,"['box', 'countertop']","[23, 42]"
+P12_101_91,P12,P12_101,00:03:55.283,00:03:54.80,00:03:56.05,11740,11802,open cupboard,open,3,cupboard,3,['cupboard'],[3]
+P12_101_92,P12,P12_101,00:03:59.681,00:03:58.26,00:04:00.65,11913,12032,take out trash bin,take-out,12,bin:trash,36,['bin:trash'],[36]
+P12_101_93,P12,P12_101,00:04:02.423,00:04:01.23,00:04:02.11,12061,12105,take plastic bag from cupboard,take-from,0,bag:plastic,19,"['bag:plastic', 'cupboard']","[19, 3]"
+P12_101_94,P12,P12_101,00:04:04.261,00:04:02.85,00:04:04.34,12142,12217,put boxes into plastic bag,put-into,5,box,23,"['box', 'bag:plastic']","[23, 19]"
+P12_101_95,P12,P12_101,00:04:08.854,00:04:07.83,00:04:08.99,12391,12449,pick up cloth,pick-up,0,cloth,17,['cloth'],[17]
+P12_101_96,P12,P12_101,00:04:09.482,00:04:08.22,00:04:10.45,12411,12522,wash countertop using cloth,wash,2,countertop,42,"['countertop', 'cloth']","[42, 17]"
+P12_101_97,P12,P12_101,00:04:11.422,00:04:10.69,00:04:11.18,12534,12559,put back cloth onto countertop,put-back,1,cloth,17,"['cloth', 'countertop']","[17, 42]"
+P12_101_98,P12,P12_101,00:04:13.345,00:04:12.01,00:04:13.09,12600,12654,open lid of trash bin,open,3,lid:trash:bin,6,['lid:trash:bin'],[6]
+P12_101_99,P12,P12_101,00:04:15.720,00:04:13.39,00:04:16.14,12669,12807,put trash bin into cupboard,put-into,5,bin:trash,36,"['bin:trash', 'cupboard']","[36, 3]"

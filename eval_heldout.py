@@ -6,6 +6,8 @@ scored on minutes 10-34. Same procedure for every judge, so the rows are compara
 from __future__ import annotations
 
 import csv
+import os
+from pathlib import Path
 import json
 import statistics
 import sys
@@ -14,7 +16,7 @@ from eval_activity_cues import CUES, auc
 from pulse.triggers import EdgeTrigger, StateTracker
 from run_video import ts
 
-ANN = "/cwStorage/home/jijh/pulse_data/epic/EPIC_100_train.csv"
+ANN = os.environ.get("EPIC_ANNOTATIONS", str(Path(__file__).with_name("eval_data") / "EPIC_100_P12_101.csv"))
 T0 = 600
 GRID = [0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95]
 
