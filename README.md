@@ -6,7 +6,7 @@ Type a sentence like *"tell me when the cat walks across my laptop"*. Pulse watc
 Glimmer** (open weights, one GPU, no cloud API). It thinks hard only when something looks likely, then saves the
 moment as a shareable card. Later you can ask *"where did I leave my keys?"*.
 
-- **Demo video (2:43):** `<YouTube link>`
+- **Demo video (2:43):** https://youtu.be/jfI9cVP3DxQ
 - **Submission write-up** (what it does, how Meta models are used, results, limits, what was built during the
   hackathon): [SUBMISSION.md](SUBMISSION.md)
 - **Measurements:** [docs/validation_muse_glimmer.md](docs/validation_muse_glimmer.md)

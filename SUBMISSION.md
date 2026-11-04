@@ -6,7 +6,7 @@
 **Meta Muse Glimmer** running on our own GPU, but only thinks hard when something looks likely. When the event
 happens, it saves a shareable moment, and you can ask it later "where did I leave my keys?".
 
-Demo video (2:43): `<YouTube link>` · Repository: https://github.com/Biogod2020/pulse-watchword
+Demo video (2:43): https://youtu.be/jfI9cVP3DxQ · Repository: https://github.com/Biogod2020/pulse-watchword
 
 ---
 
